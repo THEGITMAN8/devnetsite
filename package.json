@@ -1,0 +1,16 @@
+{
+  "name": "devnet-updated-site",
+  "version": "0.1.0",
+  "private": true,
+  "description": "DevNet updated marketing site, purple theme, campus chapter network",
+  "scripts": {
+    "build:css": "tailwindcss -i input.css -o tailwind-output.css --minify",
+    "build": "npm run build:css",
+    "dev": "tailwindcss -i input.css -o tailwind-output.css --watch",
+    "serve": "npx serve ."
+  },
+  "devDependencies": {
+    "tailwindcss": "^3.4.17"
+  }
+}
+
