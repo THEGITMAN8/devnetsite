@@ -226,27 +226,34 @@ const STATUS_STYLE = {
     zoomControl: true,
     attributionControl: true,
     maxBounds: MAP_MAX_BOUNDS,
-    maxBoundsViscosity: 1.0
+    maxBoundsViscosity: 1.0,
+    maxZoom: 16
   });
-  const tileAttrib =
-    '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/">CARTO</a>';
-  const tileCommon = { maxZoom: 19, minZoom: minZoomAllowed };
-  const cartoTiles = L.tileLayer(
-    'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
-    Object.assign({ attribution: tileAttrib, subdomains: 'abcd' }, tileCommon)
+  /* Esri World Dark Gray draws without an API key. Carto's raster URL returns an API-key watermark. */
+  const esriTiles = L.tileLayer(
+    'https://services.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}',
+    {
+      attribution: 'Tiles &copy; Esri, HERE, Garmin, &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, and the GIS user community',
+      maxZoom: 16,
+      minZoom: minZoomAllowed
+    }
   );
   const osmTiles = L.tileLayer(
     'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-    Object.assign({ attribution: '&copy; OpenStreetMap contributors' }, tileCommon)
+    {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+      maxZoom: 19,
+      minZoom: minZoomAllowed
+    }
   );
-  cartoTiles.addTo(map);
+  esriTiles.addTo(map);
   let tileFallbackActive = false;
-  let cartoTileErrors = 0;
-  cartoTiles.on('tileerror', function () {
-    cartoTileErrors += 1;
-    if (tileFallbackActive || cartoTileErrors < 2) return;
+  let esriTileErrors = 0;
+  esriTiles.on('tileerror', function () {
+    esriTileErrors += 1;
+    if (tileFallbackActive || esriTileErrors < 3) return;
     tileFallbackActive = true;
-    map.removeLayer(cartoTiles);
+    map.removeLayer(esriTiles);
     osmTiles.addTo(map);
     invalidateMapLayout();
   });
