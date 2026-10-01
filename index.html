@@ -3,17 +3,19 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="DevNet is a network of student-led developer chapters. Build locally with your campus, connect globally across North America." />
+  <meta name="description" content="DevNet connects student-led chapters and individual builders. DevNet London at Western University is the founding chapter." />
   <title>DevNet — Build locally. Connect globally.</title>
-  <link rel="icon" type="image/png" href="assets/favicon.png" />
-  <link rel="apple-touch-icon" href="assets/favicon.png" />
+  <link rel="icon" href="assets/favicon.ico" sizes="any" />
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png" />
   <meta property="og:type" content="website" />
   <meta property="og:title" content="DevNet — Build locally. Connect globally." />
-  <meta property="og:description" content="A network of student-led developer chapters across North America." />
+  <meta property="og:description" content="DevNet London at Western University is the founding chapter. Ship projects, meet builders, and build public proof of work." />
   <meta property="og:image" content="assets/og-image.png" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="DevNet — Build locally. Connect globally." />
-  <meta name="twitter:description" content="A network of student-led developer chapters across North America." />
+  <meta name="twitter:description" content="DevNet London at Western University is the founding chapter. Ship projects, meet builders, and build public proof of work." />
   <meta name="twitter:image" content="assets/og-image.png" />
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -32,7 +34,7 @@
   <header id="site-header" class="fixed top-0 left-0 right-0 z-50 nav-glass">
     <div class="site-header__bar mx-auto flex h-16 w-full max-w-7xl items-center gap-3 px-4 sm:px-6 lg:px-8 md:h-[4.5rem]">
       <a href="#top" class="site-header__logo flex shrink-0 items-center gap-2" aria-label="DevNet, home">
-        <span class="brand-monogram brand-monogram--header" aria-hidden="true">D<span class="brand-monogram__slash">/</span>N</span>
+        <img src="assets/logo.png" alt="" class="brand-logo brand-logo--header" width="36" height="36" />
         <span class="brand-wordmark">DevNet</span>
       </a>
 
@@ -77,14 +79,10 @@
         <div class="hero__halo hero__halo--b"></div>
       </div>
       <div class="relative z-10 mx-auto flex max-w-6xl flex-col items-center px-4 pb-24 pt-28 text-center sm:px-6 sm:pt-32 md:pb-32 md:pt-40">
-        <p class="hero__eyebrow">Developer Network · Campus chapters</p>
-        <div class="hero__monogram" aria-hidden="true">
-          <span class="hero__mono-d">D</span>
-          <span class="hero__mono-slash">/</span>
-          <span class="hero__mono-n">N</span>
-        </div>
+        <p class="hero__eyebrow">Developer Network · DevNet London</p>
+        <img src="assets/logo.png" alt="DevNet" class="hero__logo" width="512" height="512" />
         <h1 id="hero-heading" class="hero__headline">Build locally.<br /><span class="hero__headline-accent">Connect globally.</span></h1>
-        <p class="hero__sub">DevNet is a network of student-led developer chapters. Each chapter runs independently on its own campus. Together, we share a brand, a standard, and a distribution engine that turns local builds into public proof of work.</p>
+        <p class="hero__sub">DevNet is the network between student-led chapters and individual builders. DevNet London at Western University is the founding chapter. Chapters run their own events, socials, recruiting, and team. Members need no chapter, no minimums, and no posting requirements. The mission is to ship real projects, connect with other builders, and build public proof of work.</p>
         <div class="hero__ctas">
           <a data-cta="joinDevNet" href="#" class="btn btn--primary btn--lg">Join DevNet</a>
           <a data-cta="startChapter" href="#" target="_blank" rel="noopener noreferrer" class="btn btn--ghost btn--lg">Start a Chapter</a>
@@ -102,25 +100,25 @@
         <header class="section-head reveal">
           <p class="eyebrow">02 · The Network</p>
           <h2 id="map-heading" class="section-title">Where DevNet runs today</h2>
-          <p id="map-section-sub" class="section-sub">Thirteen network presence hubs — builders coordinating locally before or alongside a formal campus chapter. Hover a pin for city and region; switch to Chapters for campus chapter pins.</p>
+          <p id="map-section-sub" class="section-sub">DevNet London at Western University is the founding chapter.</p>
         </header>
 
         <div class="map-card reveal">
-          <div id="devnet-presence-map" class="presence-map" role="application" aria-label="Map of DevNet network presence hubs"></div>
+          <div id="devnet-presence-map" class="presence-map" role="application" aria-label="Map of DevNet London at Western University"></div>
 
           <div class="map-legend" aria-label="Map legend">
-            <span class="legend-item legend-item--active is-hidden" data-legend="active" aria-hidden="true"><span class="legend-dot legend-dot--active"></span> Active chapter</span>
-            <span class="legend-item legend-item--chapter-hub is-hidden" data-legend="chapter-hub" aria-hidden="true"><span class="legend-dot legend-dot--chapter-hub"></span> Chapter hub</span>
-            <span class="legend-item legend-item--presence" data-legend="presence"><span class="legend-dot legend-dot--presence"></span> Network presence</span>
+            <span class="legend-item legend-item--active" data-legend="active"><span class="legend-dot legend-dot--active"></span> Active chapter</span>
+            <span class="legend-item legend-item--chapter-hub" data-legend="chapter-hub"><span class="legend-dot legend-dot--chapter-hub"></span> Chapter hub</span>
+            <span class="legend-item legend-item--presence is-hidden" data-legend="presence" aria-hidden="true"><span class="legend-dot legend-dot--presence"></span> Network presence</span>
             <span class="legend-item legend-item--future is-hidden" data-legend="future" aria-hidden="true"><span class="legend-dot legend-dot--future"></span> Future chapter</span>
           </div>
 
           <div class="map-chips" role="group" aria-label="Filter map by pin type">
-            <button type="button" class="chip is-active" data-filter="presence">Presence</button>
-            <button type="button" class="chip" data-filter="chapter">Chapters</button>
+            <button type="button" class="chip" data-filter="presence">Presence</button>
+            <button type="button" class="chip is-active" data-filter="chapter">Chapters</button>
           </div>
 
-          <ul class="chapter-pill-row" aria-label="Jump to network hub">
+          <ul class="chapter-pill-row" aria-label="Jump to chapter">
             <!-- Filled by main.js from data/chapters.js -->
           </ul>
         </div>
@@ -133,7 +131,7 @@
         <header class="section-head reveal">
           <p class="eyebrow">03 · What is DevNet</p>
           <h2 id="what-heading" class="section-title">A network, a brand layer, and a distribution engine for local devs.</h2>
-          <p class="section-sub">DevNet is three things at once: a connective tissue between builders across campuses, a shared identity that lets every chapter punch above its weight, and a pipeline that turns local projects into public proof of work.</p>
+          <p class="section-sub">DevNet connects chapters and members. Chapters stay independent and student-led. DevNet London at Western University is the founding chapter, and local projects become public proof of work.</p>
         </header>
 
         <div class="pillar-grid reveal">
@@ -145,7 +143,7 @@
           <article class="pillar">
             <div class="pillar__index">02</div>
             <h3 class="pillar__title">Brand layer</h3>
-            <p class="pillar__body">One identity, many chapters. Local autonomy stays local; the DevNet name carries beyond your campus.</p>
+            <p class="pillar__body">One identity. Local autonomy stays local; the DevNet name carries beyond a single campus.</p>
           </article>
           <article class="pillar">
             <div class="pillar__index">03</div>
@@ -172,12 +170,12 @@
         <div class="reveal">
           <p class="eyebrow">04 · Members</p>
           <h2 id="members-heading" class="section-title section-title--left">Low-commitment membership. High-leverage network.</h2>
-          <p class="section-sub section-sub--left">Membership is intentionally lightweight. You join the network, you stay in it on your own terms. No quotas, no activity minimums, no fees — ever.</p>
+          <p class="section-sub section-sub--left">Membership is intentionally lightweight. Join the wider network on your own terms. No chapter required, no quotas, no activity minimums, no posting requirements, no fees — ever.</p>
           <ul class="bullet-list">
-            <li><span class="bullet">No fees, no quotas, no activity minimums.</span></li>
+            <li><span class="bullet">No fees, no quotas, no activity minimums, no posting requirements.</span></li>
             <li><span class="bullet">Get featured on DevNet's X and LinkedIn when your project ships.</span></li>
-            <li><span class="bullet">Connect with members across every chapter and presence hub.</span></li>
-            <li><span class="bullet">Opt into webinars, hackathons, and chapter events. Nothing is required.</span></li>
+            <li><span class="bullet">Connect with other builders in the network. A chapter is optional.</span></li>
+            <li><span class="bullet">Opt into workshops, hackathons, and chapter events. Nothing is required.</span></li>
             <li><span class="bullet">Any stack, any level, AI-built projects welcome.</span></li>
           </ul>
           <div class="cta-row">
@@ -192,7 +190,7 @@
             <div class="info-row"><dt>Cost</dt><dd>Free, always</dd></div>
             <div class="info-row"><dt>Commitment</dt><dd>None required</dd></div>
             <div class="info-row"><dt>Who</dt><dd>Devs, students, builders, any level</dd></div>
-            <div class="info-row"><dt>Where</dt><dd>Any chapter or presence hub</dd></div>
+            <div class="info-row"><dt>Where</dt><dd>The wider network. No chapter required.</dd></div>
             <div class="info-row"><dt>Get featured</dt><dd>Submit a working project</dd></div>
           </dl>
         </aside>
@@ -205,7 +203,7 @@
         <header class="section-head reveal">
           <p class="eyebrow">05 · Chapters</p>
           <h2 id="chapters-heading" class="section-title">Independent affiliates. One DevNet.</h2>
-          <p class="section-sub">Chapters are independent campus affiliates of DevNet — formal chapters you can start on a school. The map lists network presence hubs (builders coordinating locally); chapters are a separate layer when a campus goes live.</p>
+          <p class="section-sub">Chapters are independent and student-led. They run their own events, socials, recruiting, and team, under the name DevNet [City]. DevNet London at Western University is the founding chapter. More chapters may come later.</p>
         </header>
 
         <div class="cap-grid reveal">
@@ -215,7 +213,7 @@
           </article>
           <article class="cap-card">
             <h3 class="cap-card__title">Tap the wider network</h3>
-            <p class="cap-card__body">Reach builders in other chapters, presence hubs, and DevNet's central channels — without re-explaining what DevNet is.</p>
+            <p class="cap-card__body">Reach other builders through DevNet, the network that connects chapters and members, without re-explaining what DevNet is.</p>
           </article>
           <article class="cap-card">
             <h3 class="cap-card__title">Get distribution</h3>
@@ -240,7 +238,7 @@
         <header class="section-head reveal">
           <p class="eyebrow">06 · The Standard</p>
           <h2 id="standards-heading" class="section-title">Autonomy with a shared standard.</h2>
-          <p class="section-sub">The network only works if quality stays recognisable across every chapter. The standard is small, practical, and never a leash.</p>
+          <p class="section-sub">The network only works if the work stays recognisable. The standard is small, practical, and never a leash.</p>
         </header>
 
         <ol class="standard-list reveal">
@@ -262,7 +260,7 @@
             <span class="standard-item__num">03</span>
             <div>
               <h3 class="standard-item__title">Respect the network.</h3>
-              <p class="standard-item__body">Don't spam, don't gatekeep, don't trade on the DevNet name to sell things. Local autonomy doesn't mean ignoring the people in other chapters.</p>
+              <p class="standard-item__body">Don't spam, don't gatekeep, don't trade on the DevNet name to sell things. Local autonomy still means showing up for the rest of the network.</p>
             </div>
           </li>
           <li class="standard-item">
@@ -276,7 +274,7 @@
             <span class="standard-item__num">05</span>
             <div>
               <h3 class="standard-item__title">Use the DevNet name honestly.</h3>
-              <p class="standard-item__body">Anchor your chapter to a city or school. Don't claim presence you don't have. Map pins are network presence until a campus chapter is live — then it earns a chapter pin.</p>
+              <p class="standard-item__body">Anchor your chapter to a city. The name is DevNet [City]. DevNet London at Western University is the founding chapter.</p>
             </div>
           </li>
         </ol>
@@ -289,24 +287,24 @@
         <header class="section-head reveal">
           <p class="eyebrow">07 · Chapter naming</p>
           <h2 id="naming-heading" class="section-title">City-first. Always.</h2>
-          <p class="section-sub">When you launch a campus chapter, name it after the city first, then anchor to the school. Presence hubs on the map (Toronto, London, NYC, and the rest) stay as network presence until a chapter goes live.</p>
+          <p class="section-sub">Name a chapter DevNet [City], then anchor it to the school. DevNet London at Western University is the founding chapter. More chapters may come later.</p>
         </header>
 
         <ul class="name-grid reveal" aria-label="Chapter naming examples">
           <li class="name-card">
             <span class="name-card__brand">DevNet</span>
-            <span class="name-card__city">Toronto</span>
-            <span class="name-card__meta">Example campus chapter</span>
+            <span class="name-card__city">London</span>
+            <span class="name-card__meta">Founding chapter · Western University</span>
           </li>
           <li class="name-card">
             <span class="name-card__brand">DevNet</span>
             <span class="name-card__city">Boston</span>
-            <span class="name-card__meta">Example campus chapter</span>
+            <span class="name-card__meta">Naming format</span>
           </li>
           <li class="name-card">
             <span class="name-card__brand">DevNet</span>
             <span class="name-card__city">Vancouver</span>
-            <span class="name-card__meta">Example campus chapter</span>
+            <span class="name-card__meta">Naming format</span>
           </li>
         </ul>
       </div>
@@ -318,7 +316,7 @@
         <header class="section-head reveal">
           <p class="eyebrow">08 · Opportunity</p>
           <h2 id="opps-heading" class="section-title">Real roles. Real responsibility.</h2>
-          <p class="section-sub">Chapters are looking for founders and campus leads. These aren't résumé fillers — they're actual ownership over a piece of the network.</p>
+          <p class="section-sub">DevNet London is the founding chapter. Founder and campus lead are real ownership, not résumé fillers.</p>
         </header>
 
         <div class="opp-grid reveal">
@@ -337,11 +335,11 @@
           <article class="opp-card opp-card--lead">
             <p class="opp-card__tag">Open role</p>
             <h3 class="opp-card__title">Campus Lead</h3>
-            <p class="opp-card__body">Join an existing chapter as a campus lead. Run events, plug into the network, get featured. Lower lift than founding, higher lift than just being a member.</p>
+            <p class="opp-card__body">Join DevNet London as a campus lead. Run events, plug into the network, get featured. Lower lift than founding, higher lift than just being a member.</p>
             <ul class="opp-card__list">
               <li>Sit on chapter leadership</li>
               <li>Help shape local events and standards</li>
-              <li>Network across all DevNet chapters</li>
+              <li>Work with DevNet London and the wider network</li>
             </ul>
             <a data-cta="joinDevNet" href="#" class="btn btn--ghost">Reach out</a>
           </article>
@@ -355,7 +353,7 @@
         <header class="section-head reveal">
           <p class="eyebrow">09 · Projects</p>
           <h2 id="projects-heading" class="section-title">Ship projects. Get seen.</h2>
-          <p class="section-sub">The fastest way to convert a build into public proof of work. Every featured project shows on DevNet's X and LinkedIn and gets routed back to the chapters and presence hubs.</p>
+          <p class="section-sub">The fastest way to convert a build into public proof of work. Every featured project shows on DevNet's X and LinkedIn and gets routed back through the network.</p>
         </header>
 
         <div class="projects-flow reveal" role="list" aria-label="How projects move through DevNet">
@@ -374,7 +372,7 @@
           <div class="flow-step" role="listitem">
             <span class="flow-step__num">03</span>
             <h3 class="flow-step__title">Feature</h3>
-            <p class="flow-step__body">Accepted projects are featured across DevNet's channels and connected back into the chapter network.</p>
+            <p class="flow-step__body">Accepted projects are featured across DevNet's channels and connected back to the people who built them.</p>
           </div>
         </div>
 
@@ -405,7 +403,7 @@
     <div class="mx-auto flex w-full max-w-7xl flex-col gap-4 px-4 py-8 sm:px-6 md:flex-row md:items-center md:justify-between md:py-6 lg:px-8">
       <div class="flex items-center gap-3">
         <a href="#top" class="flex items-center gap-2 no-underline" aria-label="DevNet, home">
-          <span class="brand-monogram brand-monogram--footer" aria-hidden="true">D<span class="brand-monogram__slash">/</span>N</span>
+          <img src="assets/logo.png" alt="" class="brand-logo brand-logo--footer" width="32" height="32" />
           <span class="brand-wordmark">DevNet</span>
         </a>
       </div>

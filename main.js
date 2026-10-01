@@ -3,7 +3,7 @@
  * - Sticky header glass + scroll-spy
  * - Mobile nav toggle
  * - Reveal-on-scroll
- * - Leaflet map with chapter + presence pins, status legend, filter chips
+ * - Leaflet map focused on DevNet London, with status legend and filter chips
  *
  * Map patterns (bounds, dark tiles, popup interaction) are ported from
  * Live-devnetsite/main.js and simplified for the data-driven shape used here.
@@ -171,32 +171,55 @@ const STATUS_STYLE = {
   let clusterGroup = null;
   let arcRebuildTimer = null;
 
-  /* Continental US + southern Canada (west through east). Matches annotation framing. */
-  const MAP_MAX_BOUNDS = L.latLngBounds([21.8, -133.0], [53.2, -54.0]);
-  const minZoomAllowed = 3;
-  const OVERVIEW_FIT_OPTS = {
-    paddingTopLeft: [76, 118],
-    paddingBottomRight: [56, 72],
-    maxZoom: 4
+  /* Southern Ontario, framed on DevNet London. */
+  const MAP_MAX_BOUNDS = L.latLngBounds([41.15, -84.6], [44.85, -77.8]);
+  const minZoomAllowed = 6;
+  const CHAPTER_FIT_OPTS = {
+    paddingTopLeft: [48, 56],
+    paddingBottomRight: [48, 48],
+    maxZoom: 12
   };
+  const PRESENCE_FIT_OPTS = CHAPTER_FIT_OPTS;
+  let activeMapFilter = 'chapter';
+  let userAdjustedView = false;
+  let didInitialFit = false;
   let arcHighlightRegion = null;
   let arcWebGroup = null;
   let focusBoundsRelaxed = false;
   let mapResetInProgress = false;
 
-  function overviewBounds() {
-    let pinBounds = null;
-    pins.forEach(function (p) {
+  function boundsForPinList(list) {
+    let b = null;
+    list.forEach(function (p) {
+      if (typeof p.lat !== 'number' || typeof p.lng !== 'number') return;
       const ll = L.latLng(p.lat, p.lng);
-      if (!pinBounds) pinBounds = L.latLngBounds(ll, ll);
-      else pinBounds.extend(ll);
+      if (!b) b = L.latLngBounds(ll, ll);
+      else b.extend(ll);
     });
-    /* Gulf south margin; no South America; Halifax + Vancouver margins (annotation loop). */
-    const frame = L.latLngBounds([23.6, -129.2], [51.8, -59.2]);
-    if (!pinBounds) return frame;
-    return frame.extend(pinBounds);
+    if (!b) return null;
+    const sw = b.getSouthWest();
+    const ne = b.getNorthEast();
+    if (Math.abs(ne.lat - sw.lat) < 0.08 && Math.abs(ne.lng - sw.lng) < 0.08) {
+      b.extend([sw.lat - 0.06, sw.lng - 0.09]);
+      b.extend([ne.lat + 0.06, ne.lng + 0.09]);
+    }
+    return b;
   }
-  const hubBounds = overviewBounds();
+
+  function pinsForFilter(kind) {
+    const matched = pins.filter(function (p) { return p.type === kind; });
+    if (matched.length) return matched;
+    return pins.filter(function (p) { return p.type === 'chapter'; });
+  }
+
+  function boundsForFilter(kind) {
+    return boundsForPinList(pinsForFilter(kind)) || MAP_MAX_BOUNDS;
+  }
+
+  function fitOptsForFilter(kind) {
+    const hasPresence = pins.some(function (p) { return p.type === 'presence'; });
+    return kind === 'presence' && hasPresence ? PRESENCE_FIT_OPTS : CHAPTER_FIT_OPTS;
+  }
 
   const map = L.map(mapEl, {
     scrollWheelZoom: true,
@@ -228,8 +251,13 @@ const STATUS_STYLE = {
     invalidateMapLayout();
   });
   map.setMinZoom(minZoomAllowed);
-  map.fitBounds(hubBounds, OVERVIEW_FIT_OPTS);
-  if (map.getZoom() < minZoomAllowed) map.setZoom(minZoomAllowed);
+
+  function fitFilterView(kind) {
+    map.fitBounds(boundsForFilter(kind), fitOptsForFilter(kind));
+    if (map.getZoom() < minZoomAllowed) map.setZoom(minZoomAllowed);
+  }
+
+  fitFilterView(activeMapFilter);
 
   function relaxMapBoundsForFocus() {
     if (focusBoundsRelaxed) return;
@@ -597,7 +625,7 @@ const STATUS_STYLE = {
   }
 
   const CA_PRESENCE_SPINE = [
-    'vancouver', 'london', 'waterloo', 'guelph', 'kingston', 'toronto', 'montreal', 'halifax'
+    'vancouver', 'london', 'waterloo', 'kingston', 'toronto', 'montreal'
   ];
 
   const CA_BACKBONE_ADJ = {};
@@ -608,22 +636,14 @@ const STATUS_STYLE = {
   }());
 
   const CA_EXTRA_KEYS = {};
-  CA_EXTRA_KEYS[sortedPairKey('halifax', 'london')] = true;
-  CA_EXTRA_KEYS[sortedPairKey('halifax', 'kingston')] = true;
   CA_EXTRA_KEYS[sortedPairKey('vancouver', 'london')] = true;
   CA_EXTRA_KEYS[sortedPairKey('vancouver', 'kingston')] = true;
   CA_EXTRA_KEYS[sortedPairKey('vancouver', 'montreal')] = true;
-  /* Direct Toronto–Montréal corridor (not adjacent on spine: Guelph sits between). */
   CA_EXTRA_KEYS[sortedPairKey('montreal', 'toronto')] = true;
-  /* Ontario presence corridor: Guelph–Toronto–London (no direct London–Guelph on Presence). */
-  CA_EXTRA_KEYS[sortedPairKey('guelph', 'toronto')] = true;
   CA_EXTRA_KEYS[sortedPairKey('london', 'toronto')] = true;
   CA_EXTRA_KEYS[sortedPairKey('waterloo', 'toronto')] = true;
-  /* Chapter view spine when Waterloo (presence-only) is hidden. */
-  CA_EXTRA_KEYS[sortedPairKey('london', 'guelph')] = true;
 
   const CA_HUB_STRAIGHT_KEYS = {};
-  CA_HUB_STRAIGHT_KEYS[sortedPairKey('halifax', 'london')] = true;
 
   const US_BACKBONE_ADJ = {};
   (function () {
@@ -644,7 +664,6 @@ const STATUS_STYLE = {
     ['london', 'tucson'],
     ['london', 'miami'],
     ['london', 'boston'],
-    ['boston', 'halifax'],
     ['vancouver', 'los-angeles'],
     ['los-angeles', 'london'],
     ['vancouver', 'miami'],
@@ -777,13 +796,16 @@ const STATUS_STYLE = {
   const legendChapterHub = document.querySelector('.legend-item--chapter-hub, [data-legend="chapter-hub"]');
   const legendPresence = document.querySelector('.legend-item--presence, [data-legend="presence"]');
   const mapSectionSub = document.getElementById('map-section-sub');
+  const pillRow = document.querySelector('.chapter-pill-row');
   const hasChapters = pins.some(function (p) { return p.type === 'chapter'; });
+  const hasFutureChapters = pins.some(function (p) { return p.type === 'chapter' && p.status === 'future'; });
+  const hasPresencePins = pins.some(function (p) { return p.type === 'presence'; });
   const MAP_SUB_CHAPTER_EMPTY =
-    'No campus chapters on the map right now — every listed hub is network presence. Switch to Presence to see all network hubs.';
+    'DevNet London at Western University is the founding chapter.';
   const MAP_SUB_CHAPTER =
-    'London and Halifax are live campus chapters; Guelph is a planned startup (dashed pin). Use Presence for the other city hubs.';
+    'DevNet London at Western University is the founding chapter.';
   const MAP_SUB_PRESENCE =
-    'Thirteen network presence hubs — builders coordinating locally before or alongside a formal campus chapter. Hover a pin for city and region; switch to Chapters for campus chapter pins.';
+    'Cities on this view are network presence. DevNet London is the only campus chapter.';
 
   function setMarkerOnMap(marker, show, useClusterLayer) {
     if (clusterGroup) {
@@ -799,41 +821,48 @@ const STATUS_STYLE = {
   }
 
   function applyFilter(kind) {
-    const showChapterLayer = kind === 'chapter';
-    const showChapterStatusLegend = showChapterLayer && hasChapters;
-    const showPresenceLegend = kind === 'presence';
-    const useClusterLayer = kind === 'presence' && !!clusterGroup;
+    activeMapFilter = kind;
+    userAdjustedView = false;
+    const visiblePins = pinsForFilter(kind);
+    const visibleIds = {};
+    visiblePins.forEach(function (p) { visibleIds[p.id] = true; });
+    const showingChapters = visiblePins.some(function (p) { return p.type === 'chapter'; });
+    const showingPresence = visiblePins.some(function (p) { return p.type === 'presence'; });
+    const showChapterStatusLegend = showingChapters && hasChapters;
+    const showFutureLegend = showingChapters && hasFutureChapters;
+    const useClusterLayer = showingPresence && hasPresencePins && !!clusterGroup;
     if (legendChapterHub) {
-      legendChapterHub.classList.toggle('is-hidden', !showChapterLayer);
-      legendChapterHub.setAttribute('aria-hidden', showChapterLayer ? 'false' : 'true');
+      legendChapterHub.classList.toggle('is-hidden', !showingChapters);
+      legendChapterHub.setAttribute('aria-hidden', showingChapters ? 'false' : 'true');
     }
     if (legendPresence) {
-      legendPresence.classList.toggle('is-hidden', !showPresenceLegend);
-      legendPresence.setAttribute('aria-hidden', showPresenceLegend ? 'false' : 'true');
+      legendPresence.classList.toggle('is-hidden', !showingPresence);
+      legendPresence.setAttribute('aria-hidden', showingPresence ? 'false' : 'true');
     }
     if (legendFuture) {
-      legendFuture.classList.toggle('is-hidden', !showChapterStatusLegend);
-      legendFuture.setAttribute('aria-hidden', showChapterStatusLegend ? 'false' : 'true');
+      legendFuture.classList.toggle('is-hidden', !showFutureLegend);
+      legendFuture.setAttribute('aria-hidden', showFutureLegend ? 'false' : 'true');
     }
     if (legendActive) {
       legendActive.classList.toggle('is-hidden', !showChapterStatusLegend);
       legendActive.setAttribute('aria-hidden', showChapterStatusLegend ? 'false' : 'true');
     }
     if (mapSectionSub) {
-      if (kind === 'presence') mapSectionSub.textContent = MAP_SUB_PRESENCE;
-      else if (!hasChapters) mapSectionSub.textContent = MAP_SUB_CHAPTER_EMPTY;
+      if (showingPresence) mapSectionSub.textContent = MAP_SUB_PRESENCE;
+      else if (!showingChapters) mapSectionSub.textContent = MAP_SUB_CHAPTER_EMPTY;
       else mapSectionSub.textContent = MAP_SUB_CHAPTER;
     }
     pins.forEach(function (p) {
       const m = markers[p.id];
       if (!m) return;
-      setMarkerOnMap(m, p.type === kind, useClusterLayer);
+      setMarkerOnMap(m, !!visibleIds[p.id], useClusterLayer && p.type === 'presence');
     });
     if (clusterGroup && typeof clusterGroup.refreshClusters === 'function') {
       clusterGroup.refreshClusters();
     }
     rebuildHubArcWeb();
-    rebuildPills(kind);
+    rebuildPills(kind, visiblePins);
+    fitFilterView(kind);
   }
   chips.forEach(function (btn) {
     btn.addEventListener('click', function () {
@@ -843,19 +872,18 @@ const STATUS_STYLE = {
     });
   });
   if (useCluster && clusterGroup) map.addLayer(clusterGroup);
-  applyFilter('presence');
+  applyFilter('chapter');
 
-  const pillRow = document.querySelector('.chapter-pill-row');
-
-  function rebuildPills(kind) {
+  function rebuildPills(kind, source) {
     if (!pillRow) return;
-    const pillSource = kind === 'chapter'
+    const pillSource = source || (kind === 'chapter'
       ? (window.DEVNET_CHAPTERS || [])
-      : (window.DEVNET_PRESENCE || []);
+      : (window.DEVNET_PRESENCE || []));
+    const chapterPills = pillSource.some(function (c) { return c.type === 'chapter'; });
     pillRow.innerHTML = '';
     pillRow.setAttribute(
       'aria-label',
-      kind === 'chapter' ? 'Jump to chapter' : 'Jump to presence hub'
+      chapterPills ? 'Jump to chapter' : 'Jump to presence hub'
     );
     if (!pillSource.length) {
       pillRow.classList.add('is-hidden');
@@ -889,6 +917,7 @@ const STATUS_STYLE = {
     const m = markers[id];
     const p = pins.find(function (pin) { return pin.id === id; });
     if (!m || !p) return;
+    userAdjustedView = true;
     relaxMapBoundsForFocus();
     document.querySelectorAll('.chapter-pill').forEach(function (el) {
       el.classList.toggle('is-active', el.getAttribute('data-pin') === id);
@@ -922,16 +951,18 @@ const STATUS_STYLE = {
         m.closeTooltip();
       }
     });
-    const fitOpts = OVERVIEW_FIT_OPTS;
+    userAdjustedView = false;
+    const fitOpts = fitOptsForFilter(activeMapFilter);
+    const resetBounds = boundsForFilter(activeMapFilter);
     function clampZoomAfterFit() {
       if (map.getZoom() < minZoomAllowed) map.setZoom(minZoomAllowed);
       mapResetInProgress = false;
     }
     if (reduceMotion) {
-      map.fitBounds(hubBounds, fitOpts);
+      map.fitBounds(resetBounds, fitOpts);
       clampZoomAfterFit();
     } else {
-      map.flyToBounds(hubBounds, Object.assign({ duration: 0.55 }, fitOpts));
+      map.flyToBounds(resetBounds, Object.assign({ duration: 0.55 }, fitOpts));
       map.once('moveend', clampZoomAfterFit);
     }
   }
@@ -958,8 +989,15 @@ const STATUS_STYLE = {
 
   function invalidateMapLayout() {
     map.invalidateSize({ animate: false, pan: false });
+    const size = map.getSize();
+    if (!userAdjustedView && !mapResetInProgress && size.x > 0 && size.y > 0 && !didInitialFit) {
+      didInitialFit = true;
+      fitFilterView(activeMapFilter);
+    }
     scheduleRebuildArcWeb();
   }
+
+  map.on('dragstart', function () { userAdjustedView = true; });
 
   map.whenReady(invalidateMapLayout);
   requestAnimationFrame(invalidateMapLayout);

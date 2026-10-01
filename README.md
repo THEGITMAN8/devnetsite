@@ -1,8 +1,8 @@
 # DevNet updated-site
 
-A static, purple-themed marketing site for **DevNet** — a developer network of student-led campus chapters across North America.
+A static, purple-themed marketing site for **DevNet**. DevNet sits between student-led chapters and individual members. **DevNet London** at Western University is the founding chapter.
 
-This is a **greenfield** rebuild that lives alongside `Live-devnetsite/` (the green production site) and is **not** a fork of it. Patterns for the Leaflet presence map were ported and slimmed down from the live `main.js`.
+This is a rebuild of the marketing site. Patterns for the Leaflet map were ported and slimmed down from the previous `main.js`.
 
 ## Stack
 
@@ -14,7 +14,6 @@ This is a **greenfield** rebuild that lives alongside `Live-devnetsite/` (the gr
 ## Local development
 
 ```bash
-cd updated-site
 npm install
 npm run build          # one-shot Tailwind build
 npm run dev            # watch mode
@@ -33,15 +32,15 @@ npx serve .
 ```
 updated-site/
   index.html           # all 10 sections + nav + footer
-  style.css            # purple theme, hero D/N, cards, map popups
+  style.css            # purple theme, logo, cards, map popups
   main.js              # nav, scroll-spy, reveals, Leaflet map init
-  data/chapters.js     # 13 network presence hubs (0 chapter pins on map)
+  data/chapters.js     # DevNet London chapter pin (founding chapter)
   input.css            # Tailwind entry
   tailwind.config.js   # devnet.* purple tokens
   tailwind-output.css  # generated, committed
   vercel.json          # build + security headers
   package.json
-  assets/              # favicon, og-image (drop in your files here)
+  assets/              # logo, favicon, og-image
   README.md
 ```
 
@@ -61,24 +60,27 @@ Update there to rotate links globally — the HTML reads from JS-injected hrefs 
 
 ## Map data
 
-Chapter and presence pin data lives in `data/chapters.js`. The map lists **3 campus chapters** (London, Halifax, Guelph) and **10 presence hubs** (5 Canada, 5 US). Each entry has a `type` (`chapter` | `presence`) and a `status`:
+Chapter pin data lives in `data/chapters.js`. The map shows **one campus chapter**: DevNet London at Western University, the founding chapter. Each entry has a `type` (`chapter` | `presence`) and a `status`:
 
 | Status      | Color (purple family) | Meaning                                    |
 | ----------- | --------------------- | ------------------------------------------ |
 | `active`    | bright purple         | live campus chapter on the map               |
-| `future`    | dashed slate          | planned chapter on the roadmap             |
-| `presence`  | dim purple            | network presence hub (city, builders)        |
+| `future`    | dashed slate          | reserved status; no future pin is listed   |
+| `presence`  | dim purple            | network presence hub, if any are listed     |
 
-Edit `data/chapters.js` and re-run `npm run build` (no rebuild actually needed for the data file alone — it's loaded as a plain script — but rerun if you added new Tailwind classes).
+The map opens centered on London. Edit `data/chapters.js` and re-run `npm run build` (no rebuild actually needed for the data file alone — it's loaded as a plain script — but rerun if you added new Tailwind classes).
+
+## Logo
+
+The on-site mark and browser icon come from the purple DN logo:
+
+- `assets/devnet-logo.png` — source file
+- `assets/logo.png` — display size used in the header, hero, and footer
+- `assets/favicon.png`, `assets/favicon-16.png`, `assets/favicon-32.png`, `assets/favicon-48.png`, `assets/favicon.ico`, `assets/apple-touch-icon.png` — tab and home-screen icons
 
 ## Assets
 
-`assets/` is empty by default. Drop in:
-
-- `assets/favicon.png`
-- `assets/og-image.png` (1200x630 recommended)
-
-If absent, the page still renders — the favicon `<link>` will simply 404.
+Logo and icon files are listed under Logo above. `assets/og-image.png` is the social share image (1200x630 recommended).
 
 ## Deploy
 

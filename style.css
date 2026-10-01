@@ -83,23 +83,15 @@ body {
 }
 
 /* ============================ BRAND MARK ================================ */
-.brand-monogram {
-  font-family: 'Orbitron', system-ui, sans-serif;
-  font-weight: 900;
-  letter-spacing: 0.02em;
-  color: #fff;
-  line-height: 1;
-  display: inline-flex;
-  align-items: center;
-  text-shadow: 0 0 18px rgba(168, 85, 247, 0.4);
+.brand-logo {
+  display: block;
+  width: 2rem;
+  height: 2rem;
+  object-fit: cover;
+  flex-shrink: 0;
 }
-.brand-monogram__slash {
-  color: var(--devnet-primary);
-  margin: 0 0.05em;
-  text-shadow: 0 0 12px rgba(168, 85, 247, 0.7);
-}
-.brand-monogram--header { font-size: 1.05rem; }
-.brand-monogram--footer { font-size: 1rem; }
+.brand-logo--header { width: 2.25rem; height: 2.25rem; }
+.brand-logo--footer { width: 2rem; height: 2rem; }
 
 .brand-wordmark {
   font-family: 'Inter', system-ui, sans-serif;
@@ -284,27 +276,11 @@ body {
   margin-bottom: 2.5rem;
 }
 
-.hero__monogram {
-  display: inline-flex;
-  align-items: baseline;
-  font-family: 'Orbitron', system-ui, sans-serif;
-  font-weight: 900;
-  color: #fff;
-  font-size: clamp(6rem, 18vw, 12rem);
-  line-height: 0.9;
-  letter-spacing: -0.02em;
-  text-shadow:
-    0 0 40px rgba(168, 85, 247, 0.6),
-    0 0 80px rgba(168, 85, 247, 0.3),
-    0 4px 0 rgba(0, 0, 0, 0.3);
+.hero__logo {
+  display: block;
+  width: clamp(6.5rem, 16vw, 10rem);
+  height: auto;
   margin-bottom: 1.5rem;
-}
-.hero__mono-slash {
-  color: var(--devnet-primary);
-  margin: 0 0.05em;
-  text-shadow:
-    0 0 20px rgba(168, 85, 247, 0.9),
-    0 0 60px rgba(168, 85, 247, 0.6);
 }
 
 .hero__headline {
@@ -510,9 +486,13 @@ body {
 .leaflet-container img.leaflet-tile,
 .leaflet-container img.leaflet-tile-loaded,
 .leaflet-container img.leaflet-marker-icon,
-.leaflet-container img.leaflet-marker-shadow {
+.leaflet-container img.leaflet-marker-shadow,
+.leaflet-container .leaflet-tile-pane img,
+.leaflet-container .leaflet-overlay-pane svg,
+.leaflet-container .leaflet-shadow-pane img {
   max-width: none !important;
   max-height: none !important;
+  padding: 0 !important;
 }
 .leaflet-container .leaflet-tile-pane {
   z-index: 200;
