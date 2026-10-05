@@ -3,7 +3,7 @@
  * - Sticky header glass + scroll-spy
  * - Mobile nav toggle
  * - Reveal-on-scroll
- * - Leaflet map focused on DevNet London, with status legend and filter chips
+ * - Leaflet map of DevNet London plus network presence, with legend and filter chips
  *
  * Map patterns (bounds, dark tiles, popup interaction) are ported from
  * Live-devnetsite/main.js and simplified for the data-driven shape used here.
@@ -93,7 +93,7 @@ const STATUS_STYLE = {
   });
 
   /* Scroll-spy across header anchor links. */
-  const navIds = ['top', 'map', 'members', 'chapters', 'projects'];
+  const navIds = ['top', 'map', 'timeline', 'team'];
   const navLinks = document.querySelectorAll(
     '.site-header__link[href^="#"], .site-header__mobile-link[href^="#"]'
   );
@@ -167,20 +167,27 @@ const STATUS_STYLE = {
   if (!pins.length) return;
 
   const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const useCluster = typeof L.markerClusterGroup === 'function';
+  /* Eleven pins. Clustering would collapse Ontario and the Northeast into count bubbles. */
+  const useCluster = false;
   let clusterGroup = null;
   let arcRebuildTimer = null;
 
-  /* Southern Ontario, framed on DevNet London. */
-  const MAP_MAX_BOUNDS = L.latLngBounds([41.15, -84.6], [44.85, -77.8]);
-  const minZoomAllowed = 6;
+  /* Loose North America frame. Viscosity stays 0 so this is not a drag cage.
+     Pin fits use real coordinates; this bound only keeps an empty view on-continent. */
+  const MAP_MAX_BOUNDS = L.latLngBounds([5, -155], [72, -45]);
+  const MAP_BOUNDS_VISCOSITY = 0;
+  const minZoomAllowed = 3;
+  const OVERVIEW_FIT_OPTS = {
+    paddingTopLeft: [20, 24],
+    paddingBottomRight: [20, 20],
+    maxZoom: 5
+  };
   const CHAPTER_FIT_OPTS = {
     paddingTopLeft: [48, 56],
     paddingBottomRight: [48, 48],
     maxZoom: 12
   };
-  const PRESENCE_FIT_OPTS = CHAPTER_FIT_OPTS;
-  let activeMapFilter = 'chapter';
+  let activeMapFilter = 'all';
   let userAdjustedView = false;
   let didInitialFit = false;
   let arcHighlightRegion = null;
@@ -207,6 +214,7 @@ const STATUS_STYLE = {
   }
 
   function pinsForFilter(kind) {
+    if (kind === 'all') return pins.slice();
     const matched = pins.filter(function (p) { return p.type === kind; });
     if (matched.length) return matched;
     return pins.filter(function (p) { return p.type === 'chapter'; });
@@ -217,8 +225,8 @@ const STATUS_STYLE = {
   }
 
   function fitOptsForFilter(kind) {
-    const hasPresence = pins.some(function (p) { return p.type === 'presence'; });
-    return kind === 'presence' && hasPresence ? PRESENCE_FIT_OPTS : CHAPTER_FIT_OPTS;
+    if (kind === 'chapter') return CHAPTER_FIT_OPTS;
+    return OVERVIEW_FIT_OPTS;
   }
 
   const map = L.map(mapEl, {
@@ -226,7 +234,8 @@ const STATUS_STYLE = {
     zoomControl: true,
     attributionControl: true,
     maxBounds: MAP_MAX_BOUNDS,
-    maxBoundsViscosity: 1.0,
+    maxBoundsViscosity: MAP_BOUNDS_VISCOSITY,
+    minZoom: minZoomAllowed,
     maxZoom: 16
   });
   /* Esri World Dark Gray draws without an API key. Carto's raster URL returns an API-key watermark. */
@@ -277,13 +286,10 @@ const STATUS_STYLE = {
     if (!focusBoundsRelaxed) return;
     focusBoundsRelaxed = false;
     map.setMaxBounds(MAP_MAX_BOUNDS);
-    map.options.maxBoundsViscosity = 1.0;
+    map.options.maxBoundsViscosity = MAP_BOUNDS_VISCOSITY;
   }
 
-  map.createPane('devnetArcs');
-  map.getPane('devnetArcs').classList.add('leaflet-devnet-arcs-pane');
-  map.getPane('devnetArcs').style.zIndex = '410';
-  arcWebGroup = L.featureGroup().addTo(map);
+  /* Pins only. The hub arc web is not drawn. */
 
   if (useCluster) {
     clusterGroup = L.markerClusterGroup({
@@ -476,6 +482,21 @@ const STATUS_STYLE = {
     });
   });
 
+  /* Continental zoom packs southern Ontario into a few pixels. Keep each city a small dot there. */
+  function syncMarkerSizes() {
+    const zoom = map.getZoom();
+    const tight = zoom < 6;
+    pins.forEach(function (p) {
+      const m = markers[p.id];
+      if (!m) return;
+      const base = STATUS_STYLE[p.status] || STATUS_STYLE.presence;
+      m.setRadius(tight ? (p.type === 'chapter' ? 4 : 3) : base.radius);
+      m.setStyle({ weight: tight ? 1 : base.weight });
+    });
+  }
+  syncMarkerSizes();
+  map.on('zoomend', syncMarkerSizes);
+
   function markerVisibleOnMap(marker) {
     if (!marker) return false;
     if (map.hasLayer(marker)) return true;
@@ -493,12 +514,9 @@ const STATUS_STYLE = {
   function popupHtml(p) {
     const badgeClass = 'pin-popup__badge pin-popup__badge--' + p.status;
     let cta = '';
-    if (p.cta && p.cta.href) {
+    if (p.type === 'chapter' && p.cta && p.cta.href) {
       cta = '<a class="pin-popup__cta" href="' + escapeHtml(p.cta.href) +
         '" target="_blank" rel="noopener noreferrer">' + escapeHtml(p.cta.label || 'Learn more') + '</a>';
-    } else if (p.type === 'presence') {
-      cta = '<a class="pin-popup__cta" href="' + escapeHtml(CTA_LINKS.startChapter) +
-        '" target="_blank" rel="noopener noreferrer">Start a chapter here</a>';
     }
     if (p.type === 'presence') {
       const title = hubDisplayTitle(p);
@@ -510,8 +528,8 @@ const STATUS_STYLE = {
         '<div class="pin-popup">' +
           '<div class="pin-popup__title">' + escapeHtml(title) + '</div>' +
           locationLine +
+          '<div class="pin-popup__location">Members in the network</div>' +
           '<span class="' + badgeClass + '">' + escapeHtml(PRESENCE_BADGE_LABEL) + '</span>' +
-          (cta ? '<div>' + cta + '</div>' : '') +
         '</div>'
       );
     }
@@ -796,7 +814,7 @@ const STATUS_STYLE = {
     clusterGroup.on('unspiderfied', scheduleRebuildArcWeb);
   }
 
-  /* Filter chips: chapter | presence (mutually exclusive). */
+  /* Filter chips: all | chapter | presence. */
   const chips = document.querySelectorAll('.map-chips .chip');
   const legendFuture = document.querySelector('.legend-item--future, [data-legend="future"]');
   const legendActive = document.querySelector('[data-legend="active"]');
@@ -805,14 +823,10 @@ const STATUS_STYLE = {
   const mapSectionSub = document.getElementById('map-section-sub');
   const pillRow = document.querySelector('.chapter-pill-row');
   const hasChapters = pins.some(function (p) { return p.type === 'chapter'; });
-  const hasFutureChapters = pins.some(function (p) { return p.type === 'chapter' && p.status === 'future'; });
-  const hasPresencePins = pins.some(function (p) { return p.type === 'presence'; });
-  const MAP_SUB_CHAPTER_EMPTY =
-    'DevNet London at Western University is the founding chapter.';
   const MAP_SUB_CHAPTER =
-    'DevNet London at Western University is the founding chapter.';
-  const MAP_SUB_PRESENCE =
-    'Cities on this view are network presence. DevNet London is the only campus chapter.';
+    'DevNet London at Western University is the only chapter.';
+  const MAP_SUB_NETWORK =
+    'London is the only chapter. Other cities are members in the network, not chapters.';
 
   function setMarkerOnMap(marker, show, useClusterLayer) {
     if (clusterGroup) {
@@ -836,28 +850,29 @@ const STATUS_STYLE = {
     const showingChapters = visiblePins.some(function (p) { return p.type === 'chapter'; });
     const showingPresence = visiblePins.some(function (p) { return p.type === 'presence'; });
     const showChapterStatusLegend = showingChapters && hasChapters;
-    const showFutureLegend = showingChapters && hasFutureChapters;
-    const useClusterLayer = showingPresence && hasPresencePins && !!clusterGroup;
+    const useClusterLayer = false;
     if (legendChapterHub) {
-      legendChapterHub.classList.toggle('is-hidden', !showingChapters);
-      legendChapterHub.setAttribute('aria-hidden', showingChapters ? 'false' : 'true');
+      legendChapterHub.classList.add('is-hidden');
+      legendChapterHub.setAttribute('aria-hidden', 'true');
     }
     if (legendPresence) {
       legendPresence.classList.toggle('is-hidden', !showingPresence);
       legendPresence.setAttribute('aria-hidden', showingPresence ? 'false' : 'true');
     }
     if (legendFuture) {
-      legendFuture.classList.toggle('is-hidden', !showFutureLegend);
-      legendFuture.setAttribute('aria-hidden', showFutureLegend ? 'false' : 'true');
+      legendFuture.classList.add('is-hidden');
+      legendFuture.setAttribute('aria-hidden', 'true');
     }
     if (legendActive) {
       legendActive.classList.toggle('is-hidden', !showChapterStatusLegend);
       legendActive.setAttribute('aria-hidden', showChapterStatusLegend ? 'false' : 'true');
     }
     if (mapSectionSub) {
-      if (showingPresence) mapSectionSub.textContent = MAP_SUB_PRESENCE;
-      else if (!showingChapters) mapSectionSub.textContent = MAP_SUB_CHAPTER_EMPTY;
-      else mapSectionSub.textContent = MAP_SUB_CHAPTER;
+      if (kind === 'all' || kind === 'presence' || showingPresence) {
+        mapSectionSub.textContent = MAP_SUB_NETWORK;
+      } else {
+        mapSectionSub.textContent = MAP_SUB_CHAPTER;
+      }
     }
     pins.forEach(function (p) {
       const m = markers[p.id];
@@ -875,23 +890,35 @@ const STATUS_STYLE = {
     btn.addEventListener('click', function () {
       chips.forEach(function (b) { b.classList.remove('is-active'); });
       btn.classList.add('is-active');
-      applyFilter(btn.getAttribute('data-filter') || 'chapter');
+      applyFilter(btn.getAttribute('data-filter') || 'all');
     });
   });
   if (useCluster && clusterGroup) map.addLayer(clusterGroup);
-  applyFilter('chapter');
+  (function syncAllFilterChip() {
+    let allChip = null;
+    chips.forEach(function (b) {
+      if ((b.getAttribute('data-filter') || '') === 'all') allChip = b;
+    });
+    chips.forEach(function (b) { b.classList.remove('is-active'); });
+    if (allChip) allChip.classList.add('is-active');
+  })();
+  applyFilter('all');
 
   function rebuildPills(kind, source) {
     if (!pillRow) return;
-    const pillSource = source || (kind === 'chapter'
-      ? (window.DEVNET_CHAPTERS || [])
-      : (window.DEVNET_PRESENCE || []));
-    const chapterPills = pillSource.some(function (c) { return c.type === 'chapter'; });
-    pillRow.innerHTML = '';
-    pillRow.setAttribute(
-      'aria-label',
-      chapterPills ? 'Jump to chapter' : 'Jump to presence hub'
+    const pillSource = source || (
+      kind === 'chapter' ? (window.DEVNET_CHAPTERS || [])
+      : kind === 'presence' ? (window.DEVNET_PRESENCE || [])
+      : (window.DEVNET_PINS || [])
     );
+    const hasChapterPill = pillSource.some(function (c) { return c.type === 'chapter'; });
+    const hasPresencePill = pillSource.some(function (c) { return c.type === 'presence'; });
+    pillRow.innerHTML = '';
+    let pillLabel = 'Jump to a city';
+    if (hasChapterPill && !hasPresencePill) pillLabel = 'Jump to chapter';
+    else if (hasPresencePill && !hasChapterPill) pillLabel = 'Jump to network presence';
+    else if (hasChapterPill && hasPresencePill) pillLabel = 'Jump to the chapter or a presence city';
+    pillRow.setAttribute('aria-label', pillLabel);
     if (!pillSource.length) {
       pillRow.classList.add('is-hidden');
       pillRow.setAttribute('aria-hidden', 'true');
