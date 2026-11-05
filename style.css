@@ -2856,3 +2856,186 @@ section {
   #faq h2,
   .join-close h2 { font-size: 40px; line-height: 44px; }
 }
+
+/* round 10 */
+@property --pin-scale {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 1;
+}
+
+.map-stage {
+  overflow: hidden;
+}
+
+.map-viewport {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  touch-action: pan-y;
+  cursor: grab;
+  border-radius: inherit;
+}
+
+.map-viewport:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
+.map-viewport.is-drag { cursor: grabbing; }
+
+.map-world {
+  --pin-scale: 1;
+  position: absolute;
+  inset: 0;
+  transform-origin: 0 0;
+  touch-action: pan-y;
+}
+
+.matrix { pointer-events: none; }
+
+.map-world .pin {
+  transform: translate(-50%, -50%) scale(var(--pin-scale));
+  z-index: 1;
+}
+
+.map-world .pin--cluster {
+  width: 44px;
+  height: 44px;
+  pointer-events: auto;
+}
+
+.map-world .pin__dot { margin: 0; }
+.map-world .pin {
+  display: grid;
+  place-items: center;
+}
+.map-world .pin--founding .pin__dot,
+.map-world .pin--cluster .pin__dot,
+.map-world .pin--cluster.pin--founding .pin__dot {
+  width: 12px;
+  height: 12px;
+  margin: 0;
+}
+.map-world .pin--founding .pin__dot { width: 14px; height: 14px; }
+
+.pin.is-hot,
+.pin:hover,
+.pin:focus-visible { z-index: 3; }
+
+.pin:focus-visible .pin__dot,
+.pin.is-hot .pin__dot {
+  box-shadow: 0 0 0 4px rgba(138, 92, 240, 0.45);
+}
+
+.map-controls {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 5;
+  display: grid;
+  gap: 8px;
+}
+
+.map-ctl {
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #12091f;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.map-ctl:hover,
+.map-ctl:focus-visible {
+  border-color: var(--accent);
+  background: #24143f;
+}
+
+.map-ctl:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .map-world.is-anim {
+    transition: transform 180ms ease-out, --pin-scale 180ms ease-out;
+  }
+}
+
+@media (min-width: 1100px) {
+  .map-board {
+    grid-template-columns: minmax(0, 1fr) 256px;
+    gap: 16px;
+    align-items: start;
+  }
+  .map-board .city-list {
+    grid-template-columns: 1fr;
+    gap: 8px;
+    margin-top: 0;
+  }
+  .map-board .city-list h3 {
+    margin: 0 0 8px;
+    font-size: 14px;
+    line-height: 16px;
+  }
+  .map-board .city-list > div { gap: 0; }
+}
+
+.status { align-items: start; }
+.status article { padding: 16px; }
+.status article .btn { margin-top: 8px; }
+.status ul {
+  display: grid;
+  gap: 0;
+  margin: 0;
+  border-top: 1px solid var(--line);
+}
+.status li {
+  margin: 0;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--line);
+  line-height: 24px;
+}
+
+.btn--primary:hover,
+.btn--primary:focus-visible { background: #a888f6; }
+.btn--secondary:hover,
+.btn--secondary:focus-visible { border-color: var(--accent); }
+.nav-link:hover,
+.nav-link:focus-visible { color: var(--ink); }
+.nav-link--pill:hover,
+.nav-link--pill:focus-visible { color: #0b0614; background: #a888f6; }
+.menu-toggle:hover,
+.menu-toggle:focus-visible { border-color: var(--accent); }
+.footer-socials__btn:hover,
+.footer-socials__btn:focus-visible { color: var(--ink); border-color: var(--accent); }
+.footer-socials__text:hover,
+.footer-socials__text:focus-visible { color: var(--ink); }
+.city-row:hover,
+.city-row:focus-visible,
+.city-row.is-hot { background: rgba(138, 92, 240, 0.22); }
+.social-card:hover,
+.social-card:focus-visible,
+.event-card:hover,
+.perks li:hover,
+.howto li:hover,
+.roles li:hover,
+.net-stats li:hover,
+.status article:hover,
+.faq summary:hover,
+.faq summary:focus-visible {
+  border-color: var(--accent);
+}
+.social-card:hover,
+.social-card:focus-visible,
+.tile:hover {
+  transform: none;
+}
+.west-hero .tile:hover {
+  box-shadow: inset 0 0 0 1px var(--accent);
+}
