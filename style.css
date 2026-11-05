@@ -2670,3 +2670,189 @@ section {
 @media (prefers-reduced-motion: reduce) {
   .art__pulse line { animation: none; }
 }
+
+/* round 9 */
+.free-chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: rgba(138, 92, 240, 0.18);
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 16px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.info-card .free-chip,
+.join-close .free-chip {
+  color: var(--accent);
+}
+
+.hero-actions,
+.west-actions,
+.howto__cta,
+.join-close {
+  align-items: center;
+}
+
+.beliefs { margin-top: 32px; }
+.beliefs li { padding: 16px; }
+.beliefs h3 { margin: 8px 0 0; }
+.beliefs .num { font-size: 32px; line-height: 32px; }
+
+.perks,
+.howto { margin-top: 32px; }
+.perks h3,
+.howto h3,
+.events > h3 {
+  margin: 0 0 16px;
+  font-size: 20px;
+  line-height: 28px;
+}
+.perks ul {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.perks li {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+  min-height: 88px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--card);
+  font-weight: 700;
+}
+.perks li span {
+  color: #e4d8f5;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 20px;
+}
+.howto ol {
+  display: grid;
+  gap: 8px;
+}
+.howto li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 72px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--card);
+}
+.howto li span {
+  color: var(--accent);
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 32px;
+}
+.howto__cta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.cursor-banner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px 16px;
+}
+.cursor-banner__title { font-size: 20px; line-height: 28px; }
+
+.status { align-items: stretch; }
+.status article {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.status article .btn { margin-top: auto; align-self: flex-start; }
+.status ul { margin-bottom: 8px; }
+
+.events { margin-top: 32px; }
+.events__grid { display: grid; gap: 16px; }
+.event-card {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  height: 100%;
+  padding: 24px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--card);
+}
+.event-card:first-child { border-color: rgba(138, 92, 240, 0.45); }
+.event-card h3 { margin: 0; font-size: 20px; line-height: 28px; }
+.event-card p { margin: 8px 0 0; color: #e4d8f5; }
+.event-card .btn { margin-top: auto; align-self: flex-start; }
+.event__date--week span {
+  font-size: 16px;
+  line-height: 20px;
+  letter-spacing: 0;
+  text-align: center;
+}
+.hosted-line { margin: 16px 0 0; color: #e4d8f5; }
+.hosted-line strong { color: var(--ink); }
+
+.map-stage--fallback {
+  background:
+    radial-gradient(circle at 28% 42%, rgba(138, 92, 240, 0.38), transparent 46%),
+    radial-gradient(circle at 74% 50%, rgba(205, 184, 242, 0.22), transparent 42%),
+    #12091f;
+}
+
+.countboxes i { font-style: normal; }
+
+#faq h2 {
+  margin: 0 0 16px;
+  font-size: 32px;
+  line-height: 36px;
+}
+#faq .faq { padding: 8px 24px 16px; }
+
+.join-close {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 16px;
+}
+.join-close h2 { margin: 0; font-size: 32px; line-height: 36px; }
+
+@media (max-width: 767px) {
+  .hero {
+    min-height: 0;
+    align-items: flex-start;
+    padding: 32px 0 40px;
+  }
+  .hero img { height: 72px; }
+  .hero h1 {
+    margin: 16px 0;
+    font-size: 48px;
+    line-height: 48px;
+  }
+  .hero-actions { margin-bottom: 16px; }
+}
+
+.roles { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.roles li { min-width: 0; }
+@media (max-width: 767px) {
+  .roles li { flex-direction: column; align-items: flex-start; justify-content: center; gap: 4px; }
+}
+
+@media (min-width: 768px) {
+  .perks ul,
+  .howto ol,
+  .events__grid { grid-template-columns: repeat(3, 1fr); }
+  #faq h2,
+  .join-close h2 { font-size: 40px; line-height: 44px; }
+}
