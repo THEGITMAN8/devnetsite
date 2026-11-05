@@ -415,6 +415,12 @@ section {
   gap: 16px;
 }
 
+.section-head__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
 .about-grid h2,
 .section-head h2,
 .west-head h2,
@@ -2437,6 +2443,7 @@ section {
 .socials-extra { display: grid; gap: 16px; }
 .faq { display: grid; gap: 8px; }
 .faq summary { min-height: 44px; display: flex; align-items: center; cursor: pointer; font-weight: 700; }
+.faq a { color: var(--accent); font-weight: 700; }
 .org__wires, .org .org__top::after, .org .org__roles::before, .org .org__roles::after { display: none !important; content: none !important; }
 .org .org__roles { background: none !important; gap: 16px !important; margin-top: 16px; grid-template-columns: 1fr !important; }
 .org .org__roles .org__node::before, .org .org__roles .org__node::after { content: none !important; display: none !important; }
