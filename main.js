@@ -1,1062 +1,346 @@
-/* DevNet updated-site, main interactions
- * - Centralized CTA links (single source of truth, mirrors data/chapters.js)
- * - Sticky header glass + scroll-spy
- * - Mobile nav toggle
- * - Reveal-on-scroll
- * - Leaflet map of DevNet London plus network presence, with legend and filter chips
- *
- * Map patterns (bounds, dark tiles, popup interaction) are ported from
- * Live-devnetsite/main.js and simplified for the data-driven shape used here.
- */
+document.documentElement.classList.add("js");
 
-const CTA_LINKS = {
-  joinDevNet:
-    'https://docs.google.com/forms/d/e/1FAIpQLSf-zY-pXzwldWrckCPpmdXvuXlvv-fNodLRm0zabNjaP1JdvA/viewform?usp=dialog',
-  startChapter:
-    'https://docs.google.com/forms/d/e/1FAIpQLSfQ2YZFnGW_jo85EE1zla5nVDMlwmsz3wAoqt5cktMlDat7gQ/viewform?usp=dialog',
-  submitProject:
-    'https://docs.google.com/forms/d/e/1FAIpQLSf29qweW0Zok2b_80z03ueYLMd-n5IwpmRxCCSU0UYOikyYGg/viewform?usp=dialog'
-};
+document.addEventListener("DOMContentLoaded", function () {
+  var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var header = document.getElementById("site-header");
+  var toggle = document.getElementById("menu-toggle");
+  var menu = document.getElementById("mobile-menu");
+  var openIcon = toggle ? toggle.querySelector(".icon-open") : null;
+  var closeIcon = toggle ? toggle.querySelector(".icon-close") : null;
 
-const STATUS_LABEL = {
-  active: 'Active chapter',
-  future: 'Future',
-  presence: 'Network presence'
-};
+  function focusable() {
+    if (!menu) return [];
+    return Array.prototype.slice.call(menu.querySelectorAll("a, button")).filter(function (el) {
+      return !el.hasAttribute("disabled");
+    });
+  }
 
-const STATUS_LABEL_SHORT = {
-  active: 'Active',
-  future: 'Future',
-  presence: 'Presence'
-};
-
-const PRESENCE_BADGE_LABEL = 'Active Presence';
-
-const STATUS_STYLE = {
-  active:   { fill: '#c084fc', stroke: '#f5d0fe', radius: 9, weight: 2.5, dash: null,    glow: true },
-  future:   { fill: 'rgba(100,116,139,0.25)', stroke: '#94a3b8', radius: 7, weight: 2, dash: '4 3', glow: false },
-  presence: { fill: '#7e22ce', stroke: '#d8b4fe', radius: 6, weight: 1.5, dash: null,    glow: false }
-};
-
-(function injectCtaHrefs() {
-  document.querySelectorAll('[data-cta]').forEach(function (el) {
-    const key = el.getAttribute('data-cta');
-    const href = key && CTA_LINKS[key];
-    if (!href) return;
-    el.setAttribute('href', href);
-    if (/^https?:\/\//.test(href)) {
-      el.setAttribute('target', '_blank');
-      el.setAttribute('rel', 'noopener noreferrer');
-    }
-  });
-})();
-
-(function siteUi() {
-  const header = document.getElementById('site-header');
-  const toggle = document.getElementById('menu-toggle');
-  const menu = document.getElementById('mobile-menu');
-  const yearEl = document.getElementById('year');
-  if (yearEl) yearEl.textContent = String(new Date().getFullYear());
-
-  function closeMobileMenu() {
+  function setOpen(open) {
     if (!toggle || !menu) return;
-    menu.classList.add('hidden');
-    toggle.setAttribute('aria-expanded', 'false');
-    toggle.setAttribute('aria-label', 'Open menu');
+    menu.classList.toggle("is-open", open);
+    document.body.classList.toggle("nav-open", open);
+    toggle.setAttribute("aria-expanded", open ? "true" : "false");
+    toggle.setAttribute("aria-label", open ? "Close menu" : "Open menu");
+    if (openIcon) openIcon.hidden = open;
+    if (closeIcon) closeIcon.hidden = !open;
+    if (open) {
+      var items = focusable();
+      if (items[0]) items[0].focus();
+    }
+  }
+
+  if (toggle && menu) {
+    setOpen(false);
+    toggle.addEventListener("click", function () {
+      setOpen(!menu.classList.contains("is-open"));
+    });
+    menu.addEventListener("click", function (event) {
+      if (event.target.closest("a")) setOpen(false);
+    });
+    document.addEventListener("keydown", function (event) {
+      if (!menu.classList.contains("is-open")) return;
+      if (event.key === "Escape") {
+        setOpen(false);
+        toggle.focus();
+        return;
+      }
+      if (event.key !== "Tab") return;
+      var items = focusable();
+      if (!items.length) return;
+      var first = items[0];
+      var last = items[items.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    });
+    window.addEventListener("resize", function () {
+      if (window.matchMedia("(min-width: 768px)").matches) setOpen(false);
+    });
   }
 
   function onScroll() {
     if (!header) return;
-    if (window.scrollY > 12) header.classList.add('scrolled');
-    else header.classList.remove('scrolled');
+    header.classList.toggle("is-scrolled", window.scrollY > 8);
   }
-  window.addEventListener('scroll', onScroll, { passive: true });
   onScroll();
+  window.addEventListener("scroll", onScroll, { passive: true });
 
-  if (toggle && menu) {
-    toggle.addEventListener('click', function () {
-      const isHidden = menu.classList.toggle('hidden');
-      toggle.setAttribute('aria-expanded', String(!isHidden));
-      toggle.setAttribute('aria-label', isHidden ? 'Open menu' : 'Close menu');
+  var revealNodes = document.querySelectorAll(".reveal");
+  function markVisible(node) {
+    var rect = node.getBoundingClientRect();
+    if (rect.top < window.innerHeight * 0.92 && rect.bottom > 40) node.classList.add("is-in");
+  }
+  function markAllVisible() {
+    revealNodes.forEach(markVisible);
+  }
+  if (!reduce && "IntersectionObserver" in window) {
+    var revealObserver = new IntersectionObserver(
+      function (entries) {
+        entries.forEach(function (entry) {
+          if (!entry.isIntersecting) return;
+          entry.target.classList.add("is-in");
+          revealObserver.unobserve(entry.target);
+        });
+      },
+      { threshold: 0.08 }
+    );
+    revealNodes.forEach(function (node) {
+      revealObserver.observe(node);
     });
-    menu.querySelectorAll('a').forEach(function (a) {
-      a.addEventListener('click', closeMobileMenu);
+    markAllVisible();
+    window.addEventListener("scroll", markAllVisible, { passive: true });
+  } else {
+    revealNodes.forEach(function (node) {
+      node.classList.add("is-in");
     });
   }
 
-  document.addEventListener('keydown', function (e) {
-    if (e.key !== 'Escape') return;
-    if (!menu || menu.classList.contains('hidden')) return;
-    const tag = e.target && e.target.tagName;
-    if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
-    closeMobileMenu();
-  });
-
-  /* Scroll-spy across header anchor links. */
-  const navIds = ['top', 'map', 'timeline', 'team'];
-  const navLinks = document.querySelectorAll(
-    '.site-header__link[href^="#"], .site-header__mobile-link[href^="#"]'
-  );
-  const sections = navIds
-    .map(function (id) { return document.getElementById(id); })
+  var sectionIds = ["about", "network", "western"];
+  var sections = sectionIds
+    .map(function (id) {
+      return document.getElementById(id);
+    })
     .filter(Boolean);
 
-  function setActive(id) {
-    navLinks.forEach(function (a) {
-      if (a.getAttribute('href') === '#' + id) a.setAttribute('aria-current', 'location');
-      else a.removeAttribute('aria-current');
-    });
-  }
-
-  let lastId = null;
-  let ticking = false;
-  function pickActive() {
-    if (!sections.length) return null;
-    const line = (header ? header.getBoundingClientRect().height : 0) + window.innerHeight * 0.25;
-    let active = sections[0].id;
-    for (let i = 0; i < sections.length; i++) {
-      const r = sections[i].getBoundingClientRect();
-      if (r.top <= line) active = sections[i].id;
-      else break;
-    }
-    return active;
-  }
-  function updateSpy() {
-    ticking = false;
-    const id = pickActive();
-    if (!id || id === lastId) return;
-    lastId = id;
-    setActive(id);
-  }
-  function requestSpy() {
-    if (ticking) return;
-    ticking = true;
-    if (typeof window.requestAnimationFrame === 'function') {
-      window.requestAnimationFrame(updateSpy);
-    } else {
-      setTimeout(updateSpy, 16);
-    }
-  }
-  if (navLinks.length && sections.length) {
-    window.addEventListener('scroll', requestSpy, { passive: true });
-    window.addEventListener('resize', requestSpy);
-    updateSpy();
-  }
-
-  /* Reveal-on-scroll for elements with .reveal. */
-  const reveals = document.querySelectorAll('.reveal');
-  if ('IntersectionObserver' in window) {
-    const io = new IntersectionObserver(function (entries) {
-      entries.forEach(function (e) {
-        if (e.isIntersecting) {
-          e.target.classList.add('visible');
-          io.unobserve(e.target);
-        }
+  if (sections.length) {
+    function spy() {
+      var current = "";
+      sections.forEach(function (section) {
+        if (section.getBoundingClientRect().top < 120) current = section.id;
       });
-    }, { rootMargin: '0px 0px -12% 0px', threshold: 0.06 });
-    reveals.forEach(function (el) { io.observe(el); });
-  } else {
-    reveals.forEach(function (el) { el.classList.add('visible'); });
-  }
-})();
-
-(function initMap() {
-  const mapEl = document.getElementById('devnet-presence-map');
-  if (!mapEl || typeof L === 'undefined') return;
-  const pins = (window.DEVNET_PINS || []).slice();
-  if (!pins.length) return;
-
-  const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  /* Eleven pins. Clustering would collapse Ontario and the Northeast into count bubbles. */
-  const useCluster = false;
-  let clusterGroup = null;
-  let arcRebuildTimer = null;
-
-  /* Loose North America frame. Viscosity stays 0 so this is not a drag cage.
-     Pin fits use real coordinates; this bound only keeps an empty view on-continent. */
-  const MAP_MAX_BOUNDS = L.latLngBounds([5, -155], [72, -45]);
-  const MAP_BOUNDS_VISCOSITY = 0;
-  const minZoomAllowed = 3;
-  const OVERVIEW_FIT_OPTS = {
-    paddingTopLeft: [20, 24],
-    paddingBottomRight: [20, 20],
-    maxZoom: 5
-  };
-  const CHAPTER_FIT_OPTS = {
-    paddingTopLeft: [48, 56],
-    paddingBottomRight: [48, 48],
-    maxZoom: 12
-  };
-  let activeMapFilter = 'all';
-  let userAdjustedView = false;
-  let didInitialFit = false;
-  let arcHighlightRegion = null;
-  let arcWebGroup = null;
-  let focusBoundsRelaxed = false;
-  let mapResetInProgress = false;
-
-  function boundsForPinList(list) {
-    let b = null;
-    list.forEach(function (p) {
-      if (typeof p.lat !== 'number' || typeof p.lng !== 'number') return;
-      const ll = L.latLng(p.lat, p.lng);
-      if (!b) b = L.latLngBounds(ll, ll);
-      else b.extend(ll);
-    });
-    if (!b) return null;
-    const sw = b.getSouthWest();
-    const ne = b.getNorthEast();
-    if (Math.abs(ne.lat - sw.lat) < 0.08 && Math.abs(ne.lng - sw.lng) < 0.08) {
-      b.extend([sw.lat - 0.06, sw.lng - 0.09]);
-      b.extend([ne.lat + 0.06, ne.lng + 0.09]);
+      document.querySelectorAll("[data-nav]").forEach(function (link) {
+        var href = link.getAttribute("href") || "";
+        var hashIndex = href.indexOf("#");
+        var hash = hashIndex >= 0 ? href.slice(hashIndex + 1) : "";
+        var on = hash === current && current !== "";
+        if (on) link.setAttribute("aria-current", "true");
+        else if (link.getAttribute("aria-current") === "true") link.removeAttribute("aria-current");
+      });
     }
-    return b;
+    spy();
+    window.addEventListener("scroll", spy, { passive: true });
   }
 
-  function pinsForFilter(kind) {
-    if (kind === 'all') return pins.slice();
-    const matched = pins.filter(function (p) { return p.type === kind; });
-    if (matched.length) return matched;
-    return pins.filter(function (p) { return p.type === 'chapter'; });
-  }
-
-  function boundsForFilter(kind) {
-    return boundsForPinList(pinsForFilter(kind)) || MAP_MAX_BOUNDS;
-  }
-
-  function fitOptsForFilter(kind) {
-    if (kind === 'chapter') return CHAPTER_FIT_OPTS;
-    return OVERVIEW_FIT_OPTS;
-  }
-
-  const map = L.map(mapEl, {
-    scrollWheelZoom: true,
-    zoomControl: true,
-    attributionControl: true,
-    maxBounds: MAP_MAX_BOUNDS,
-    maxBoundsViscosity: MAP_BOUNDS_VISCOSITY,
-    minZoom: minZoomAllowed,
-    maxZoom: 16
-  });
-  /* Esri World Dark Gray draws without an API key. Carto's raster URL returns an API-key watermark. */
-  const esriTiles = L.tileLayer(
-    'https://services.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}',
-    {
-      attribution: 'Tiles &copy; Esri, HERE, Garmin, &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, and the GIS user community',
-      maxZoom: 16,
-      minZoom: minZoomAllowed
-    }
-  );
-  const osmTiles = L.tileLayer(
-    'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-    {
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-      maxZoom: 19,
-      minZoom: minZoomAllowed
-    }
-  );
-  esriTiles.addTo(map);
-  let tileFallbackActive = false;
-  let esriTileErrors = 0;
-  esriTiles.on('tileerror', function () {
-    esriTileErrors += 1;
-    if (tileFallbackActive || esriTileErrors < 3) return;
-    tileFallbackActive = true;
-    map.removeLayer(esriTiles);
-    osmTiles.addTo(map);
-    invalidateMapLayout();
-  });
-  map.setMinZoom(minZoomAllowed);
-
-  function fitFilterView(kind) {
-    map.fitBounds(boundsForFilter(kind), fitOptsForFilter(kind));
-    if (map.getZoom() < minZoomAllowed) map.setZoom(minZoomAllowed);
-  }
-
-  fitFilterView(activeMapFilter);
-
-  function relaxMapBoundsForFocus() {
-    if (focusBoundsRelaxed) return;
-    focusBoundsRelaxed = true;
-    map.setMaxBounds(null);
-    map.options.maxBoundsViscosity = 0;
-  }
-
-  function restoreMapBounds() {
-    if (!focusBoundsRelaxed) return;
-    focusBoundsRelaxed = false;
-    map.setMaxBounds(MAP_MAX_BOUNDS);
-    map.options.maxBoundsViscosity = MAP_BOUNDS_VISCOSITY;
-  }
-
-  /* Pins only. The hub arc web is not drawn. */
-
-  if (useCluster) {
-    clusterGroup = L.markerClusterGroup({
-      maxClusterRadius: 38,
-      spiderfyOnMaxZoom: true,
-      showCoverageOnHover: false,
-      removeOutsideVisibleBounds: true,
-      disableClusteringAtZoom: 9,
-      zoomToBoundsOnClick: true,
-      spiderLegPolylineOptions: { weight: 1.5, color: 'rgba(192, 132, 252, 0.45)', opacity: 0.9 },
-      iconCreateFunction: function (cl) {
-        const n = cl.getChildCount();
-        return L.divIcon({
-          html: '<span class="devnet-cluster-count">' + n + '</span>',
-          className: 'devnet-marker-cluster',
-          iconSize: L.point(34, 34)
-        });
-      }
-    });
-  }
-
-  function escapeHtml(str) {
-    return String(str).replace(/[&<>"']/g, function (c) {
-      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
-    });
-  }
-
-  function hubDisplayTitle(p) {
-    const city = p && p.city != null ? String(p.city).trim() : '';
-    if (city) return city;
-    const name = p && p.name != null ? String(p.name).trim() : '';
-    return name;
-  }
-
-  function formatLocationSubtitle(p, compact) {
-    const region = p && p.region != null ? String(p.region).trim() : '';
-    if (!region) return '';
-    const parts = region.split(',').map(function (s) { return s.trim(); }).filter(Boolean);
-    if (!parts.length) return '';
-    const countryRaw = parts[parts.length - 1];
-    let country = countryRaw;
-    if (/^canada$/i.test(countryRaw)) country = 'CAN';
-    else if (/^(usa|u\.?s\.?a?\.?|united states(?: of america)?)$/i.test(countryRaw)) country = 'USA';
-    else if (/^can$/i.test(countryRaw)) country = 'CAN';
-    const province = parts.slice(0, -1).join(', ');
-    if (!province) return country;
-    if (compact) return province + ' ' + country;
-    return province + ', ' + country;
-  }
-
-  function popupTitle(p) {
-    if (p.type === 'chapter') {
-      const name = p && p.name != null ? String(p.name).trim() : '';
-      if (name) return name;
-    }
-    return hubDisplayTitle(p);
-  }
-
-  function tooltipHtml(p) {
-    if (p.type === 'presence') {
-      const title = hubDisplayTitle(p);
-      const subtitle = formatLocationSubtitle(p, true);
-      return (
-        '<div class="presence-tooltip-inner">' +
-          '<span class="presence-tooltip-inner__name">' + escapeHtml(title) + '</span>' +
-          (subtitle ? '<span class="presence-tooltip-inner__location">' + escapeHtml(subtitle) + '</span>' : '') +
-          '<span class="presence-tooltip-inner__status">' + escapeHtml(PRESENCE_BADGE_LABEL) + '</span>' +
-        '</div>'
-      );
-    }
-    const title = popupTitle(p);
-    const subtitle = formatLocationSubtitle(p, true);
-    const status = STATUS_LABEL_SHORT[p.status] || STATUS_LABEL[p.status] || p.status;
-    return (
-      '<div class="presence-tooltip-inner">' +
-        '<span class="presence-tooltip-inner__name">' + escapeHtml(title) + '</span>' +
-        (subtitle ? '<span class="presence-tooltip-inner__location">' + escapeHtml(subtitle) + '</span>' : '') +
-        '<span class="presence-tooltip-inner__status">' + escapeHtml(status) + '</span>' +
-      '</div>'
-    );
-  }
-
-  /* Flip tooltip away from map edges (Leaflet container clips overflow). */
-  const TOOLTIP_EDGE_PAD = { top: 88, right: 130, bottom: 72, left: 130 };
-
-  function tooltipPlacementForLatLng(latlng) {
-    const size = map.getSize();
-    const pt = map.latLngToContainerPoint(latlng);
-    const spaceTop = pt.y;
-    const spaceBottom = size.y - pt.y;
-    const spaceLeft = pt.x;
-    const spaceRight = size.x - pt.x;
-    const needFlipY = spaceTop < TOOLTIP_EDGE_PAD.top || spaceBottom < TOOLTIP_EDGE_PAD.bottom;
-    const needFlipX = spaceLeft < TOOLTIP_EDGE_PAD.left || spaceRight < TOOLTIP_EDGE_PAD.right;
-
-    if (needFlipY && needFlipX) {
-      const minVert = Math.min(spaceTop, spaceBottom);
-      const minHoriz = Math.min(spaceLeft, spaceRight);
-      if (minVert <= minHoriz) {
-        return spaceTop < spaceBottom
-          ? { direction: 'bottom', offset: L.point(0, 10) }
-          : { direction: 'top', offset: L.point(0, -10) };
-      }
-      return spaceLeft < spaceRight
-        ? { direction: 'right', offset: L.point(10, 0) }
-        : { direction: 'left', offset: L.point(-10, 0) };
-    }
-    if (needFlipY) {
-      return spaceTop < spaceBottom
-        ? { direction: 'bottom', offset: L.point(0, 10) }
-        : { direction: 'top', offset: L.point(0, -10) };
-    }
-    if (needFlipX) {
-      return spaceLeft < spaceRight
-        ? { direction: 'right', offset: L.point(10, 0) }
-        : { direction: 'left', offset: L.point(-10, 0) };
-    }
-    return { direction: 'top', offset: L.point(0, -10) };
-  }
-
-  function applyTooltipPlacement(marker, latlng) {
-    const tip = marker.getTooltip && marker.getTooltip();
-    if (!tip) return;
-    const place = tooltipPlacementForLatLng(latlng || marker.getLatLng());
-    tip.options.direction = place.direction;
-    tip.options.offset = place.offset;
-    if (typeof tip.setDirection === 'function') tip.setDirection(place.direction);
-    if (tip.isOpen && tip.isOpen()) tip.update();
-  }
-
-  function refreshOpenTooltipPlacements() {
-    pins.forEach(function (p) {
-      const m = markers[p.id];
-      const tip = m && m.getTooltip && m.getTooltip();
-      if (tip && tip.isOpen && tip.isOpen()) applyTooltipPlacement(m, m.getLatLng());
-    });
-  }
-
-  const markers = {};
-  pins.forEach(function (p) {
-    const s = STATUS_STYLE[p.status] || STATUS_STYLE.presence;
-    const opts = {
-      radius: s.radius,
-      fillColor: s.fill,
-      color: s.stroke,
-      weight: s.weight,
-      opacity: 1,
-      fillOpacity: s.fill === 'transparent' ? 0 : 0.88
-    };
-    if (s.dash) opts.dashArray = s.dash;
-    const marker = L.circleMarker([p.lat, p.lng], opts);
-    marker.bindTooltip(tooltipHtml(p), {
-      direction: 'top',
-      offset: [0, -10],
-      opacity: 1,
-      sticky: true,
-      className: 'devnet-map-tooltip'
-    });
-    marker.bindPopup(popupHtml(p), {
-      className: 'devnet-popup',
-      maxWidth: 280,
-      autoPan: true,
-      autoPanPadding: L.point(48, 48)
-    });
-    markers[p.id] = marker;
-
-    marker.on('mouseover', function () {
-      setArcHighlightByRegion(p.mapRegion || null);
-      applyTooltipPlacement(marker);
-      marker.openTooltip();
-    });
-    marker.on('mouseout', function () {
-      marker.closeTooltip();
-      setArcHighlightByRegion(null);
-    });
-    marker.on('click', function () {
-      focusPin(p.id);
-    });
-    marker.on('popupclose', function () {
-      if (mapResetInProgress) return;
-      setTimeout(function () {
-        if (mapResetInProgress) return;
-        let anyPopupOpen = false;
-        pins.forEach(function (pin) {
-          const m = markers[pin.id];
-          if (m && m.isPopupOpen && m.isPopupOpen()) anyPopupOpen = true;
-        });
-        if (!anyPopupOpen) resetMapToOverview();
-      }, 0);
-    });
-  });
-
-  /* Continental zoom packs southern Ontario into a few pixels. Keep each city a small dot there. */
-  function syncMarkerSizes() {
-    const zoom = map.getZoom();
-    const tight = zoom < 6;
-    pins.forEach(function (p) {
-      const m = markers[p.id];
-      if (!m) return;
-      const base = STATUS_STYLE[p.status] || STATUS_STYLE.presence;
-      m.setRadius(tight ? (p.type === 'chapter' ? 4 : 3) : base.radius);
-      m.setStyle({ weight: tight ? 1 : base.weight });
-    });
-  }
-  syncMarkerSizes();
-  map.on('zoomend', syncMarkerSizes);
-
-  function markerVisibleOnMap(marker) {
-    if (!marker) return false;
-    if (map.hasLayer(marker)) return true;
-    if (clusterGroup && clusterGroup.hasLayer(marker)) return true;
-    return false;
-  }
-
-  function getMarkerDisplayParent(marker) {
-    if (!useCluster || !clusterGroup) return marker;
-    if (typeof clusterGroup.getVisibleParent !== 'function') return marker;
-    const p = clusterGroup.getVisibleParent(marker);
-    return p || marker;
-  }
-
-  function popupHtml(p) {
-    const badgeClass = 'pin-popup__badge pin-popup__badge--' + p.status;
-    let cta = '';
-    if (p.type === 'chapter' && p.cta && p.cta.href) {
-      cta = '<a class="pin-popup__cta" href="' + escapeHtml(p.cta.href) +
-        '" target="_blank" rel="noopener noreferrer">' + escapeHtml(p.cta.label || 'Learn more') + '</a>';
-    }
-    if (p.type === 'presence') {
-      const title = hubDisplayTitle(p);
-      const location = formatLocationSubtitle(p);
-      const locationLine = location
-        ? '<div class="pin-popup__location">' + escapeHtml(location) + '</div>'
-        : '';
-      return (
-        '<div class="pin-popup">' +
-          '<div class="pin-popup__title">' + escapeHtml(title) + '</div>' +
-          locationLine +
-          '<div class="pin-popup__location">Members in the network</div>' +
-          '<span class="' + badgeClass + '">' + escapeHtml(PRESENCE_BADGE_LABEL) + '</span>' +
-        '</div>'
-      );
-    }
-    const statusLabel = STATUS_LABEL_SHORT[p.status] || STATUS_LABEL[p.status] || p.status;
-    const title = popupTitle(p);
-    const location = formatLocationSubtitle(p);
-    const locationLine = location
-      ? '<div class="pin-popup__location">' + escapeHtml(location) + '</div>'
-      : '';
-    const schoolLine = p.type === 'chapter' && p.school
-      ? '<div class="pin-popup__school">' + escapeHtml(p.school) + '</div>'
-      : '';
-    return (
-      '<div class="pin-popup">' +
-        '<div class="pin-popup__title">' + escapeHtml(title) + '</div>' +
-        locationLine +
-        schoolLine +
-        '<span class="' + badgeClass + '">' + escapeHtml(statusLabel) + '</span>' +
-        (cta ? '<div>' + cta + '</div>' : '') +
-      '</div>'
-    );
-  }
-
-  /* Hub arc web (topology ported from Live-devnetsite/main.js). */
-  function hubArcLatLngs(lat1, lng1, lat2, lng2, segments) {
-    const dLat = lat2 - lat1;
-    const dLng = lng2 - lng1;
-    const chordDeg = Math.sqrt(dLat * dLat + dLng * dLng);
-    const midLat = (lat1 + lat2) / 2;
-    const midLng = (lng1 + lng2) / 2;
-    const bulge = Math.min(0.38, Math.max(0.06, chordDeg * 0.028));
-    const cLat = midLat + bulge;
-    const cLng = midLng;
-    const out = [];
-    for (let i = 0; i <= segments; i++) {
-      const u = i / segments;
-      const omu = 1 - u;
-      out.push(L.latLng(
-        omu * omu * lat1 + 2 * omu * u * cLat + u * u * lat2,
-        omu * omu * lng1 + 2 * omu * u * cLng + u * u * lng2
-      ));
-    }
-    return out;
-  }
-
-  const ARC_STYLE_BASE = {
-    color: '#c084fc',
-    weight: 1.2,
-    opacity: 0.28,
-    lineCap: 'round',
-    lineJoin: 'round',
-    dashArray: '6 4'
-  };
-  const ARC_STYLE_DIM = {
-    color: '#c084fc',
-    weight: 1,
-    opacity: 0.06,
-    lineCap: 'round',
-    lineJoin: 'round',
-    dashArray: '6 4'
-  };
-  const ARC_STYLE_HIGH_CA = {
-    color: '#f5d0fe',
-    weight: 2,
-    opacity: 0.85,
-    lineCap: 'round',
-    lineJoin: 'round',
-    dashArray: null
-  };
-  const ARC_STYLE_HIGH_US = {
-    color: '#67e8f9',
-    weight: 2,
-    opacity: 0.85,
-    lineCap: 'round',
-    lineJoin: 'round',
-    dashArray: null
-  };
-
-  function arcStyleHighForRegion(region) {
-    if (region === 'us') return ARC_STYLE_HIGH_US;
-    return ARC_STYLE_HIGH_CA;
-  }
-
-  function applyArcHighlightToLayers() {
-    if (!arcWebGroup) return;
-    const region = arcHighlightRegion;
-    arcWebGroup.eachLayer(function (layer) {
-      if (!layer._devnetEdgeType) return;
-      if (!region) {
-        layer.setStyle(ARC_STYLE_BASE);
-        return;
-      }
-      if (layer._devnetEdgeType === region) {
-        layer.setStyle(arcStyleHighForRegion(region));
-      } else {
-        layer.setStyle(ARC_STYLE_DIM);
-      }
-    });
-  }
-
-  function setArcHighlightByRegion(region) {
-    arcHighlightRegion = region;
-    applyArcHighlightToLayers();
-  }
-
-  function sortedPairKey(a, b) {
-    return a < b ? a + '|' + b : b + '|' + a;
-  }
-
-  function pinVisibleByHubKey(key) {
-    for (let i = 0; i < pins.length; i++) {
-      const p = pins[i];
-      if (p.hubKey !== key) continue;
-      const m = markers[p.id];
-      if (m && markerVisibleOnMap(m)) return p;
-    }
-    return null;
-  }
-
-  const CA_PRESENCE_SPINE = [
-    'vancouver', 'london', 'waterloo', 'kingston', 'toronto', 'montreal'
-  ];
-
-  const CA_BACKBONE_ADJ = {};
-  (function () {
-    for (let i = 0; i < CA_PRESENCE_SPINE.length - 1; i++) {
-      CA_BACKBONE_ADJ[sortedPairKey(CA_PRESENCE_SPINE[i], CA_PRESENCE_SPINE[i + 1])] = true;
-    }
-  }());
-
-  const CA_EXTRA_KEYS = {};
-  CA_EXTRA_KEYS[sortedPairKey('vancouver', 'london')] = true;
-  CA_EXTRA_KEYS[sortedPairKey('vancouver', 'kingston')] = true;
-  CA_EXTRA_KEYS[sortedPairKey('vancouver', 'montreal')] = true;
-  CA_EXTRA_KEYS[sortedPairKey('montreal', 'toronto')] = true;
-  CA_EXTRA_KEYS[sortedPairKey('london', 'toronto')] = true;
-  CA_EXTRA_KEYS[sortedPairKey('waterloo', 'toronto')] = true;
-
-  const CA_HUB_STRAIGHT_KEYS = {};
-
-  const US_BACKBONE_ADJ = {};
-  (function () {
-    const chain = ['los-angeles', 'tucson', 'miami', 'new-york-city', 'boston'];
-    for (let i = 0; i < chain.length - 1; i++) {
-      US_BACKBONE_ADJ[sortedPairKey(chain[i], chain[i + 1])] = true;
-    }
-  }());
-
-  const US_EXTRA_KEYS = {};
-  US_EXTRA_KEYS[sortedPairKey('los-angeles', 'new-york-city')] = true;
-  US_EXTRA_KEYS[sortedPairKey('new-york-city', 'tucson')] = true;
-  US_EXTRA_KEYS[sortedPairKey('boston', 'miami')] = true;
-
-  const CROSS_US_CA_KEYS = {};
-  [
-    ['boston', 'montreal'],
-    ['london', 'tucson'],
-    ['london', 'miami'],
-    ['london', 'boston'],
-    ['vancouver', 'los-angeles'],
-    ['los-angeles', 'london'],
-    ['vancouver', 'miami'],
-    ['vancouver', 'tucson'],
-    ['new-york-city', 'montreal'],
-    ['new-york-city', 'toronto'],
-    ['new-york-city', 'london']
-  ].forEach(function (pair) {
-    CROSS_US_CA_KEYS[sortedPairKey(pair[0], pair[1])] = true;
-  });
-
-  function hubArcEdgeAllowed(idA, idB) {
-    const cA = pinVisibleByHubKey(idA);
-    const cB = pinVisibleByHubKey(idB);
-    if (!cA || !cB) return false;
-    const k = sortedPairKey(idA, idB);
-    if (cA.mapRegion === 'ca' && cB.mapRegion === 'ca') {
-      return !!(CA_BACKBONE_ADJ[k] || CA_EXTRA_KEYS[k]);
-    }
-    if (cA.mapRegion === 'us' && cB.mapRegion === 'us') {
-      return !!(US_BACKBONE_ADJ[k] || US_EXTRA_KEYS[k]);
-    }
-    return !!CROSS_US_CA_KEYS[k];
-  }
-
-  function groupRegionFlavor(hubKeys) {
-    let ca = false;
-    let us = false;
-    hubKeys.forEach(function (key) {
-      const p = pinVisibleByHubKey(key);
-      if (!p) return;
-      if (p.mapRegion === 'ca') ca = true;
-      if (p.mapRegion === 'us') us = true;
-    });
-    if (ca && !us) return 'ca';
-    if (us && !ca) return 'us';
-    return 'cross';
-  }
-
-  function edgeTypeForHubPair(keysA, keysB) {
-    const f1 = groupRegionFlavor(keysA);
-    const f2 = groupRegionFlavor(keysB);
-    if (f1 === 'ca' && f2 === 'ca') return 'ca';
-    if (f1 === 'us' && f2 === 'us') return 'us';
-    return 'cross';
-  }
-
-  function groupsAllowHubArc(keysA, keysB) {
-    for (let ai = 0; ai < keysA.length; ai++) {
-      for (let bi = 0; bi < keysB.length; bi++) {
-        if (hubArcEdgeAllowed(keysA[ai], keysB[bi])) return true;
-      }
-    }
-    return false;
-  }
-
-  function groupsUseStraightHubChord(keysA, keysB) {
-    for (let ai = 0; ai < keysA.length; ai++) {
-      for (let bi = 0; bi < keysB.length; bi++) {
-        const a = keysA[ai];
-        const b = keysB[bi];
-        if (!hubArcEdgeAllowed(a, b)) continue;
-        if (CA_HUB_STRAIGHT_KEYS[sortedPairKey(a, b)]) return true;
-      }
-    }
-    return false;
-  }
-
-  function rebuildHubArcWeb() {
-    if (!arcWebGroup) return;
-    arcWebGroup.clearLayers();
-    const groups = {};
-    pins.forEach(function (p) {
-      if (!p.hubKey) return;
-      const marker = markers[p.id];
-      if (!marker || !markerVisibleOnMap(marker)) return;
-      const par = getMarkerDisplayParent(marker);
-      const sid = L.Util.stamp(par);
-      if (!groups[sid]) {
-        groups[sid] = { latlng: par.getLatLng(), hubKeys: [] };
-      }
-      const g = groups[sid];
-      if (g.hubKeys.indexOf(p.hubKey) === -1) g.hubKeys.push(p.hubKey);
-    });
-    const groupKeys = Object.keys(groups);
-    for (let gi = 0; gi < groupKeys.length; gi++) {
-      for (let gj = gi + 1; gj < groupKeys.length; gj++) {
-        const ga = groups[groupKeys[gi]];
-        const gb = groups[groupKeys[gj]];
-        if (!groupsAllowHubArc(ga.hubKeys, gb.hubKeys)) continue;
-        const la = ga.latlng;
-        const lb = gb.latlng;
-        const edgeType = edgeTypeForHubPair(ga.hubKeys, gb.hubKeys);
-        const latlngs = groupsUseStraightHubChord(ga.hubKeys, gb.hubKeys)
-          ? [la, lb]
-          : hubArcLatLngs(la.lat, la.lng, lb.lat, lb.lng, 16);
-        const line = L.polyline(latlngs, Object.assign({
-          pane: 'devnetArcs',
-          interactive: false,
-          className: 'devnet-hub-arc'
-        }, ARC_STYLE_BASE));
-        line._devnetEdgeType = edgeType;
-        arcWebGroup.addLayer(line);
-      }
-    }
-    applyArcHighlightToLayers();
-  }
-
-  function scheduleRebuildArcWeb() {
-    clearTimeout(arcRebuildTimer);
-    arcRebuildTimer = setTimeout(function () {
-      arcRebuildTimer = null;
-      rebuildHubArcWeb();
-    }, 48);
-  }
-
-  map.on('zoomend', scheduleRebuildArcWeb);
-  map.on('moveend', scheduleRebuildArcWeb);
-  map.on('moveend zoomend', refreshOpenTooltipPlacements);
-  if (clusterGroup) {
-    clusterGroup.on('animationend', scheduleRebuildArcWeb);
-    clusterGroup.on('spiderfied', scheduleRebuildArcWeb);
-    clusterGroup.on('unspiderfied', scheduleRebuildArcWeb);
-  }
-
-  /* Filter chips: all | chapter | presence. */
-  const chips = document.querySelectorAll('.map-chips .chip');
-  const legendFuture = document.querySelector('.legend-item--future, [data-legend="future"]');
-  const legendActive = document.querySelector('[data-legend="active"]');
-  const legendChapterHub = document.querySelector('.legend-item--chapter-hub, [data-legend="chapter-hub"]');
-  const legendPresence = document.querySelector('.legend-item--presence, [data-legend="presence"]');
-  const mapSectionSub = document.getElementById('map-section-sub');
-  const pillRow = document.querySelector('.chapter-pill-row');
-  const hasChapters = pins.some(function (p) { return p.type === 'chapter'; });
-  const MAP_SUB_CHAPTER =
-    'DevNet London at Western University is the only chapter.';
-  const MAP_SUB_NETWORK =
-    'London is the only chapter. Other cities are members in the network, not chapters.';
-
-  function setMarkerOnMap(marker, show, useClusterLayer) {
-    if (clusterGroup) {
-      if (clusterGroup.hasLayer(marker)) clusterGroup.removeLayer(marker);
-    }
-    if (map.hasLayer(marker)) map.removeLayer(marker);
-    if (!show) return;
-    if (useClusterLayer && clusterGroup) {
-      clusterGroup.addLayer(marker);
-    } else {
-      marker.addTo(map);
-    }
-  }
-
-  function applyFilter(kind) {
-    activeMapFilter = kind;
-    userAdjustedView = false;
-    const visiblePins = pinsForFilter(kind);
-    const visibleIds = {};
-    visiblePins.forEach(function (p) { visibleIds[p.id] = true; });
-    const showingChapters = visiblePins.some(function (p) { return p.type === 'chapter'; });
-    const showingPresence = visiblePins.some(function (p) { return p.type === 'presence'; });
-    const showChapterStatusLegend = showingChapters && hasChapters;
-    const useClusterLayer = false;
-    if (legendChapterHub) {
-      legendChapterHub.classList.add('is-hidden');
-      legendChapterHub.setAttribute('aria-hidden', 'true');
-    }
-    if (legendPresence) {
-      legendPresence.classList.toggle('is-hidden', !showingPresence);
-      legendPresence.setAttribute('aria-hidden', showingPresence ? 'false' : 'true');
-    }
-    if (legendFuture) {
-      legendFuture.classList.add('is-hidden');
-      legendFuture.setAttribute('aria-hidden', 'true');
-    }
-    if (legendActive) {
-      legendActive.classList.toggle('is-hidden', !showChapterStatusLegend);
-      legendActive.setAttribute('aria-hidden', showChapterStatusLegend ? 'false' : 'true');
-    }
-    if (mapSectionSub) {
-      if (kind === 'all' || kind === 'presence' || showingPresence) {
-        mapSectionSub.textContent = MAP_SUB_NETWORK;
-      } else {
-        mapSectionSub.textContent = MAP_SUB_CHAPTER;
-      }
-    }
-    pins.forEach(function (p) {
-      const m = markers[p.id];
-      if (!m) return;
-      setMarkerOnMap(m, !!visibleIds[p.id], useClusterLayer && p.type === 'presence');
-    });
-    if (clusterGroup && typeof clusterGroup.refreshClusters === 'function') {
-      clusterGroup.refreshClusters();
-    }
-    rebuildHubArcWeb();
-    rebuildPills(kind, visiblePins);
-    fitFilterView(kind);
-  }
-  chips.forEach(function (btn) {
-    btn.addEventListener('click', function () {
-      chips.forEach(function (b) { b.classList.remove('is-active'); });
-      btn.classList.add('is-active');
-      applyFilter(btn.getAttribute('data-filter') || 'all');
-    });
-  });
-  if (useCluster && clusterGroup) map.addLayer(clusterGroup);
-  (function syncAllFilterChip() {
-    let allChip = null;
-    chips.forEach(function (b) {
-      if ((b.getAttribute('data-filter') || '') === 'all') allChip = b;
-    });
-    chips.forEach(function (b) { b.classList.remove('is-active'); });
-    if (allChip) allChip.classList.add('is-active');
-  })();
-  applyFilter('all');
-
-  function rebuildPills(kind, source) {
-    if (!pillRow) return;
-    const pillSource = source || (
-      kind === 'chapter' ? (window.DEVNET_CHAPTERS || [])
-      : kind === 'presence' ? (window.DEVNET_PRESENCE || [])
-      : (window.DEVNET_PINS || [])
-    );
-    const hasChapterPill = pillSource.some(function (c) { return c.type === 'chapter'; });
-    const hasPresencePill = pillSource.some(function (c) { return c.type === 'presence'; });
-    pillRow.innerHTML = '';
-    let pillLabel = 'Jump to a city';
-    if (hasChapterPill && !hasPresencePill) pillLabel = 'Jump to chapter';
-    else if (hasPresencePill && !hasChapterPill) pillLabel = 'Jump to network presence';
-    else if (hasChapterPill && hasPresencePill) pillLabel = 'Jump to the chapter or a presence city';
-    pillRow.setAttribute('aria-label', pillLabel);
-    if (!pillSource.length) {
-      pillRow.classList.add('is-hidden');
-      pillRow.setAttribute('aria-hidden', 'true');
+  document.querySelectorAll("[data-count]").forEach(function (el) {
+    var target = Number(el.getAttribute("data-count"));
+    var suffix = el.getAttribute("data-suffix") || "";
+    var finalText = String(target) + suffix;
+    if (reduce || !("IntersectionObserver" in window)) {
+      el.textContent = finalText;
       return;
     }
-    pillRow.classList.remove('is-hidden');
-    pillRow.setAttribute('aria-hidden', 'false');
-    pillSource.forEach(function (c) {
-      const li = document.createElement('li');
-      const btn = document.createElement('button');
-      btn.type = 'button';
-      btn.className = 'chapter-pill';
-      btn.setAttribute('data-pin', c.id);
-      const dot = document.createElement('span');
-      dot.className = 'chapter-pill__dot';
-      const s = STATUS_STYLE[c.status] || STATUS_STYLE.presence;
-      dot.style.background = s ? s.fill : '#a855f7';
-      dot.style.boxShadow = s && s.glow ? '0 0 8px ' + s.fill : 'none';
-      const label = document.createElement('span');
-      label.textContent = c.city;
-      btn.appendChild(dot);
-      btn.appendChild(label);
-      btn.addEventListener('click', function () { focusPin(c.id); });
-      li.appendChild(btn);
-      pillRow.appendChild(li);
+    var started = false;
+    var counter = new IntersectionObserver(
+      function (entries) {
+        entries.forEach(function (entry) {
+          if (!entry.isIntersecting || started) return;
+          started = true;
+          counter.unobserve(el);
+          var start = null;
+          var duration = 800;
+          function frame(now) {
+            if (start === null) start = now;
+            var progress = Math.min(1, (now - start) / duration);
+            var eased = 1 - Math.pow(1 - progress, 3);
+            el.textContent = String(Math.round(target * eased)) + suffix;
+            if (progress < 1) requestAnimationFrame(frame);
+            else el.textContent = finalText;
+          }
+          requestAnimationFrame(frame);
+        });
+      },
+      { threshold: 0.6 }
+    );
+    counter.observe(el);
+  });
+
+  var stage = document.querySelector(".map-stage");
+  function drawMap() {
+    if (!stage || stage.classList.contains("is-drawn")) return;
+    var rect = stage.getBoundingClientRect();
+    if (rect.top < window.innerHeight * 0.8 && rect.bottom > 80) stage.classList.add("is-drawn");
+  }
+  if (stage && !reduce && "IntersectionObserver" in window) {
+    var mapObserver = new IntersectionObserver(
+      function (entries) {
+        entries.forEach(function (entry) {
+          if (!entry.isIntersecting) return;
+          stage.classList.add("is-drawn");
+          mapObserver.unobserve(stage);
+        });
+      },
+      { threshold: 0.2 }
+    );
+    mapObserver.observe(stage);
+    drawMap();
+    window.addEventListener("scroll", drawMap, { passive: true });
+  } else if (stage) {
+    stage.classList.add("is-drawn");
+  }
+
+  function setCity(id) {
+    document.querySelectorAll("[data-city]").forEach(function (el) {
+      el.classList.toggle("is-hot", id !== "" && el.getAttribute("data-city") === id);
     });
   }
 
-  function focusPin(id) {
-    const m = markers[id];
-    const p = pins.find(function (pin) { return pin.id === id; });
-    if (!m || !p) return;
-    userAdjustedView = true;
-    relaxMapBoundsForFocus();
-    document.querySelectorAll('.chapter-pill').forEach(function (el) {
-      el.classList.toggle('is-active', el.getAttribute('data-pin') === id);
-    });
-    setArcHighlightByRegion(p.mapRegion || null);
-    const z = Math.max(map.getZoom(), 9);
-    function afterVisible() {
-      if (reduceMotion) map.setView([p.lat, p.lng], z);
-      else map.flyTo([p.lat, p.lng], z, { duration: 0.55 });
-      m.openPopup();
-    }
-    if (useCluster && clusterGroup && clusterGroup.hasLayer(m)) {
-      clusterGroup.zoomToShowLayer(m, afterVisible);
-    } else {
-      afterVisible();
-    }
-  }
-
-  function resetMapToOverview() {
-    if (mapResetInProgress) return;
-    mapResetInProgress = true;
-    restoreMapBounds();
-    setArcHighlightByRegion(null);
-    document.querySelectorAll('.chapter-pill').forEach(function (el) {
-      el.classList.remove('is-active');
-    });
-    pins.forEach(function (pin) {
-      const m = markers[pin.id];
-      if (m) {
-        m.closePopup();
-        m.closeTooltip();
-      }
-    });
-    userAdjustedView = false;
-    const fitOpts = fitOptsForFilter(activeMapFilter);
-    const resetBounds = boundsForFilter(activeMapFilter);
-    function clampZoomAfterFit() {
-      if (map.getZoom() < minZoomAllowed) map.setZoom(minZoomAllowed);
-      mapResetInProgress = false;
-    }
-    if (reduceMotion) {
-      map.fitBounds(resetBounds, fitOpts);
-      clampZoomAfterFit();
-    } else {
-      map.flyToBounds(resetBounds, Object.assign({ duration: 0.55 }, fitOpts));
-      map.once('moveend', clampZoomAfterFit);
-    }
-  }
-
-  const ResetControl = L.Control.extend({
-    options: { position: 'topleft' },
-    onAdd: function () {
-      const wrap = L.DomUtil.create('div', 'leaflet-bar leaflet-control presence-map-reset-control');
-      const btn = L.DomUtil.create('button', 'presence-map-reset-btn', wrap);
-      btn.type = 'button';
-      btn.textContent = 'Reset';
-      btn.setAttribute('aria-label', 'Reset map to original view');
-      L.DomEvent.disableClickPropagation(wrap);
-      L.DomEvent.on(btn, 'click', function (e) {
-        L.DomEvent.stopPropagation(e);
-        resetMapToOverview();
-      });
-      return wrap;
+  document.addEventListener("pointerover", function (event) {
+    var target = event.target.closest("[data-city]");
+    setCity(target ? target.getAttribute("data-city") : "");
+  });
+  document.addEventListener("focusin", function (event) {
+    var target = event.target.closest("[data-city]");
+    if (target) setCity(target.getAttribute("data-city"));
+  });
+  document.addEventListener("focusout", function (event) {
+    var target = event.target.closest("[data-city]");
+    if (!target) return;
+    var next = event.relatedTarget && event.relatedTarget.closest("[data-city]");
+    if (!next) setCity("");
+  });
+  document.addEventListener("pointerout", function (event) {
+    var target = event.target.closest("[data-city]");
+    if (!target) return;
+    var next = event.relatedTarget && event.relatedTarget.closest ? event.relatedTarget.closest("[data-city]") : null;
+    if (!next && !(document.activeElement && document.activeElement.closest && document.activeElement.closest("[data-city]"))) {
+      setCity("");
     }
   });
-  map.addControl(new ResetControl());
 
-  const mapCard = mapEl.closest('.map-card');
-
-  function invalidateMapLayout() {
-    map.invalidateSize({ animate: false, pan: false });
-    const size = map.getSize();
-    if (!userAdjustedView && !mapResetInProgress && size.x > 0 && size.y > 0 && !didInitialFit) {
-      didInitialFit = true;
-      fitFilterView(activeMapFilter);
-    }
-    scheduleRebuildArcWeb();
-  }
-
-  map.on('dragstart', function () { userAdjustedView = true; });
-
-  map.whenReady(invalidateMapLayout);
-  requestAnimationFrame(invalidateMapLayout);
-  setTimeout(invalidateMapLayout, 400);
-  window.addEventListener('load', invalidateMapLayout, { once: true });
-
-  if (mapCard) {
-    mapCard.addEventListener('transitionend', function (e) {
-      if (e.target !== mapCard) return;
-      if (e.propertyName === 'opacity' || e.propertyName === 'transform') invalidateMapLayout();
-    });
-    if (!mapCard.classList.contains('visible')) {
-      const revealMo = new MutationObserver(function () {
-        if (!mapCard.classList.contains('visible')) return;
-        revealMo.disconnect();
-        requestAnimationFrame(invalidateMapLayout);
+  document.querySelectorAll(".tl-item button").forEach(function (button) {
+    button.addEventListener("click", function () {
+      var item = button.closest(".tl-item");
+      var open = item.classList.contains("is-open");
+      document.querySelectorAll(".tl-item").forEach(function (other) {
+        var otherButton = other.querySelector("button");
+        var panel = other.querySelector(".tl-panel");
+        var willOpen = other === item && !open;
+        other.classList.toggle("is-open", willOpen);
+        if (otherButton) otherButton.setAttribute("aria-expanded", willOpen ? "true" : "false");
+        if (panel) panel.hidden = !willOpen;
       });
-      revealMo.observe(mapCard, { attributes: true, attributeFilter: ['class'] });
-    }
+    });
+    button.addEventListener("keydown", function (event) {
+      if (event.key !== "ArrowDown" && event.key !== "ArrowUp") return;
+      var buttons = Array.prototype.slice.call(document.querySelectorAll(".tl-item button"));
+      var index = buttons.indexOf(button);
+      var nextIndex = event.key === "ArrowDown" ? index + 1 : index - 1;
+      if (nextIndex < 0) nextIndex = buttons.length - 1;
+      if (nextIndex >= buttons.length) nextIndex = 0;
+      event.preventDefault();
+      buttons[nextIndex].focus();
+    });
+  });
+
+  var countdown = document.getElementById("countdown");
+  var intro = document.getElementById("event-intro");
+  var introButton = intro ? intro.querySelector("button") : null;
+  var introPanel = intro ? intro.querySelector(".tl-panel") : null;
+  var nextItem = document.getElementById("event-chapter");
+  var startMs = Date.parse("2026-11-06T14:00:00-05:00");
+  var endMs = Date.parse("2026-11-06T16:00:00-05:00");
+
+  function openOnly(item) {
+    document.querySelectorAll(".tl-item").forEach(function (other) {
+      var button = other.querySelector("button");
+      var panel = other.querySelector(".tl-panel");
+      var willOpen = other === item;
+      other.classList.toggle("is-open", willOpen);
+      if (button) button.setAttribute("aria-expanded", willOpen ? "true" : "false");
+      if (panel) panel.hidden = !willOpen;
+    });
   }
 
-  if ('IntersectionObserver' in window) {
-    const ioMap = new IntersectionObserver(function (entries) {
-      entries.forEach(function (e) { if (e.isIntersecting) invalidateMapLayout(); });
-    }, { threshold: 0.05 });
-    ioMap.observe(mapEl);
+  function renderCountdown() {
+    if (!countdown || !intro) return;
+    var now = Date.now();
+    if (now >= endMs) {
+      countdown.textContent = "Past";
+      intro.classList.add("is-past");
+      if (introButton) introButton.setAttribute("aria-label", "Intro Workshop, past");
+      if (!intro.dataset.user && !intro.dataset.shifted) {
+        intro.dataset.shifted = "1";
+        openOnly(nextItem);
+      }
+      return;
+    }
+    if (now >= startMs) {
+      countdown.textContent = "Happening now";
+      return;
+    }
+    var diff = startMs - now;
+    var days = Math.floor(diff / 86400000);
+    var hours = Math.floor((diff % 86400000) / 3600000);
+    var minutes = Math.floor((diff % 3600000) / 60000);
+    countdown.textContent = days > 0 ? "Starts in " + days + "d " + hours + "h" : "Starts in " + hours + "h " + minutes + "m";
   }
-})();
+
+  if (intro) {
+    renderCountdown();
+    window.setInterval(renderCountdown, 30000);
+    if (introButton) {
+      introButton.addEventListener("click", function () {
+        intro.dataset.user = "1";
+      });
+    }
+    if (introPanel) introPanel.hidden = !intro.classList.contains("is-open");
+  }
+
+  var cursorChip = document.querySelector(".cursor-chip");
+  if (cursorChip) {
+    var cursorButton = cursorChip.querySelector("button");
+    function setCursor(open) {
+      cursorChip.classList.toggle("is-open", open);
+      cursorButton.setAttribute("aria-expanded", open ? "true" : "false");
+    }
+    cursorButton.addEventListener("click", function () {
+      setCursor(!cursorChip.classList.contains("is-open"));
+    });
+    document.addEventListener("keydown", function (event) {
+      if (event.key === "Escape") setCursor(false);
+    });
+  }
+
+  function copyText(text) {
+    if (navigator.clipboard && window.isSecureContext) {
+      return navigator.clipboard.writeText(text);
+    }
+    return new Promise(function (resolve, reject) {
+      var area = document.createElement("textarea");
+      area.value = text;
+      area.setAttribute("readonly", "");
+      area.className = "visually-hidden";
+      document.body.appendChild(area);
+      area.select();
+      try {
+        document.execCommand("copy") ? resolve() : reject(new Error("copy failed"));
+      } catch (error) {
+        reject(error);
+      }
+      document.body.removeChild(area);
+    });
+  }
+
+  document.querySelectorAll(".copy").forEach(function (button) {
+    button.addEventListener("click", function (event) {
+      event.preventDefault();
+      event.stopPropagation();
+      var url = button.getAttribute("data-copy") || "";
+      var live = button.parentElement.querySelector(".copy-live");
+      copyText(url).then(function () {
+        button.classList.add("is-copied");
+        if (live) live.textContent = "Copied";
+        window.setTimeout(function () {
+          button.classList.remove("is-copied");
+          if (live) live.textContent = "";
+        }, 1500);
+      }).catch(function () {
+        if (live) live.textContent = "";
+      });
+    });
+  });
+});

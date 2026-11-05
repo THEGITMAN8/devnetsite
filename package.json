@@ -2,15 +2,8 @@
   "name": "devnet-updated-site",
   "version": "0.1.0",
   "private": true,
-  "description": "DevNet marketing site. Founding chapter: DevNet London at Western University.",
+  "description": "DevNet, a network of builders across 12 cities. Static site for devnetwork.app.",
   "scripts": {
-    "build:css": "tailwindcss -i input.css -o tailwind-output.css --minify",
-    "build": "npm run build:css",
-    "dev": "tailwindcss -i input.css -o tailwind-output.css --watch",
-    "serve": "npx serve ."
-  },
-  "devDependencies": {
-    "tailwindcss": "^3.4.17"
+    "build": "node --check main.js"
   }
 }
-
