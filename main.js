@@ -125,40 +125,16 @@ document.addEventListener("DOMContentLoaded", function () {
     window.addEventListener("scroll", spy, { passive: true });
   }
 
-  document.querySelectorAll("[data-count]").forEach(function (el) {
-    var target = Number(el.getAttribute("data-count"));
-    var suffix = el.getAttribute("data-suffix") || "";
-    var finalText = String(target) + suffix;
-    if (reduce || !("IntersectionObserver" in window)) {
-      el.textContent = finalText;
-      return;
-    }
-    var started = false;
-    var counter = new IntersectionObserver(
-      function (entries) {
-        entries.forEach(function (entry) {
-          if (!entry.isIntersecting || started) return;
-          started = true;
-          counter.unobserve(el);
-          var start = null;
-          var duration = 800;
-          function frame(now) {
-            if (start === null) start = now;
-            var progress = Math.min(1, (now - start) / duration);
-            var eased = 1 - Math.pow(1 - progress, 3);
-            el.textContent = String(Math.round(target * eased)) + suffix;
-            if (progress < 1) requestAnimationFrame(frame);
-            else el.textContent = finalText;
-          }
-          requestAnimationFrame(frame);
-        });
-      },
-      { threshold: 0.6 }
-    );
-    counter.observe(el);
-  });
-
   var stage = document.querySelector(".map-stage");
+  var matrix = stage ? stage.querySelector(".matrix") : null;
+  function showMapFallback() {
+    if (!stage) return;
+    stage.classList.add("map-stage--fallback");
+    if (matrix) matrix.hidden = true;
+  }
+  if (matrix) {
+    matrix.addEventListener("error", showMapFallback);
+  }
   function drawMap() {
     if (!stage || stage.classList.contains("is-drawn")) return;
     var rect = stage.getBoundingClientRect();
@@ -360,10 +336,20 @@ document.addEventListener("DOMContentLoaded", function () {
       var hours = Math.floor((ms % 86400000) / 3600000);
       var minutes = Math.floor((ms % 3600000) / 60000);
       var seconds = Math.floor((ms % 60000) / 1000);
+      var labels = {
+        d: days === 1 ? "Day" : "Days",
+        h: hours === 1 ? "Hour" : "Hours",
+        m: "Min",
+        s: "Sec"
+      };
       if (units.d) units.d.textContent = String(days);
       if (units.h) units.h.textContent = String(hours);
       if (units.m) units.m.textContent = String(minutes);
       if (units.s) units.s.textContent = String(seconds);
+      ["d", "h", "m", "s"].forEach(function (key) {
+        var label = countdown.querySelector('[data-label="' + key + '"]');
+        if (label) label.textContent = labels[key];
+      });
     }
     var now = Date.now();
     if (now >= endMs) {
