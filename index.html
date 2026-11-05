@@ -82,7 +82,7 @@
         </div>
         <ul class="hero-stats">
           <li><span data-count="12">12</span> cities</li>
-          <li><span data-count="50" data-suffix="+">50+</span> builders</li>
+          <li><span data-count="75" data-suffix="+">75+</span> builders</li>
           <li class="hero-stats__text">Cursor Ambassadors</li>
         </ul>
       </div>
@@ -100,37 +100,32 @@
             </div>
           </div>
           <div class="art-wrap">
-            <svg class="art" viewBox="0 0 480 460" aria-hidden="false">
-            <g fill="none" stroke="rgba(205,184,242,0.1)" stroke-width="1">
-              <line x1="36" y1="78" x2="150" y2="40"/>
-              <line x1="330" y1="40" x2="446" y2="86"/>
-              <line x1="28" y1="300" x2="78" y2="400"/>
-              <line x1="410" y1="250" x2="452" y2="360"/>
-            </g>
-            <g class="art__links" fill="none" stroke="rgba(205,184,242,0.45)" stroke-width="1.25">
-              <line x1="214.3" y1="147.5" x2="135.7" y2="292.5"/>
-              <line x1="265.7" y1="147.5" x2="344.3" y2="292.5"/>
-            </g>
-            <g class="art__pulse" fill="none" stroke="#8A5CF0" stroke-width="2">
-              <line x1="214.3" y1="147.5" x2="135.7" y2="292.5"/>
-              <line x1="265.7" y1="147.5" x2="344.3" y2="292.5"/>
-            </g>
-            <g fill="#1B1033" stroke="rgba(138,92,240,0.85)" stroke-width="1.5">
-              <circle cx="240" cy="100" r="54"/>
-              <circle cx="110" cy="340" r="54"/>
-              <circle cx="370" cy="340" r="54"/>
-            </g>
-            <g fill="#F3EEFB" font-family="Inter, system-ui, sans-serif" text-anchor="middle">
-              <text x="240" y="96" font-size="18" font-weight="700">DevNet</text>
-              <text x="240" y="172" font-size="13" fill="#A99BC4">The brand and the network.</text>
-              <text x="110" y="336" font-size="16" font-weight="700">Chapters</text>
-              <text x="110" y="412" font-size="13" fill="#A99BC4">Independent, run by</text>
-              <text x="110" y="428" font-size="13" fill="#A99BC4">local exec teams.</text>
-              <text x="370" y="336" font-size="16" font-weight="700">Members</text>
-              <text x="370" y="412" font-size="13" fill="#A99BC4">Join low-commitment,</text>
-              <text x="370" y="428" font-size="13" fill="#A99BC4">build at your pace.</text>
-            </g>
-          </svg>
+            <svg class="art" viewBox="0 0 480 360" role="img" aria-labelledby="art-title">
+              <title id="art-title">DevNet, chapters, and members</title>
+              <g class="art__links" fill="none" stroke="rgba(205,184,242,0.55)" stroke-width="1.5">
+                <line x1="240" y1="92" x2="120" y2="250"/>
+                <line x1="240" y1="92" x2="360" y2="250"/>
+              </g>
+              <g class="art__pulse" fill="none" stroke="#8A5CF0" stroke-width="2">
+                <line x1="240" y1="92" x2="120" y2="250"/>
+                <line x1="240" y1="92" x2="360" y2="250"/>
+              </g>
+              <g fill="#1B1033" stroke="#8A5CF0" stroke-width="1.5">
+                <circle cx="240" cy="78" r="48"/>
+                <circle cx="120" cy="264" r="48"/>
+                <circle cx="360" cy="264" r="48"/>
+              </g>
+              <g fill="#F3EEFB" font-family="Inter, system-ui, sans-serif" font-size="16" font-weight="700" text-anchor="middle">
+                <text x="240" y="84">DevNet</text>
+                <text x="120" y="270">Chapters</text>
+                <text x="360" y="270">Members</text>
+              </g>
+            </svg>
+            <ul class="art-key">
+              <li><strong>DevNet</strong><span>The brand and the network.</span></li>
+              <li><strong>Chapters</strong><span>Independent, run by local exec teams.</span></li>
+              <li><strong>Members</strong><span>Join low-commitment, build at your pace.</span></li>
+            </ul>
           </div>
         </div>
         <ul class="beliefs stagger">
@@ -154,10 +149,10 @@
         <div class="do-row">
           <h3>What we do</h3>
           <ul>
-            <li><strong>Workshops</strong><span>5+ workshops hosted at Western. Intro workshop Nov 6. Another workshop late Jan or early Feb.</span></li>
-            <li><strong>Hackathons</strong><span>2+ hackathons hosted. Chapter hackathon late Nov. DevNet-wide flagship hackathon in March with Western, Dalhousie, and Guelph.</span></li>
-            <li><strong>Build sessions</strong><span>We teach, we learn, and we build together. Public proof of work.</span></li>
-            <li><strong>Community</strong><span>A network of builders across 12 cities. Chapters are independent, run by local exec teams.</span></li>
+            <li><span class="icon-tile" aria-hidden="true"><svg viewBox="0 0 24 24" width="24" height="24"><path fill="currentColor" d="M4 5h16v10H4zM2 17h20v2H2z"/></svg></span><strong>Workshops</strong><span>5+ workshops hosted. Intro workshop Nov 6.</span></li>
+            <li><span class="icon-tile" aria-hidden="true"><svg viewBox="0 0 24 24" width="24" height="24"><path fill="currentColor" d="M5 4h2v16H5zM8 8h11l-2 4 2 4H8z"/></svg></span><strong>Hackathons</strong><span>2+ hackathons hosted. Hackathon Dec 4.</span></li>
+            <li><span class="icon-tile" aria-hidden="true"><svg viewBox="0 0 24 24" width="24" height="24"><path fill="currentColor" d="M4 6h16v12H4zM8 10h3v2H8zm5 0h3v2h-3z"/></svg></span><strong>Build sessions</strong><span>We teach, we learn, and we build together.</span></li>
+            <li><span class="icon-tile" aria-hidden="true"><svg viewBox="0 0 24 24" width="24" height="24"><path fill="currentColor" d="M8 11a3 3 0 110-6 3 3 0 010 6zm8 1a2.5 2.5 0 110-5 2.5 2.5 0 010 5zM3 19c0-2.5 2.2-4 5-4s5 1.5 5 4v1H3zm10 .5c.2-2.2 1.8-3.7 4-4.2 1.6.4 2.8 1.5 3.4 3.2.3.8.4 1.4.4 2H13z"/></svg></span><strong>Community</strong><span>12 cities. Chapters run by local exec teams.</span></li>
           </ul>
         </div>
         <div class="join-strip">
@@ -166,8 +161,11 @@
         </div>
         <div class="cursor-banner">
           <p class="cursor-banner__mark">Cursor</p>
-          <p class="cursor-banner__title">Cursor Ambassadors</p>
-          <p class="cursor-banner__note">In partnership with Cursor. Members get access to the Cursor ecosystem.</p>
+          <div>
+            <p class="cursor-banner__title">Cursor Ambassadors</p>
+            <p>In partnership with Cursor.</p>
+            <p>Members get access to the Cursor ecosystem.</p>
+          </div>
         </div>
       </div>
     </section>
@@ -181,38 +179,28 @@
         <div class="map-board">
           <div class="map-stage">
             <img class="matrix" src="/assets/na-dots.svg" alt="" width="760" height="538" loading="lazy" decoding="async">
-            <svg class="cluster-box" viewBox="0 0 760 538" aria-hidden="true"><rect x="472.2" y="226.6" width="79.0" height="40.9" rx="8" fill="none" stroke="rgba(245,208,254,0.9)" stroke-width="1.5"></rect></svg>
-            <button type="button" class="pin" data-city="vancouver" aria-label="Vancouver, network city"><span class="pin__dot"></span></button>
-<button type="button" class="pin pin--founding pin--cluster" data-city="london" aria-label="London, founding chapter"><span class="pin__dot"></span></button>
-<button type="button" class="pin pin--cluster" data-city="waterloo" aria-label="Waterloo, network city"><span class="pin__dot"></span></button>
-<button type="button" class="pin pin--cluster" data-city="guelph" aria-label="Guelph, network city"><span class="pin__dot"></span></button>
-<button type="button" class="pin pin--cluster" data-city="toronto" aria-label="Toronto, network city"><span class="pin__dot"></span></button>
-<button type="button" class="pin pin--cluster" data-city="kingston" aria-label="Kingston, network city"><span class="pin__dot"></span></button>
-<button type="button" class="pin" data-city="montreal" aria-label="Montreal, network city"><span class="pin__dot"></span></button>
-<button type="button" class="pin" data-city="halifax" aria-label="Halifax, network city"><span class="pin__dot"></span></button>
-<button type="button" class="pin" data-city="tucson" aria-label="Tucson, network city"><span class="pin__dot"></span></button>
-<button type="button" class="pin" data-city="miami" aria-label="Miami, network city"><span class="pin__dot"></span></button>
-<button type="button" class="pin" data-city="boston" aria-label="Boston, network city"><span class="pin__dot"></span></button>
-<button type="button" class="pin" data-city="new-york-city" aria-label="New York City, network city"><span class="pin__dot"></span></button>
+            <button type="button" class="pin" data-city="vancouver" aria-label="Vancouver, network city"><span class="pin__dot"></span><span class="pin__label" aria-hidden="true">Vancouver</span></button>
+<button type="button" class="pin pin--founding pin--cluster" data-city="london" aria-label="London, founding chapter"><span class="pin__dot"></span><span class="pin__label" aria-hidden="true">London</span></button>
+<button type="button" class="pin pin--cluster" data-city="waterloo" aria-label="Waterloo, network city"><span class="pin__dot"></span><span class="pin__label" aria-hidden="true">Waterloo</span></button>
+<button type="button" class="pin pin--cluster" data-city="guelph" aria-label="Guelph, network city"><span class="pin__dot"></span><span class="pin__label" aria-hidden="true">Guelph</span></button>
+<button type="button" class="pin pin--cluster" data-city="toronto" aria-label="Toronto, network city"><span class="pin__dot"></span><span class="pin__label" aria-hidden="true">Toronto</span></button>
+<button type="button" class="pin pin--cluster" data-city="kingston" aria-label="Kingston, network city"><span class="pin__dot"></span><span class="pin__label" aria-hidden="true">Kingston</span></button>
+<button type="button" class="pin" data-city="montreal" aria-label="Montreal, network city"><span class="pin__dot"></span><span class="pin__label" aria-hidden="true">Montreal</span></button>
+<button type="button" class="pin" data-city="halifax" aria-label="Halifax, network city"><span class="pin__dot"></span><span class="pin__label" aria-hidden="true">Halifax</span></button>
+<button type="button" class="pin" data-city="tucson" aria-label="Tucson, network city"><span class="pin__dot"></span><span class="pin__label" aria-hidden="true">Tucson</span></button>
+<button type="button" class="pin" data-city="miami" aria-label="Miami, network city"><span class="pin__dot"></span><span class="pin__label" aria-hidden="true">Miami</span></button>
+<button type="button" class="pin" data-city="boston" aria-label="Boston, network city"><span class="pin__dot"></span><span class="pin__label" aria-hidden="true">Boston</span></button>
+<button type="button" class="pin" data-city="new-york-city" aria-label="New York City, network city"><span class="pin__dot"></span><span class="pin__label" aria-hidden="true">New York City</span></button>
           </div>
-          <div class="map-lower">
-            <div class="inset">
-              <img src="/assets/on-dots.svg" alt="" width="360" height="240" loading="lazy" decoding="async">
-              <button type="button" class="ipin" data-city="london" aria-label="London, founding chapter"><span class="ipin__n">1</span></button>
-<button type="button" class="ipin" data-city="waterloo" aria-label="Waterloo, network city"><span class="ipin__n">2</span></button>
-<button type="button" class="ipin" data-city="guelph" aria-label="Guelph, network city"><span class="ipin__n">3</span></button>
-<button type="button" class="ipin" data-city="toronto" aria-label="Toronto, network city"><span class="ipin__n">4</span></button>
-<button type="button" class="ipin" data-city="kingston" aria-label="Kingston, network city"><span class="ipin__n">5</span></button>
-            </div>
             <div class="city-list">
               <div>
                 <h3>Canada 8</h3>
                 <button type="button" class="city-row" data-city="vancouver"><span class="city-row__dot" aria-hidden="true"></span><span>Vancouver</span></button>
-<button type="button" class="city-row city-row--live" data-city="london"><span class="city-row__n">1</span><span class="city-row__dot" aria-hidden="true"></span><span>London</span></button>
-<button type="button" class="city-row" data-city="waterloo"><span class="city-row__n">2</span><span class="city-row__dot" aria-hidden="true"></span><span>Waterloo</span></button>
-<button type="button" class="city-row" data-city="guelph"><span class="city-row__n">3</span><span class="city-row__dot" aria-hidden="true"></span><span>Guelph</span></button>
-<button type="button" class="city-row" data-city="toronto"><span class="city-row__n">4</span><span class="city-row__dot" aria-hidden="true"></span><span>Toronto</span></button>
-<button type="button" class="city-row" data-city="kingston"><span class="city-row__n">5</span><span class="city-row__dot" aria-hidden="true"></span><span>Kingston</span></button>
+<button type="button" class="city-row city-row--live" data-city="london"><span class="city-row__dot" aria-hidden="true"></span><span>London</span></button>
+<button type="button" class="city-row" data-city="waterloo"><span class="city-row__dot" aria-hidden="true"></span><span>Waterloo</span></button>
+<button type="button" class="city-row" data-city="guelph"><span class="city-row__dot" aria-hidden="true"></span><span>Guelph</span></button>
+<button type="button" class="city-row" data-city="toronto"><span class="city-row__dot" aria-hidden="true"></span><span>Toronto</span></button>
+<button type="button" class="city-row" data-city="kingston"><span class="city-row__dot" aria-hidden="true"></span><span>Kingston</span></button>
 <button type="button" class="city-row" data-city="montreal"><span class="city-row__dot" aria-hidden="true"></span><span>Montreal</span></button>
 <button type="button" class="city-row" data-city="halifax"><span class="city-row__dot" aria-hidden="true"></span><span>Halifax</span></button>
               </div>
@@ -224,41 +212,49 @@
 <button type="button" class="city-row" data-city="new-york-city"><span class="city-row__dot" aria-hidden="true"></span><span>New York City</span></button>
               </div>
             </div>
-          </div>
         </div>
-        <div class="map-notes">
+        <div class="status">
           <article>
-            <h3>Chapters</h3>
-            <p>Western, London, Ontario. Active.</p>
-            <p>Dalhousie, Halifax. Launching this year.</p>
-            <p>Guelph. Launching.</p>
+            <h3>Active</h3>
+            <p>Western, London, Ontario</p>
           </article>
           <article>
-            <h3>Network</h3>
-            <p>12 cities.</p>
-            <p>Canada 8. United States 4.</p>
-            <p>50+ builders.</p>
-          </article>
-          <article>
-            <h3>Socials</h3>
-            <p><a href="/socials">DevNet socials</a></p>
+            <h3>Aiming to launch in 2027</h3>
+            <ul>
+              <li>Dalhousie, Halifax</li>
+              <li>Guelph</li>
+              <li>Kingston</li>
+            </ul>
           </article>
         </div>
-        <div class="rail">
-          <div class="rail__track">
-            <span class="rail__today" aria-hidden="true"></span>
-            <article class="rail__card">
-              <span class="rail__node">Fall</span>
-              <h3>Chapter hackathon, late Nov</h3>
-              <span class="pill">Planned</span>
-            </article>
-            <article class="rail__card">
-              <span class="rail__node">Winter</span>
-              <h3>DevNet-wide flagship hackathon, Western + Dalhousie + Guelph, March</h3>
-              <span class="pill">Planned</span>
-            </article>
-          </div>
-        </div>
+        <ul class="net-stats">
+          <li><strong>12</strong> cities</li>
+          <li><strong>75+</strong> builders</li>
+          <li><strong>8</strong> Canada</li>
+          <li><strong>4</strong> United States</li>
+        </ul>
+        <ol class="cal" id="calendar">
+          <li class="cal__item cal__item--next">
+            <span class="cal__date">Nov 6</span>
+            <div>
+              <h3>Intro workshop</h3>
+              <p>Friday, 2:00 to 4:00 PM, Ivey Building Room 1130.</p>
+            </div>
+          </li>
+          <li class="cal__item">
+            <span class="cal__date">Nov</span>
+            <div>
+              <h3>Chapter event</h3>
+              <p>Third week of November.</p>
+            </div>
+          </li>
+          <li class="cal__item">
+            <span class="cal__date">Dec 4</span>
+            <div>
+              <h3>Hackathon</h3>
+            </div>
+          </li>
+        </ol>
       </div>
     </section>
 
@@ -271,7 +267,6 @@
             <div class="west-actions">
               <a class="btn btn--primary" href="https://docs.google.com/forms/d/e/1FAIpQLSepIp21u2-UWk3RKEXfqirkb2ZRyZ3W1cim90FPCFbdUjWC2w/viewform" target="_blank" rel="noopener noreferrer">Join</a>
               <a class="btn btn--primary" href="https://www.instagram.com/devnet_western" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M12 2.2c3.2 0 3.6 0 4.8.1 3.3.1 4.8 1.7 4.9 4.9.1 1.3.1 1.6.1 4.8s0 3.6-.1 4.8c-.1 3.2-1.7 4.8-4.9 4.9-1.3.1-1.6.1-4.8.1s-3.6 0-4.8-.1c-3.3-.1-4.8-1.7-4.9-4.9-.1-1.3-.1-1.6-.1-4.8s0-3.6.1-4.8c.1-3.2 1.7-4.8 4.9-4.9 1.2-.1 1.6-.1 4.8-.1zM12 0C8.7 0 8.3 0 7.1.1 2.7.3.3 2.7.1 7.1 0 8.3 0 8.7 0 12s0 3.7.1 4.9c.2 4.4 2.6 6.8 7 7C8.3 24 8.7 24 12 24s3.7 0 4.9-.1c4.4-.2 6.8-2.6 7-7 .1-1.2.1-1.6.1-4.9s0-3.7-.1-4.9c-.2-4.4-2.6-6.8-7-7C15.7 0 15.3 0 12 0zm0 5.8a6.2 6.2 0 100 12.4 6.2 6.2 0 000-12.4zM12 16a4 4 0 110-8 4 4 0 010 8zm6.4-11.8a1.4 1.4 0 100 2.8 1.4 1.4 0 000-2.8z"/></svg>Instagram</a>
-              <a class="btn btn--secondary" href="https://forms.gle/V3QFE7BKYfyYbkzh8" target="_blank" rel="noopener noreferrer">RSVP</a>
             </div>
           </div>
           <div class="tiles west-tiles">
@@ -282,13 +277,6 @@
           </div>
         </div>
         
-        <div class="hosted">
-          <h3>Hosted</h3>
-          <ul>
-            <li>2+ hackathons hosted</li>
-            <li>5+ workshops hosted</li>
-          </ul>
-        </div>
         <div class="upcoming">
           <article class="event" id="event-intro">
             <div class="event__date" aria-hidden="true">NOV<span>6</span></div>
@@ -304,38 +292,21 @@
               <a class="btn btn--secondary" href="https://forms.gle/V3QFE7BKYfyYbkzh8" target="_blank" rel="noopener noreferrer">RSVP</a>
             </div>
           </article>
-          <button type="button" class="plan-toggle" aria-expanded="false" aria-controls="plan-rest">See full plan</button>
-          <ol id="plan-rest" class="vtime" hidden>
-              <li><span class="vtime__m">Nov</span><span>Speaker event (Nov)</span><span class="pill">Planned</span></li>
-              <li><span class="vtime__m">Nov</span><span>Chapter hackathon (late Nov)</span><span class="pill">Planned</span></li>
-              <li><span class="vtime__m">Jan</span><span>Welcome back call (Jan)</span><span class="pill">Planned</span></li>
-              <li><span class="vtime__m">Jan</span><span>Workshop (late Jan or early Feb)</span><span class="pill">Planned</span></li>
-              <li><span class="vtime__m">Feb</span><span>Speaker event (Feb or early Mar)</span><span class="pill">Planned</span></li>
-              <li><span class="vtime__m">Mar</span><span>DevNet-wide flagship hackathon (March)</span><span class="pill">Planned</span></li>
-          </ol>
+          <p class="cal-link"><a href="#calendar">Network calendar</a></p>
         </div>
         <div class="org">
           <h3 class="org__stat"><span data-count="21">21</span> people, 9 roles</h3>
-          <div class="org__tree">
-            <svg class="org__wires" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
-            <path d="M50 0 V26" pathLength="1"></path>
-            <path d="M12.5 26 H87.5" pathLength="1"></path>
-            <path d="M12.5 26 V34" pathLength="1"></path>
-            <path d="M37.5 26 V34" pathLength="1"></path>
-            <path d="M62.5 26 V34" pathLength="1"></path>
-            <path d="M87.5 26 V34" pathLength="1"></path>
-            <path d="M50 26 V78" pathLength="1"></path>
-            <path d="M12.5 78 H87.5" pathLength="1"></path>
-            <path d="M12.5 78 V88" pathLength="1"></path>
-            <path d="M37.5 78 V88" pathLength="1"></path>
-            <path d="M62.5 78 V88" pathLength="1"></path>
-            <path d="M87.5 78 V88" pathLength="1"></path>
-          </svg>
-            <div class="org__top">
-              <button type="button" class="org__node org__node--top" aria-label="Presidents, 2"><span class="org__role">Presidents</span><span class="dots" aria-hidden="true"><i></i><i></i></span><span class="org__count">2</span></button>
-            </div>
-            <div class="org__roles stagger"><button type="button" class="org__node" aria-label="Finance, 3"><span class="org__role">Finance</span><span class="dots" aria-hidden="true"><i></i><i></i><i></i></span><span class="org__count">3</span></button><button type="button" class="org__node" aria-label="Strategy, 3"><span class="org__role">Strategy</span><span class="dots" aria-hidden="true"><i></i><i></i><i></i></span><span class="org__count">3</span></button><button type="button" class="org__node" aria-label="Advisors, 2"><span class="org__role">Advisors</span><span class="dots" aria-hidden="true"><i></i><i></i></span><span class="org__count">2</span></button><button type="button" class="org__node" aria-label="Marketing, 2"><span class="org__role">Marketing</span><span class="dots" aria-hidden="true"><i></i><i></i></span><span class="org__count">2</span></button><button type="button" class="org__node" aria-label="Partnerships, 3"><span class="org__role">Partnerships</span><span class="dots" aria-hidden="true"><i></i><i></i><i></i></span><span class="org__count">3</span></button><button type="button" class="org__node" aria-label="Events, 3"><span class="org__role">Events</span><span class="dots" aria-hidden="true"><i></i><i></i><i></i></span><span class="org__count">3</span></button><button type="button" class="org__node" aria-label="EDI, 1"><span class="org__role">EDI</span><span class="dots" aria-hidden="true"><i></i></span><span class="org__count">1</span></button><button type="button" class="org__node" aria-label="Culture, 2"><span class="org__role">Culture</span><span class="dots" aria-hidden="true"><i></i><i></i></span><span class="org__count">2</span></button></div>
-          </div>
+          <ul class="roles">
+            <li><span class="roles__n">2</span><span>Presidents</span></li>
+            <li><span class="roles__n">3</span><span>Finance</span></li>
+            <li><span class="roles__n">3</span><span>Strategy</span></li>
+            <li><span class="roles__n">2</span><span>Advisors</span></li>
+            <li><span class="roles__n">2</span><span>Marketing</span></li>
+            <li><span class="roles__n">3</span><span>Partnerships</span></li>
+            <li><span class="roles__n">3</span><span>Events</span></li>
+            <li><span class="roles__n">1</span><span>EDI</span></li>
+            <li><span class="roles__n">2</span><span>Culture</span></li>
+          </ul>
         </div>
       </div>
     </section>
@@ -364,7 +335,6 @@
         <h2 id="join-heading">Build with us.</h2>
         <div class="join-actions">
           <a class="btn btn--primary" href="https://docs.google.com/forms/d/e/1FAIpQLSepIp21u2-UWk3RKEXfqirkb2ZRyZ3W1cim90FPCFbdUjWC2w/viewform" target="_blank" rel="noopener noreferrer">Join</a>
-          <a class="btn btn--secondary" href="https://www.instagram.com/devnet_western" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M12 2.2c3.2 0 3.6 0 4.8.1 3.3.1 4.8 1.7 4.9 4.9.1 1.3.1 1.6.1 4.8s0 3.6-.1 4.8c-.1 3.2-1.7 4.8-4.9 4.9-1.3.1-1.6.1-4.8.1s-3.6 0-4.8-.1c-3.3-.1-4.8-1.7-4.9-4.9-.1-1.3-.1-1.6-.1-4.8s0-3.6.1-4.8c.1-3.2 1.7-4.8 4.9-4.9 1.2-.1 1.6-.1 4.8-.1zM12 0C8.7 0 8.3 0 7.1.1 2.7.3.3 2.7.1 7.1 0 8.3 0 8.7 0 12s0 3.7.1 4.9c.2 4.4 2.6 6.8 7 7C8.3 24 8.7 24 12 24s3.7 0 4.9-.1c4.4-.2 6.8-2.6 7-7 .1-1.2.1-1.6.1-4.9s0-3.7-.1-4.9c-.2-4.4-2.6-6.8-7-7C15.7 0 15.3 0 12 0zm0 5.8a6.2 6.2 0 100 12.4 6.2 6.2 0 000-12.4zM12 16a4 4 0 110-8 4 4 0 010 8zm6.4-11.8a1.4 1.4 0 100 2.8 1.4 1.4 0 000-2.8z"/></svg>Instagram</a>
         </div>
       </div>
     </section>
