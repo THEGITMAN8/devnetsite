@@ -182,9 +182,11 @@ document.addEventListener("DOMContentLoaded", function () {
     stage.classList.add("is-drawn");
   }
 
+  var lockedCity = "";
   function setCity(id) {
+    var active = id || lockedCity;
     document.querySelectorAll("[data-city]").forEach(function (el) {
-      el.classList.toggle("is-hot", id !== "" && el.getAttribute("data-city") === id);
+      el.classList.toggle("is-hot", active !== "" && el.getAttribute("data-city") === active);
     });
   }
 
@@ -210,6 +212,96 @@ document.addEventListener("DOMContentLoaded", function () {
       setCity("");
     }
   });
+
+  document.querySelectorAll(".chapter").forEach(function (button) {
+    button.addEventListener("click", function () {
+      var id = button.getAttribute("data-city") || "";
+      lockedCity = lockedCity === id ? "" : id;
+      setCity(lockedCity);
+      if (!lockedCity) return;
+      var pin = document.querySelector('.map-stage .pin[data-city="' + lockedCity + '"]');
+      if (pin) pin.scrollIntoView({ block: "center", inline: "nearest", behavior: reduce ? "auto" : "smooth" });
+    });
+  });
+
+  var flow = document.querySelector(".orgflow");
+  function drawFlow() {
+    if (!flow || flow.classList.contains("is-drawn")) return;
+    var rect = flow.getBoundingClientRect();
+    if (rect.top < window.innerHeight * 0.85 && rect.bottom > 40) flow.classList.add("is-drawn");
+  }
+  if (flow && reduce) {
+    flow.classList.add("is-drawn");
+  } else if (flow) {
+    drawFlow();
+    window.addEventListener("scroll", drawFlow, { passive: true });
+    if ("IntersectionObserver" in window) {
+      var flowObserver = new IntersectionObserver(
+        function (entries) {
+          entries.forEach(function (entry) {
+            if (!entry.isIntersecting) return;
+            flow.classList.add("is-drawn");
+            flowObserver.unobserve(flow);
+          });
+        },
+        { threshold: 0.2 }
+      );
+      flowObserver.observe(flow);
+    }
+  }
+  var lockedNode = "";
+  function focusNode(id) {
+    if (!flow) return;
+    var active = id || lockedNode;
+    flow.classList.remove("is-focus-devnet", "is-focus-chapters", "is-focus-members");
+    if (active) flow.classList.add("is-focus-" + active);
+  }
+  document.querySelectorAll(".orgflow .node").forEach(function (node) {
+    node.addEventListener("pointerover", function () {
+      focusNode(node.getAttribute("data-node"));
+    });
+    node.addEventListener("focusin", function () {
+      focusNode(node.getAttribute("data-node"));
+    });
+    node.addEventListener("click", function () {
+      var id = node.getAttribute("data-node");
+      lockedNode = lockedNode === id ? "" : id;
+      focusNode(lockedNode);
+    });
+  });
+  if (flow) {
+    flow.addEventListener("pointerout", function (event) {
+      var next = event.relatedTarget && event.relatedTarget.closest ? event.relatedTarget.closest(".node") : null;
+      if (!next) focusNode("");
+    });
+  }
+
+  document.querySelectorAll(".org__node").forEach(function (node) {
+    node.addEventListener("click", function () {
+      var on = node.classList.contains("is-on");
+      document.querySelectorAll(".org__node").forEach(function (other) {
+        other.classList.remove("is-on");
+      });
+      if (!on) node.classList.add("is-on");
+    });
+  });
+
+  var spine = document.querySelector(".spine");
+  function paintSpine() {
+    if (!spine || reduce) return;
+    var max = document.documentElement.scrollHeight - window.innerHeight;
+    var step = max <= 0 ? 20 : Math.max(0, Math.min(20, Math.round((window.scrollY / max) * 20)));
+    spine.className = "spine is-p" + step;
+    document.querySelectorAll(".spine__node").forEach(function (node) {
+      var section = document.getElementById(node.getAttribute("data-spine"));
+      if (!section) return;
+      node.classList.toggle("is-on", section.getBoundingClientRect().top < window.innerHeight * 0.65);
+    });
+  }
+  if (spine && !reduce) {
+    paintSpine();
+    window.addEventListener("scroll", paintSpine, { passive: true });
+  }
 
   document.querySelectorAll(".tl-item button").forEach(function (button) {
     button.addEventListener("click", function () {
@@ -240,7 +332,7 @@ document.addEventListener("DOMContentLoaded", function () {
   var intro = document.getElementById("event-intro");
   var introButton = intro ? intro.querySelector("button") : null;
   var introPanel = intro ? intro.querySelector(".tl-panel") : null;
-  var nextItem = document.getElementById("event-chapter");
+  var nextItem = document.getElementById("event-speaker");
   var startMs = Date.parse("2026-11-06T14:00:00-05:00");
   var endMs = Date.parse("2026-11-06T16:00:00-05:00");
 
@@ -261,7 +353,7 @@ document.addEventListener("DOMContentLoaded", function () {
     if (now >= endMs) {
       countdown.textContent = "Past";
       intro.classList.add("is-past");
-      if (introButton) introButton.setAttribute("aria-label", "Intro Workshop, past");
+      if (introButton) introButton.setAttribute("aria-label", "Intro workshop, past");
       if (!intro.dataset.user && !intro.dataset.shifted) {
         intro.dataset.shifted = "1";
         openOnly(nextItem);
