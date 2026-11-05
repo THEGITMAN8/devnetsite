@@ -1,245 +1,362 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="DevNet London at Western University is the only DevNet chapter: a student club for builders at Western, with members elsewhere in the network." />
-  <title>DevNet London at Western University</title>
-  <link rel="icon" href="assets/favicon.ico" sizes="any" />
-  <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon.png" />
-  <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16.png" />
-  <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png" />
-  <meta property="og:type" content="website" />
-  <meta property="og:title" content="DevNet London at Western University" />
-  <meta property="og:description" content="DevNet London at Western University is the only DevNet chapter: a student club for builders at Western, with members elsewhere in the network." />
-  <meta property="og:image" content="assets/og-image.png" />
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="DevNet London at Western University" />
-  <meta name="twitter:description" content="DevNet London at Western University is the only DevNet chapter: a student club for builders at Western, with members elsewhere in the network." />
-  <meta name="twitter:image" content="assets/og-image.png" />
-
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
-
-  <link rel="stylesheet" href="tailwind-output.css" />
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
-  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" integrity="sha256-YU3qCpj/P06tdPBJGPax0bm6Q1wltfwjsho5TR4+TYc=" crossorigin="" />
-  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" integrity="sha256-YSWCMtmNZNwqex4CEw1nQhvFub2lmU7vcCKP+XVwwXA=" crossorigin="" />
-  <link rel="stylesheet" href="style.css" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DevNet</title>
+  <meta name="description" content="DevNet, a network of builders across 12 cities, Western chapter.">
+  <link rel="canonical" href="https://www.devnetwork.app/">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="DevNet">
+  <meta property="og:title" content="DevNet">
+  <meta property="og:description" content="DevNet, a network of builders across 12 cities, Western chapter.">
+  <meta property="og:url" content="https://www.devnetwork.app/">
+  <meta property="og:image" content="https://www.devnetwork.app/assets/og-image.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="DevNet">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="DevNet">
+  <meta name="twitter:description" content="DevNet, a network of builders across 12 cities, Western chapter.">
+  <meta name="twitter:image" content="https://www.devnetwork.app/assets/og-image.png">
+  <meta name="twitter:image:alt" content="DevNet">
+  <meta name="theme-color" content="#0B0614">
+  <link rel="icon" href="/assets/favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon-16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png">
+  <link rel="preload" href="/assets/fonts/inter-400.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/assets/fonts/inter-700.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" as="image" href="/assets/logo.webp" type="image/webp">
+  <link rel="stylesheet" href="/style.css">
+  <script src="/main.js"></script>
 </head>
-<body class="bg-devnet-bg text-slate-200 font-sans antialiased">
+<body>
+  <div class="spine" aria-hidden="true"><span class="spine__fill"></span><span class="spine__node" data-spine="about"><b>01</b><span>About</span></span><span class="spine__node" data-spine="network"><b>02</b><span>Network</span></span><span class="spine__node" data-spine="western"><b>03</b><span>Western</span></span><span class="spine__node" data-spine="socials"><b>04</b><span>Socials</span></span></div>
   <a href="#top" class="skip-link">Skip to content</a>
-
-  <header id="site-header" class="fixed top-0 left-0 right-0 z-50 nav-glass">
-    <div class="site-header__bar mx-auto flex h-16 w-full max-w-6xl items-center gap-3 px-4 sm:px-6 md:h-[4.5rem]">
-      <a href="#top" class="site-header__logo flex shrink-0 items-center gap-2" aria-label="DevNet, home">
-        <img src="assets/logo.png" alt="" class="brand-logo brand-logo--header" width="36" height="36" />
-        <span class="brand-wordmark">DevNet</span>
+  <header class="site-header" id="site-header">
+    <div class="bar">
+      <a class="brand" href="#top">
+        <picture>
+          <source srcset="/assets/logo.webp" type="image/webp">
+          <img src="/assets/logo.png" alt="" width="77" height="36" decoding="async">
+        </picture>
+        DevNet
       </a>
-
-      <nav class="site-header__nav hidden md:flex" aria-label="Primary">
-        <a href="#top" class="site-header__link">Home</a>
-        <a href="#map" class="site-header__link">Map</a>
-        <a href="#timeline" class="site-header__link">Year</a>
-        <a href="#team" class="site-header__link">Team</a>
+      <nav class="desktop-nav" aria-label="Primary">
+          <a class="nav-link" href="#about" data-nav>About</a>
+          <a class="nav-link" href="#network" data-nav>Network</a>
+          <a class="nav-link" href="#western" data-nav>Western</a>
+          <a class="nav-link nav-link--pill" href="/socials" data-nav>Socials</a>
       </nav>
-
-      <div class="site-header__cta hidden md:flex">
-        <a data-cta="joinDevNet" href="#" class="btn btn--primary">Join DevNet</a>
-      </div>
-
-      <button type="button" id="menu-toggle" class="menu-toggle ml-auto md:hidden shrink-0 rounded-md border border-devnet-border text-slate-200 hover:bg-devnet-surface" aria-expanded="false" aria-controls="mobile-menu" aria-label="Open menu">
-        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+      <a class="btn btn--primary header-join" href="https://docs.google.com/forms/d/e/1FAIpQLSepIp21u2-UWk3RKEXfqirkb2ZRyZ3W1cim90FPCFbdUjWC2w/viewform" target="_blank" rel="noopener noreferrer">Join</a>
+      <button type="button" id="menu-toggle" class="menu-toggle" aria-expanded="false" aria-controls="mobile-menu" aria-label="Open menu">
+        <svg class="icon-open" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"></path></svg>
+        <svg class="icon-close" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" hidden><path d="M6 6l12 12M18 6L6 18"></path></svg>
       </button>
     </div>
-    <div id="mobile-menu" class="hidden border-t border-devnet-border bg-devnet-bg/95 backdrop-blur-md md:hidden">
-      <nav class="site-header__mobile" aria-label="Mobile">
-        <a href="#top" class="site-header__mobile-link">Home</a>
-        <a href="#map" class="site-header__mobile-link">Map</a>
-        <a href="#timeline" class="site-header__mobile-link">Year</a>
-        <a href="#team" class="site-header__mobile-link">Team</a>
-        <a data-cta="joinDevNet" href="#" class="btn btn--primary site-header__mobile-cta">Join DevNet</a>
+    <div id="mobile-menu" class="mobile-menu">
+      <nav aria-label="Mobile">
+          <a class="nav-link" href="#about" data-nav>About</a>
+          <a class="nav-link" href="#network" data-nav>Network</a>
+          <a class="nav-link" href="#western" data-nav>Western</a>
+          <a class="nav-link nav-link--pill" href="/socials" data-nav>Socials</a>
+          <a class="btn btn--primary sheet-join" href="https://docs.google.com/forms/d/e/1FAIpQLSepIp21u2-UWk3RKEXfqirkb2ZRyZ3W1cim90FPCFbdUjWC2w/viewform" target="_blank" rel="noopener noreferrer">Join</a>
       </nav>
     </div>
   </header>
-
   <main id="top" tabindex="-1">
     <section class="hero" aria-labelledby="hero-heading">
-      <div class="wrap hero__inner">
-        <img src="assets/logo.png" alt="" class="hero__logo" width="44" height="44" />
-        <h1 id="hero-heading" class="hero__headline">DevNet London at Western University</h1>
-        <p class="hero__sub">The only DevNet chapter: a student club for builders at Western, with members elsewhere in the network.</p>
-        <a data-cta="joinDevNet" href="#" class="btn btn--primary">Join DevNet</a>
+      <div class="hero-glow" aria-hidden="true"></div>
+      <svg class="hero-graph" viewBox="0 0 800 480" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><line x1="102" y1="152" x2="80" y2="60" stroke="rgba(205,184,242,0.18)" stroke-width="1"></line><line x1="102" y1="152" x2="140" y2="90" stroke="rgba(205,184,242,0.18)" stroke-width="1"></line><line x1="102" y1="152" x2="120" y2="180" stroke="rgba(205,184,242,0.18)" stroke-width="1"></line><line x1="102" y1="152" x2="200" y2="220" stroke="rgba(205,184,242,0.18)" stroke-width="1"></line><line x1="211" y1="307" x2="200" y2="220" stroke="rgba(205,184,242,0.18)" stroke-width="1"></line><line x1="211" y1="307" x2="180" y2="360" stroke="rgba(205,184,242,0.18)" stroke-width="1"></line><line x1="211" y1="307" x2="260" y2="400" stroke="rgba(205,184,242,0.18)" stroke-width="1"></line><line x1="496" y1="203" x2="479" y2="209" stroke="rgba(205,184,242,0.18)" stroke-width="1"></line><line x1="496" y1="203" x2="485" y2="204" stroke="rgba(205,184,242,0.18)" stroke-width="1"></line><line x1="496" y1="203" x2="488" y2="204" stroke="rgba(205,184,242,0.18)" stroke-width="1"></line><line x1="496" y1="203" x2="522" y2="198" stroke="rgba(205,184,242,0.18)" stroke-width="1"></line><line x1="496" y1="203" x2="548" y2="186" stroke="rgba(205,184,242,0.18)" stroke-width="1"></line><line x1="496" y1="203" x2="570" y2="215" stroke="rgba(205,184,242,0.18)" stroke-width="1"></line><line x1="496" y1="203" x2="544" y2="230" stroke="rgba(205,184,242,0.18)" stroke-width="1"></line><line x1="496" y1="203" x2="460" y2="90" stroke="rgba(205,184,242,0.18)" stroke-width="1"></line><line x1="496" y1="203" x2="440" y2="200" stroke="rgba(205,184,242,0.18)" stroke-width="1"></line><line x1="496" y1="203" x2="520" y2="260" stroke="rgba(205,184,242,0.18)" stroke-width="1"></line><line x1="496" y1="203" x2="600" y2="190" stroke="rgba(205,184,242,0.18)" stroke-width="1"></line><line x1="479" y1="209" x2="485" y2="204" stroke="rgba(205,184,242,0.18)" stroke-width="1"></line><line x1="479" y1="209" x2="488" y2="204" stroke="rgba(205,184,242,0.18)" stroke-width="1"></line><line x1="479" y1="209" x2="522" y2="198" stroke="rgba(205,184,242,0.18)" stroke-width="1"></line><line x1="479" y1="209" x2="548" y2="186" stroke="rgba(205,184,242,0.18)" stroke-width="1"></line><line x1="479" y1="209" x2="570" y2="215" stroke="rgba(205,184,242,0.18)" stroke-width="1"></line><line x1="479" y1="209" x2="544" y2="230" stroke="rgba(205,184,242,0.18)" stroke-width="1"></line><line x1="479" y1="209" x2="440" y2="200" stroke="rgba(205,184,242,0.18)" stroke-width="1"></line><line x1="479" y1="209" x2="520" y2="260" stroke="rgba(205,184,242,0.18)" stroke-width="1"></line><line x1="485" y1="204" x2="488" y2="204" stroke="rgba(205,184,242,0.18)" stroke-width="1"></line><line x1="485" y1="204" x2="522" y2="198" stroke="rgba(205,184,242,0.18)" stroke-width="1"></line><line x1="485" y1="204" x2="548" y2="186" stroke="rgba(205,184,242,0.18)" stroke-width="1"></line><line x1="485" y1="204" x2="570" y2="215" stroke="rgba(205,184,242,0.18)" stroke-width="1"></line><line x1="485" y1="204" x2="544" y2="230" stroke="rgba(205,184,242,0.18)" stroke-width="1"></line><line x1="485" y1="204" x2="460" y2="90" stroke="rgba(205,184,242,0.18)" stroke-width="1"></line><line x1="485" y1="204" x2="440" y2="200" stroke="rgba(205,184,242,0.18)" stroke-width="1"></line><line x1="485" y1="204" x2="520" y2="260" stroke="rgba(205,184,242,0.18)" stroke-width="1"></line><line x1="485" y1="204" x2="600" y2="190" stroke="rgba(205,184,242,0.18)" stroke-width="1"></line><line x1="488" y1="204" x2="522" y2="198" stroke="rgba(205,184,242,0.18)" stroke-width="1"></line><line x1="488" y1="204" x2="548" y2="186" stroke="rgba(205,184,242,0.18)" stroke-width="1"></line><line x1="488" y1="204" x2="570" y2="215" stroke="rgba(205,184,242,0.18)" stroke-width="1"></line><line x1="488" y1="204" x2="544" y2="230" stroke="rgba(205,184,242,0.18)" stroke-width="1"></line><line x1="488" y1="204" x2="460" y2="90" stroke="rgba(205,184,242,0.18)" stroke-width="1"></line><line x1="488" y1="204" x2="440" y2="200" stroke="rgba(205,184,242,0.18)" stroke-width="1"></line><line x1="488" y1="204" x2="520" y2="260" stroke="rgba(205,184,242,0.18)" stroke-width="1"></line><line x1="488" y1="204" x2="600" y2="190" stroke="rgba(205,184,242,0.18)" stroke-width="1"></line><line x1="522" y1="198" x2="548" y2="186" stroke="rgba(205,184,242,0.18)" stroke-width="1"></line><line x1="522" y1="198" x2="638" y2="194" stroke="rgba(205,184,242,0.18)" stroke-width="1"></line><line x1="522" y1="198" x2="570" y2="215" stroke="rgba(205,184,242,0.18)" stroke-width="1"></line><line x1="522" y1="198" x2="544" y2="230" stroke="rgba(205,184,242,0.18)" stroke-width="1"></line><line x1="522" y1="198" x2="440" y2="200" stroke="rgba(205,184,242,0.18)" stroke-width="1"></line><line x1="522" y1="198" x2="520" y2="260" stroke="rgba(205,184,242,0.18)" stroke-width="1"></line><line x1="522" y1="198" x2="600" y2="190" stroke="rgba(205,184,242,0.18)" stroke-width="1"></line><line x1="548" y1="186" x2="638" y2="194" stroke="rgba(205,184,242,0.18)" stroke-width="1"></line><line x1="548" y1="186" x2="570" y2="215" stroke="rgba(205,184,242,0.18)" stroke-width="1"></line><line x1="548" y1="186" x2="544" y2="230" stroke="rgba(205,184,242,0.18)" stroke-width="1"></line><line x1="548" y1="186" x2="440" y2="200" stroke="rgba(205,184,242,0.18)" stroke-width="1"></line><line x1="548" y1="186" x2="520" y2="260" stroke="rgba(205,184,242,0.18)" stroke-width="1"></line><line x1="548" y1="186" x2="600" y2="190" stroke="rgba(205,184,242,0.18)" stroke-width="1"></line><line x1="638" y1="194" x2="570" y2="215" stroke="rgba(205,184,242,0.18)" stroke-width="1"></line><line x1="638" y1="194" x2="544" y2="230" stroke="rgba(205,184,242,0.18)" stroke-width="1"></line><line x1="638" y1="194" x2="600" y2="190" stroke="rgba(205,184,242,0.18)" stroke-width="1"></line><line x1="638" y1="194" x2="680" y2="230" stroke="rgba(205,184,242,0.18)" stroke-width="1"></line><line x1="570" y1="215" x2="544" y2="230" stroke="rgba(205,184,242,0.18)" stroke-width="1"></line><line x1="570" y1="215" x2="520" y2="260" stroke="rgba(205,184,242,0.18)" stroke-width="1"></line><line x1="570" y1="215" x2="600" y2="190" stroke="rgba(205,184,242,0.18)" stroke-width="1"></line><line x1="570" y1="215" x2="680" y2="230" stroke="rgba(205,184,242,0.18)" stroke-width="1"></line><line x1="544" y1="230" x2="440" y2="200" stroke="rgba(205,184,242,0.18)" stroke-width="1"></line><line x1="544" y1="230" x2="520" y2="260" stroke="rgba(205,184,242,0.18)" stroke-width="1"></line><line x1="544" y1="230" x2="600" y2="190" stroke="rgba(205,184,242,0.18)" stroke-width="1"></line><line x1="488" y1="365" x2="520" y2="260" stroke="rgba(205,184,242,0.18)" stroke-width="1"></line><line x1="488" y1="365" x2="430" y2="390" stroke="rgba(205,184,242,0.18)" stroke-width="1"></line><line x1="488" y1="365" x2="510" y2="360" stroke="rgba(205,184,242,0.18)" stroke-width="1"></line><line x1="488" y1="365" x2="590" y2="410" stroke="rgba(205,184,242,0.18)" stroke-width="1"></line><line x1="80" y1="60" x2="140" y2="90" stroke="rgba(205,184,242,0.18)" stroke-width="1"></line><line x1="140" y1="90" x2="220" y2="40" stroke="rgba(205,184,242,0.18)" stroke-width="1"></line><line x1="140" y1="90" x2="120" y2="180" stroke="rgba(205,184,242,0.18)" stroke-width="1"></line><line x1="220" y1="40" x2="300" y2="80" stroke="rgba(205,184,242,0.18)" stroke-width="1"></line><line x1="300" y1="80" x2="380" y2="50" stroke="rgba(205,184,242,0.18)" stroke-width="1"></line><line x1="300" y1="80" x2="280" y2="160" stroke="rgba(205,184,242,0.18)" stroke-width="1"></line><line x1="380" y1="50" x2="460" y2="90" stroke="rgba(205,184,242,0.18)" stroke-width="1"></line><line x1="460" y1="90" x2="540" y2="40" stroke="rgba(205,184,242,0.18)" stroke-width="1"></line><line x1="460" y1="90" x2="440" y2="200" stroke="rgba(205,184,242,0.18)" stroke-width="1"></line><line x1="540" y1="40" x2="620" y2="70" stroke="rgba(205,184,242,0.18)" stroke-width="1"></line><line x1="620" y1="70" x2="700" y2="48" stroke="rgba(205,184,242,0.18)" stroke-width="1"></line><line x1="700" y1="48" x2="760" y2="100" stroke="rgba(205,184,242,0.18)" stroke-width="1"></line><line x1="120" y1="180" x2="200" y2="220" stroke="rgba(205,184,242,0.18)" stroke-width="1"></line><line x1="200" y1="220" x2="280" y2="160" stroke="rgba(205,184,242,0.18)" stroke-width="1"></line><line x1="280" y1="160" x2="360" y2="240" stroke="rgba(205,184,242,0.18)" stroke-width="1"></line><line x1="360" y1="240" x2="440" y2="200" stroke="rgba(205,184,242,0.18)" stroke-width="1"></line><line x1="360" y1="240" x2="340" y2="340" stroke="rgba(205,184,242,0.18)" stroke-width="1"></line><line x1="440" y1="200" x2="520" y2="260" stroke="rgba(205,184,242,0.18)" stroke-width="1"></line><line x1="520" y1="260" x2="600" y2="190" stroke="rgba(205,184,242,0.18)" stroke-width="1"></line><line x1="520" y1="260" x2="510" y2="360" stroke="rgba(205,184,242,0.18)" stroke-width="1"></line><line x1="600" y1="190" x2="680" y2="230" stroke="rgba(205,184,242,0.18)" stroke-width="1"></line><line x1="680" y1="230" x2="740" y2="280" stroke="rgba(205,184,242,0.18)" stroke-width="1"></line><line x1="740" y1="280" x2="670" y2="370" stroke="rgba(205,184,242,0.18)" stroke-width="1"></line><line x1="90" y1="320" x2="180" y2="360" stroke="rgba(205,184,242,0.18)" stroke-width="1"></line><line x1="180" y1="360" x2="260" y2="400" stroke="rgba(205,184,242,0.18)" stroke-width="1"></line><line x1="260" y1="400" x2="340" y2="340" stroke="rgba(205,184,242,0.18)" stroke-width="1"></line><line x1="340" y1="340" x2="430" y2="390" stroke="rgba(205,184,242,0.18)" stroke-width="1"></line><line x1="430" y1="390" x2="510" y2="360" stroke="rgba(205,184,242,0.18)" stroke-width="1"></line><line x1="510" y1="360" x2="590" y2="410" stroke="rgba(205,184,242,0.18)" stroke-width="1"></line><line x1="590" y1="410" x2="670" y2="370" stroke="rgba(205,184,242,0.18)" stroke-width="1"></line><line x1="670" y1="370" x2="750" y2="420" stroke="rgba(205,184,242,0.18)" stroke-width="1"></line><circle cx="102" cy="152" r="3.2" fill="rgba(138,92,240,0.9)"></circle><circle cx="211" cy="307" r="3.2" fill="rgba(138,92,240,0.9)"></circle><circle cx="496" cy="203" r="3.2" fill="rgba(138,92,240,0.9)"></circle><circle cx="479" cy="209" r="3.2" fill="rgba(138,92,240,0.9)"></circle><circle cx="485" cy="204" r="3.2" fill="rgba(138,92,240,0.9)"></circle><circle cx="488" cy="204" r="3.2" fill="rgba(138,92,240,0.9)"></circle><circle cx="522" cy="198" r="3.2" fill="rgba(138,92,240,0.9)"></circle><circle cx="548" cy="186" r="3.2" fill="rgba(138,92,240,0.9)"></circle><circle cx="638" cy="194" r="3.2" fill="rgba(138,92,240,0.9)"></circle><circle cx="570" cy="215" r="3.2" fill="rgba(138,92,240,0.9)"></circle><circle cx="544" cy="230" r="3.2" fill="rgba(138,92,240,0.9)"></circle><circle cx="488" cy="365" r="3.2" fill="rgba(138,92,240,0.9)"></circle><circle cx="80" cy="60" r="2" fill="rgba(205,184,242,0.45)"></circle><circle cx="140" cy="90" r="2" fill="rgba(205,184,242,0.45)"></circle><circle cx="220" cy="40" r="2" fill="rgba(205,184,242,0.45)"></circle><circle cx="300" cy="80" r="2" fill="rgba(205,184,242,0.45)"></circle><circle cx="380" cy="50" r="2" fill="rgba(205,184,242,0.45)"></circle><circle cx="460" cy="90" r="2" fill="rgba(205,184,242,0.45)"></circle><circle cx="540" cy="40" r="2" fill="rgba(205,184,242,0.45)"></circle><circle cx="620" cy="70" r="2" fill="rgba(205,184,242,0.45)"></circle><circle cx="700" cy="48" r="2" fill="rgba(205,184,242,0.45)"></circle><circle cx="760" cy="100" r="2" fill="rgba(205,184,242,0.45)"></circle><circle cx="120" cy="180" r="2" fill="rgba(205,184,242,0.45)"></circle><circle cx="200" cy="220" r="2" fill="rgba(205,184,242,0.45)"></circle><circle cx="280" cy="160" r="2" fill="rgba(205,184,242,0.45)"></circle><circle cx="360" cy="240" r="2" fill="rgba(205,184,242,0.45)"></circle><circle cx="440" cy="200" r="2" fill="rgba(205,184,242,0.45)"></circle><circle cx="520" cy="260" r="2" fill="rgba(205,184,242,0.45)"></circle><circle cx="600" cy="190" r="2" fill="rgba(205,184,242,0.45)"></circle><circle cx="680" cy="230" r="2" fill="rgba(205,184,242,0.45)"></circle><circle cx="740" cy="280" r="2" fill="rgba(205,184,242,0.45)"></circle><circle cx="90" cy="320" r="2" fill="rgba(205,184,242,0.45)"></circle><circle cx="180" cy="360" r="2" fill="rgba(205,184,242,0.45)"></circle><circle cx="260" cy="400" r="2" fill="rgba(205,184,242,0.45)"></circle><circle cx="340" cy="340" r="2" fill="rgba(205,184,242,0.45)"></circle><circle cx="430" cy="390" r="2" fill="rgba(205,184,242,0.45)"></circle><circle cx="510" cy="360" r="2" fill="rgba(205,184,242,0.45)"></circle><circle cx="590" cy="410" r="2" fill="rgba(205,184,242,0.45)"></circle><circle cx="670" cy="370" r="2" fill="rgba(205,184,242,0.45)"></circle><circle cx="750" cy="420" r="2" fill="rgba(205,184,242,0.45)"></circle></svg>
+      <div class="wrap hero-inner">
+        <picture>
+          <source srcset="/assets/logo.webp" type="image/webp">
+          <img src="/assets/logo.png" alt="DevNet" width="207" height="96" fetchpriority="high" decoding="async">
+        </picture>
+        <h1 id="hero-heading">DevNet</h1>
+        <p class="line">A network of builders across 12 cities.</p>
+        <div class="hero-actions">
+          <a class="btn btn--primary" href="https://docs.google.com/forms/d/e/1FAIpQLSepIp21u2-UWk3RKEXfqirkb2ZRyZ3W1cim90FPCFbdUjWC2w/viewform" target="_blank" rel="noopener noreferrer">Join</a>
+          <a class="btn btn--secondary" href="#network">See the network</a>
+        </div>
+        <ul class="hero-stats">
+          <li><span data-count="12">12</span> cities</li>
+          <li><span data-count="75" data-suffix="+">75+</span> builders</li>
+          <li class="hero-stats__text">Cursor Ambassadors</li>
+        </ul>
       </div>
     </section>
 
-    <section id="map" class="section" aria-labelledby="map-heading">
+    <section id="about" class="block reveal" aria-labelledby="about-heading">
       <div class="wrap">
-        <header class="section-head">
-          <h2 id="map-heading" class="section-title">One chapter. A wider presence.</h2>
-          <p id="map-section-sub" class="section-sub">London is the only chapter. Other cities are members in the network, not chapters.</p>
-        </header>
-
-        <div class="map-card reveal">
-          <div id="devnet-presence-map" class="presence-map" role="application" aria-label="Map of DevNet London and members in the network"></div>
-
-          <div class="map-legend" aria-label="Map legend">
-            <span class="legend-item legend-item--active" data-legend="active"><span class="legend-dot legend-dot--active"></span> Active chapter</span>
-            <span class="legend-item legend-item--chapter-hub" data-legend="chapter-hub"><span class="legend-dot legend-dot--chapter-hub"></span> Chapter hub</span>
-            <span class="legend-item legend-item--presence" data-legend="presence"><span class="legend-dot legend-dot--presence"></span> Network presence</span>
-            <span class="legend-item legend-item--future is-hidden" data-legend="future" aria-hidden="true"><span class="legend-dot legend-dot--future"></span> Future chapter</span>
+        <p class="index">01 About</p>
+        <div class="band band-a">
+          <div>
+            <h2 id="about-heading">A network of builders who ship real projects.</h2>
+            <div class="band-a__copy">
+              <p>DevNet helps developers ship real projects, connect with other builders, and build public proof of work.</p>
+              <p>Anyone can code with AI. We teach, we learn, and we build together.</p>
+            </div>
           </div>
-
-          <div class="map-chips" role="group" aria-label="Filter map by pin type">
-            <button type="button" class="chip is-active" data-filter="all">All</button>
-            <button type="button" class="chip" data-filter="chapter">Chapter</button>
-            <button type="button" class="chip" data-filter="presence">Presence</button>
+          <div class="art-wrap">
+            <svg class="art" viewBox="0 0 480 360" role="img" aria-labelledby="art-title">
+              <title id="art-title">DevNet, chapters, and members</title>
+              <g class="art__links" fill="none" stroke="rgba(205,184,242,0.55)" stroke-width="1.5">
+                <line x1="240" y1="92" x2="120" y2="250"/>
+                <line x1="240" y1="92" x2="360" y2="250"/>
+              </g>
+              <g class="art__pulse" fill="none" stroke="#8A5CF0" stroke-width="2">
+                <line x1="240" y1="92" x2="120" y2="250"/>
+                <line x1="240" y1="92" x2="360" y2="250"/>
+              </g>
+              <g fill="#1B1033" stroke="#8A5CF0" stroke-width="1.5">
+                <circle cx="240" cy="78" r="48"/>
+                <circle cx="120" cy="264" r="48"/>
+                <circle cx="360" cy="264" r="48"/>
+              </g>
+              <g fill="#F3EEFB" font-family="Inter, system-ui, sans-serif" font-size="16" font-weight="700" text-anchor="middle">
+                <text x="240" y="84">DevNet</text>
+                <text x="120" y="270">Chapters</text>
+                <text x="360" y="270">Members</text>
+              </g>
+            </svg>
+            <ul class="art-key">
+              <li><strong>DevNet</strong><span>The brand and the network.</span></li>
+              <li><strong>Chapters</strong><span>Independent, run by local exec teams.</span></li>
+              <li><strong>Members</strong><span>Join low-commitment, build at your pace.</span></li>
+            </ul>
           </div>
+        </div>
+        <ul class="beliefs stagger">
+          <li>
+            <span class="num">01</span>
+            <h3>Execution over ideas</h3>
+            <p>Shipping beats talking about shipping.</p>
+          </li>
+          <li>
+            <span class="num">02</span>
+            <h3>Real projects matter</h3>
+            <p>Public proof of work beats a resume line.</p>
+          </li>
+          <li>
+            <span class="num">03</span>
+            <h3>Builders grow faster together</h3>
+            <p>Surround yourself with people building.</p>
+          </li>
+        </ul>
+        
+        <div class="do-row">
+          <h3>What we do</h3>
+          <ul>
+            <li><span class="icon-tile" aria-hidden="true"><svg viewBox="0 0 24 24" width="24" height="24"><path fill="currentColor" d="M4 5h16v10H4zM2 17h20v2H2z"/></svg></span><strong>Workshops</strong><span>5+ workshops hosted. Intro workshop Nov 6.</span></li>
+            <li><span class="icon-tile" aria-hidden="true"><svg viewBox="0 0 24 24" width="24" height="24"><path fill="currentColor" d="M5 4h2v16H5zM8 8h11l-2 4 2 4H8z"/></svg></span><strong>Hackathons</strong><span>2+ hackathons hosted. Hackathon Dec 4.</span></li>
+            <li><span class="icon-tile" aria-hidden="true"><svg viewBox="0 0 24 24" width="24" height="24"><path fill="currentColor" d="M4 6h16v12H4zM8 10h3v2H8zm5 0h3v2h-3z"/></svg></span><strong>Build sessions</strong><span>We teach, we learn, and we build together.</span></li>
+            <li><span class="icon-tile" aria-hidden="true"><svg viewBox="0 0 24 24" width="24" height="24"><path fill="currentColor" d="M8 11a3 3 0 110-6 3 3 0 010 6zm8 1a2.5 2.5 0 110-5 2.5 2.5 0 010 5zM3 19c0-2.5 2.2-4 5-4s5 1.5 5 4v1H3zm10 .5c.2-2.2 1.8-3.7 4-4.2 1.6.4 2.8 1.5 3.4 3.2.3.8.4 1.4.4 2H13z"/></svg></span><strong>Community</strong><span>12 cities. Chapters run by local exec teams.</span></li>
+          </ul>
+        </div>
+        <div class="join-strip">
+          <p>Join low-commitment, build at your pace.</p>
+          <a class="btn btn--primary" href="https://docs.google.com/forms/d/e/1FAIpQLSepIp21u2-UWk3RKEXfqirkb2ZRyZ3W1cim90FPCFbdUjWC2w/viewform" target="_blank" rel="noopener noreferrer">Join</a>
+        </div>
+        <div class="cursor-banner">
+          <p class="cursor-banner__mark">Cursor</p>
+          <div>
+            <p class="cursor-banner__title">Cursor Ambassadors</p>
+            <p>In partnership with Cursor.</p>
+            <p>Members get access to the Cursor ecosystem.</p>
+          </div>
+        </div>
+      </div>
+    </section>
 
-          <ul class="chapter-pill-row" aria-label="Jump to chapter">
-            <!-- Filled by main.js from data/chapters.js -->
+    <section id="network" class="block reveal" aria-labelledby="network-heading">
+      <div class="wrap">
+        <p class="index">02 Network</p>
+        <div class="section-head">
+          <h2 id="network-heading">12 cities. One network.</h2>
+        </div>
+        <div class="map-board">
+          <div class="map-stage">
+            <img class="matrix" src="/assets/na-dots.svg" alt="" width="760" height="538" loading="lazy" decoding="async">
+            <button type="button" class="pin" data-city="vancouver" aria-label="Vancouver, network city"><span class="pin__dot"></span><span class="pin__label" aria-hidden="true">Vancouver</span></button>
+<button type="button" class="pin pin--founding pin--cluster" data-city="london" aria-label="London, founding chapter"><span class="pin__dot"></span><span class="pin__label" aria-hidden="true">London</span></button>
+<button type="button" class="pin pin--cluster" data-city="waterloo" aria-label="Waterloo, network city"><span class="pin__dot"></span><span class="pin__label" aria-hidden="true">Waterloo</span></button>
+<button type="button" class="pin pin--cluster" data-city="guelph" aria-label="Guelph, network city"><span class="pin__dot"></span><span class="pin__label" aria-hidden="true">Guelph</span></button>
+<button type="button" class="pin pin--cluster" data-city="toronto" aria-label="Toronto, network city"><span class="pin__dot"></span><span class="pin__label" aria-hidden="true">Toronto</span></button>
+<button type="button" class="pin pin--cluster" data-city="kingston" aria-label="Kingston, network city"><span class="pin__dot"></span><span class="pin__label" aria-hidden="true">Kingston</span></button>
+<button type="button" class="pin" data-city="montreal" aria-label="Montreal, network city"><span class="pin__dot"></span><span class="pin__label" aria-hidden="true">Montreal</span></button>
+<button type="button" class="pin" data-city="halifax" aria-label="Halifax, network city"><span class="pin__dot"></span><span class="pin__label" aria-hidden="true">Halifax</span></button>
+<button type="button" class="pin" data-city="tucson" aria-label="Tucson, network city"><span class="pin__dot"></span><span class="pin__label" aria-hidden="true">Tucson</span></button>
+<button type="button" class="pin" data-city="miami" aria-label="Miami, network city"><span class="pin__dot"></span><span class="pin__label" aria-hidden="true">Miami</span></button>
+<button type="button" class="pin" data-city="boston" aria-label="Boston, network city"><span class="pin__dot"></span><span class="pin__label" aria-hidden="true">Boston</span></button>
+<button type="button" class="pin" data-city="new-york-city" aria-label="New York City, network city"><span class="pin__dot"></span><span class="pin__label" aria-hidden="true">New York City</span></button>
+          </div>
+            <div class="city-list">
+              <div>
+                <h3>Canada 8</h3>
+                <button type="button" class="city-row" data-city="vancouver"><span class="city-row__dot" aria-hidden="true"></span><span>Vancouver</span></button>
+<button type="button" class="city-row city-row--live" data-city="london"><span class="city-row__dot" aria-hidden="true"></span><span>London</span></button>
+<button type="button" class="city-row" data-city="waterloo"><span class="city-row__dot" aria-hidden="true"></span><span>Waterloo</span></button>
+<button type="button" class="city-row" data-city="guelph"><span class="city-row__dot" aria-hidden="true"></span><span>Guelph</span></button>
+<button type="button" class="city-row" data-city="toronto"><span class="city-row__dot" aria-hidden="true"></span><span>Toronto</span></button>
+<button type="button" class="city-row" data-city="kingston"><span class="city-row__dot" aria-hidden="true"></span><span>Kingston</span></button>
+<button type="button" class="city-row" data-city="montreal"><span class="city-row__dot" aria-hidden="true"></span><span>Montreal</span></button>
+<button type="button" class="city-row" data-city="halifax"><span class="city-row__dot" aria-hidden="true"></span><span>Halifax</span></button>
+              </div>
+              <div>
+                <h3>United States 4</h3>
+                <button type="button" class="city-row" data-city="tucson"><span class="city-row__dot" aria-hidden="true"></span><span>Tucson</span></button>
+<button type="button" class="city-row" data-city="miami"><span class="city-row__dot" aria-hidden="true"></span><span>Miami</span></button>
+<button type="button" class="city-row" data-city="boston"><span class="city-row__dot" aria-hidden="true"></span><span>Boston</span></button>
+<button type="button" class="city-row" data-city="new-york-city"><span class="city-row__dot" aria-hidden="true"></span><span>New York City</span></button>
+              </div>
+            </div>
+        </div>
+        <div class="status">
+          <article>
+            <h3>Active</h3>
+            <p>Western, London, Ontario</p>
+          </article>
+          <article>
+            <h3>Aiming to launch in 2027</h3>
+            <ul>
+              <li>Dalhousie, Halifax</li>
+              <li>Guelph</li>
+              <li>Kingston</li>
+            </ul>
+          </article>
+        </div>
+        <ul class="net-stats">
+          <li><strong>12</strong> cities</li>
+          <li><strong>75+</strong> builders</li>
+          <li><strong>8</strong> Canada</li>
+          <li><strong>4</strong> United States</li>
+        </ul>
+        <ol class="cal" id="calendar">
+          <li class="cal__item cal__item--next">
+            <span class="cal__date">Nov 6</span>
+            <div>
+              <h3>Intro workshop</h3>
+              <p>Friday, 2:00 to 4:00 PM, Ivey Building Room 1130.</p>
+            </div>
+          </li>
+          <li class="cal__item">
+            <span class="cal__date">Nov</span>
+            <div>
+              <h3>Chapter event</h3>
+              <p>Third week of November.</p>
+            </div>
+          </li>
+          <li class="cal__item">
+            <span class="cal__date">Dec 4</span>
+            <div>
+              <h3>Hackathon</h3>
+            </div>
+          </li>
+        </ol>
+      </div>
+    </section>
+
+    <section id="western" class="block west reveal" aria-labelledby="western-heading">
+      <div class="wrap">
+        <div class="west-hero">
+          <div>
+            <p class="index">03 Western</p>
+            <h2 id="western-heading">DevNet at Western University</h2>
+            <div class="west-actions">
+              <a class="btn btn--primary" href="https://docs.google.com/forms/d/e/1FAIpQLSepIp21u2-UWk3RKEXfqirkb2ZRyZ3W1cim90FPCFbdUjWC2w/viewform" target="_blank" rel="noopener noreferrer">Join</a>
+              <a class="btn btn--primary" href="https://www.instagram.com/devnet_western" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M12 2.2c3.2 0 3.6 0 4.8.1 3.3.1 4.8 1.7 4.9 4.9.1 1.3.1 1.6.1 4.8s0 3.6-.1 4.8c-.1 3.2-1.7 4.8-4.9 4.9-1.3.1-1.6.1-4.8.1s-3.6 0-4.8-.1c-3.3-.1-4.8-1.7-4.9-4.9-.1-1.3-.1-1.6-.1-4.8s0-3.6.1-4.8c.1-3.2 1.7-4.8 4.9-4.9 1.2-.1 1.6-.1 4.8-.1zM12 0C8.7 0 8.3 0 7.1.1 2.7.3.3 2.7.1 7.1 0 8.3 0 8.7 0 12s0 3.7.1 4.9c.2 4.4 2.6 6.8 7 7C8.3 24 8.7 24 12 24s3.7 0 4.9-.1c4.4-.2 6.8-2.6 7-7 .1-1.2.1-1.6.1-4.9s0-3.7-.1-4.9c-.2-4.4-2.6-6.8-7-7C15.7 0 15.3 0 12 0zm0 5.8a6.2 6.2 0 100 12.4 6.2 6.2 0 000-12.4zM12 16a4 4 0 110-8 4 4 0 010 8zm6.4-11.8a1.4 1.4 0 100 2.8 1.4 1.4 0 000-2.8z"/></svg>Instagram</a>
+            </div>
+          </div>
+          <div class="tiles west-tiles">
+            <div class="tile"><p class="tile__n"><span data-count="50" data-suffix="+">50+</span></p><p class="tile__l">builders</p></div>
+            <div class="tile"><p class="tile__n"><span data-count="2" data-suffix="+">2+</span></p><p class="tile__l">hackathons hosted</p></div>
+            <div class="tile"><p class="tile__n"><span data-count="5" data-suffix="+">5+</span></p><p class="tile__l">workshops hosted</p></div>
+            <div class="tile"><p class="tile__n"><span data-count="21">21</span></p><p class="tile__l">execs</p></div>
+          </div>
+        </div>
+        
+        <div class="upcoming">
+          <article class="event" id="event-intro">
+            <div class="event__date" aria-hidden="true">NOV<span>6</span></div>
+            <div>
+              <h3>Intro workshop</h3>
+              <p>Friday Nov 6, 2:00 to 4:00 PM, Ivey Building Room 1130. Intro workshop with two guest speakers.</p>
+              <div class="countboxes" id="countdown" aria-live="polite">
+                <span><b data-unit="d">0</b>Days</span>
+                <span><b data-unit="h">0</b>Hours</span>
+                <span><b data-unit="m">0</b>Min</span>
+                <span><b data-unit="s">0</b>Sec</span>
+              </div>
+              <a class="btn btn--secondary" href="https://forms.gle/V3QFE7BKYfyYbkzh8" target="_blank" rel="noopener noreferrer">RSVP</a>
+            </div>
+          </article>
+          <p class="cal-link"><a href="#calendar">Network calendar</a></p>
+        </div>
+        <div class="org">
+          <h3 class="org__stat"><span data-count="21">21</span> people, 9 roles</h3>
+          <ul class="roles">
+            <li><span class="roles__n">2</span><span>Presidents</span></li>
+            <li><span class="roles__n">3</span><span>Finance</span></li>
+            <li><span class="roles__n">3</span><span>Strategy</span></li>
+            <li><span class="roles__n">2</span><span>Advisors</span></li>
+            <li><span class="roles__n">2</span><span>Marketing</span></li>
+            <li><span class="roles__n">3</span><span>Partnerships</span></li>
+            <li><span class="roles__n">3</span><span>Events</span></li>
+            <li><span class="roles__n">1</span><span>EDI</span></li>
+            <li><span class="roles__n">2</span><span>Culture</span></li>
           </ul>
         </div>
       </div>
     </section>
 
-    <section id="timeline" class="section" aria-labelledby="timeline-heading">
+
+    <section id="socials" class="block reveal" aria-labelledby="socials-heading">
       <div class="wrap">
-        <header class="section-head">
-          <h2 id="timeline-heading" class="section-title">The year</h2>
-        </header>
-
-        <div class="year">
-          <section class="year-term" aria-labelledby="fall-heading">
-            <h3 id="fall-heading" class="year-term__title">Fall 2026</h3>
-            <ol class="year-list">
-              <li class="year-item">
-                <span class="year-item__name">Intro calls</span>
-                <span class="year-item__when">Early October</span>
-              </li>
-              <li class="year-item">
-                <span class="year-item__name">Workshop: Cursor, Vercel, and GitHub</span>
-                <span class="year-item__when">October / November</span>
-              </li>
-              <li class="year-item">
-                <span class="year-item__name">Speaker</span>
-                <span class="year-item__when">October / November</span>
-              </li>
-              <li class="year-item">
-                <span class="year-item__name">Hackathon</span>
-                <span class="year-item__when">End of November</span>
-              </li>
-            </ol>
-          </section>
-
-          <section class="year-term" aria-labelledby="winter-heading">
-            <h3 id="winter-heading" class="year-term__title">Winter 2027</h3>
-            <ol class="year-list">
-              <li class="year-item">
-                <span class="year-item__name">Welcome back</span>
-                <span class="year-item__when">Early January</span>
-              </li>
-              <li class="year-item">
-                <span class="year-item__name">Workshop: Cursor, Grok, Muse, and OpenClaw</span>
-                <span class="year-item__when">Early February</span>
-              </li>
-              <li class="year-item">
-                <span class="year-item__name">Speaker</span>
-                <span class="year-item__when">February / early March</span>
-              </li>
-              <li class="year-item">
-                <span class="year-item__name">Flagship hackathon</span>
-                <span class="year-item__when">Mid to late March</span>
-              </li>
-            </ol>
-          </section>
+        <p class="index">04 Socials</p>
+        <div class="section-head">
+          <h2 id="socials-heading">Follow DevNet</h2>
+          <div class="section-head__actions">
+            <a class="btn btn--primary" href="https://docs.google.com/forms/d/e/1FAIpQLSepIp21u2-UWk3RKEXfqirkb2ZRyZ3W1cim90FPCFbdUjWC2w/viewform" target="_blank" rel="noopener noreferrer">Join</a>
+            <a class="btn btn--secondary" href="/socials">All socials</a>
+          </div>
         </div>
-      </div>
-    </section>
-
-    <section id="team" class="section" aria-labelledby="team-heading">
-      <div class="wrap">
-        <header class="section-head">
-          <h2 id="team-heading" class="section-title">The team</h2>
-          <p class="section-sub">DevNet London exec. These roles are filled.</p>
-        </header>
-
-        <ul class="team-list">
-          <li class="team-row">
-            <h3 class="team-row__role">Finance</h3>
-            <p class="team-row__names">Noah Wilson, Jake Fortis, Richard Wang</p>
-            <p class="team-row__duty">Budget, sponsors, and reimbursements.</p>
-          </li>
-          <li class="team-row">
-            <h3 class="team-row__role">Strategy</h3>
-            <p class="team-row__names">Ryan Castellerion, Sean Markovitch, Jaimey Lupan</p>
-            <p class="team-row__duty">The year plan, event format, and attendance.</p>
-          </li>
-          <li class="team-row">
-            <h3 class="team-row__role">Advisors</h3>
-            <p class="team-row__names">Rowan Brenner, Danielle Rosenzweig</p>
-            <p class="team-row__duty">Recruiting, onboarding, the buddy program, and mentors.</p>
-          </li>
-          <li class="team-row">
-            <h3 class="team-row__role">Marketing</h3>
-            <p class="team-row__names">Sophie Wolf, Zoe Rosenfeld</p>
-            <p class="team-row__duty">Instagram, LinkedIn, and email.</p>
-          </li>
-          <li class="team-row">
-            <h3 class="team-row__role">Partnerships</h3>
-            <p class="team-row__names">Isaac Sandler, Jordan Rubenstein, Lucas Laschinger</p>
-            <p class="team-row__duty">Sponsor outreach and one speaker each semester.</p>
-          </li>
-          <li class="team-row">
-            <h3 class="team-row__role">Events</h3>
-            <p class="team-row__names">Jack Minsky, Daniel Merkur, Davis Valencia</p>
-            <p class="team-row__duty">Venues, dates, logistics, and socials.</p>
-          </li>
-          <li class="team-row">
-            <h3 class="team-row__role">Culture</h3>
-            <p class="team-row__names">Firoz Kareem-Martinez, Daniel Snir</p>
-            <p class="team-row__duty">Community and belonging.</p>
-          </li>
+        <ul class="social-grid social-grid--compact">
+          <li><a class="social-card social-card--compact" href="https://www.linkedin.com/company/dev-network/" target="_blank" rel="noopener noreferrer"><span class="icon-tile" aria-hidden="true"><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path fill="currentColor" d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg></span><strong>LinkedIn</strong><span class="handle">linkedin.com/<wbr>company/<wbr>dev-network</span><span>DevNet company page.</span></a></li>
+          <li><a class="social-card social-card--compact" href="https://x.com/devnet_x" target="_blank" rel="noopener noreferrer"><span class="icon-tile" aria-hidden="true"><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path fill="currentColor" d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></span><strong>X</strong><span class="handle">@devnet_x</span><span>DevNet account.</span></a></li>
+          <li><a class="social-card social-card--compact" href="https://www.instagram.com/devnet_western" target="_blank" rel="noopener noreferrer"><span class="icon-tile" aria-hidden="true"><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path fill="currentColor" d="M12 2.2c3.2 0 3.6 0 4.8.1 3.3.1 4.8 1.7 4.9 4.9.1 1.3.1 1.6.1 4.8s0 3.6-.1 4.8c-.1 3.2-1.7 4.8-4.9 4.9-1.3.1-1.6.1-4.8.1s-3.6 0-4.8-.1c-3.3-.1-4.8-1.7-4.9-4.9-.1-1.3-.1-1.6-.1-4.8s0-3.6.1-4.8c.1-3.2 1.7-4.8 4.9-4.9 1.2-.1 1.6-.1 4.8-.1zM12 0C8.7 0 8.3 0 7.1.1 2.7.3.3 2.7.1 7.1 0 8.3 0 8.7 0 12s0 3.7.1 4.9c.2 4.4 2.6 6.8 7 7C8.3 24 8.7 24 12 24s3.7 0 4.9-.1c4.4-.2 6.8-2.6 7-7 .1-1.2.1-1.6.1-4.9s0-3.7-.1-4.9c-.2-4.4-2.6-6.8-7-7C15.7 0 15.3 0 12 0zm0 5.8a6.2 6.2 0 100 12.4 6.2 6.2 0 000-12.4zM12 16a4 4 0 110-8 4 4 0 010 8zm6.4-11.8a1.4 1.4 0 100 2.8 1.4 1.4 0 000-2.8z"/></svg></span><strong>Instagram</strong><span class="handle">@devnet_western</span><span>Western chapter account.</span></a></li>
+          <li><a class="social-card social-card--compact" href="mailto:devnetwork8@gmail.com"><span class="icon-tile" aria-hidden="true"><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path fill="currentColor" d="M1.5 8.67v8.58a3 3 0 003 3h15a3 3 0 003-3V8.67l-8.928 5.493a3 3 0 01-3.144 0L1.5 8.67z"/><path fill="currentColor" d="M22.5 6.908V6.75a3 3 0 00-3-3h-15a3 3 0 00-3 3v.158l9.714 5.978a1.5 1.5 0 001.572 0L22.5 6.908z"/></svg></span><strong>Email</strong><span class="handle">devnetwork8@gmail.com</span><span>Email DevNet.</span></a></li>
         </ul>
       </div>
     </section>
-
-    <section id="join" class="section section--close" aria-labelledby="join-heading">
+    <section class="join-band" aria-labelledby="join-heading">
       <div class="wrap">
-        <h2 id="join-heading" class="section-title">Join DevNet</h2>
-        <p class="section-sub">DevNet London is the chapter at Western University. Members are builders in the wider network.</p>
-        <a data-cta="joinDevNet" href="#" class="btn btn--primary">Join DevNet</a>
+        <h2 id="join-heading">Build with us.</h2>
+        <div class="join-actions">
+          <a class="btn btn--primary" href="https://docs.google.com/forms/d/e/1FAIpQLSepIp21u2-UWk3RKEXfqirkb2ZRyZ3W1cim90FPCFbdUjWC2w/viewform" target="_blank" rel="noopener noreferrer">Join</a>
+        </div>
       </div>
     </section>
   </main>
-
   <footer class="site-footer">
-    <div class="site-footer__bar mx-auto flex w-full max-w-6xl flex-col gap-4 px-4 py-8 sm:px-6 md:flex-row md:items-center md:justify-between md:py-6">
-      <a href="#top" class="flex items-center gap-2" aria-label="DevNet, home">
-        <img src="assets/logo.png" alt="" class="brand-logo brand-logo--footer" width="32" height="32" />
-        <span class="brand-wordmark">DevNet</span>
+    <div class="site-footer__bar">
+      <a class="brand" href="/#top">
+        <picture>
+          <source srcset="/assets/logo.webp" type="image/webp">
+          <img src="/assets/logo.png" alt="" width="52" height="24" loading="lazy" decoding="async">
+        </picture>
+        DevNet
       </a>
-
-      <nav class="footer-socials" aria-label="Contact and social">
-        <a href="https://x.com/devnet_x" target="_blank" rel="noopener noreferrer" class="footer-socials__btn" aria-label="DevNet on X">
-          <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
-        </a>
-        <a href="https://www.linkedin.com/company/dev-network/" target="_blank" rel="noopener noreferrer" class="footer-socials__btn" aria-label="DevNet on LinkedIn">
-          <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
-        </a>
-        <a href="mailto:devnetwork8@gmail.com" class="footer-socials__btn" aria-label="Email DevNet">
-          <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M1.5 8.67v8.58a3 3 0 003 3h15a3 3 0 003-3V8.67l-8.928 5.493a3 3 0 01-3.144 0L1.5 8.67z"/><path d="M22.5 6.908V6.75a3 3 0 00-3-3h-15a3 3 0 00-3 3v.158l9.714 5.978a1.5 1.5 0 001.572 0L22.5 6.908z"/></svg>
-        </a>
+      <nav class="footer-socials" aria-label="Social">
+        <a class="footer-socials__btn" href="https://www.linkedin.com/company/dev-network/" target="_blank" rel="noopener noreferrer" aria-label="DevNet on LinkedIn"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg></a>
+        <a class="footer-socials__btn" href="https://x.com/devnet_x" target="_blank" rel="noopener noreferrer" aria-label="DevNet on X"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></a>
+        <a class="footer-socials__btn" href="mailto:devnetwork8@gmail.com" aria-label="Email DevNet"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M1.5 8.67v8.58a3 3 0 003 3h15a3 3 0 003-3V8.67l-8.928 5.493a3 3 0 01-3.144 0L1.5 8.67z"/><path fill="currentColor" d="M22.5 6.908V6.75a3 3 0 00-3-3h-15a3 3 0 00-3 3v.158l9.714 5.978a1.5 1.5 0 001.572 0L22.5 6.908z"/></svg></a>
+        <a class="footer-socials__btn" href="https://www.instagram.com/devnet_western" target="_blank" rel="noopener noreferrer" aria-label="DevNet Western on Instagram"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M12 2.2c3.2 0 3.6 0 4.8.1 3.3.1 4.8 1.7 4.9 4.9.1 1.3.1 1.6.1 4.8s0 3.6-.1 4.8c-.1 3.2-1.7 4.8-4.9 4.9-1.3.1-1.6.1-4.8.1s-3.6 0-4.8-.1c-3.3-.1-4.8-1.7-4.9-4.9-.1-1.3-.1-1.6-.1-4.8s0-3.6.1-4.8c.1-3.2 1.7-4.8 4.9-4.9 1.2-.1 1.6-.1 4.8-.1zM12 0C8.7 0 8.3 0 7.1.1 2.7.3.3 2.7.1 7.1 0 8.3 0 8.7 0 12s0 3.7.1 4.9c.2 4.4 2.6 6.8 7 7C8.3 24 8.7 24 12 24s3.7 0 4.9-.1c4.4-.2 6.8-2.6 7-7 .1-1.2.1-1.6.1-4.9s0-3.7-.1-4.9c-.2-4.4-2.6-6.8-7-7C15.7 0 15.3 0 12 0zm0 5.8a6.2 6.2 0 100 12.4 6.2 6.2 0 000-12.4zM12 16a4 4 0 110-8 4 4 0 010 8zm6.4-11.8a1.4 1.4 0 100 2.8 1.4 1.4 0 000-2.8z"/></svg></a>
+        <a class="footer-socials__text" href="/socials">Socials</a>
       </nav>
-
-      <p class="footer-copy">&copy; <span id="year"></span> DevNet London</p>
+      <p class="footer-copy">DevNet</p>
     </div>
   </footer>
-
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-  <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js" integrity="sha256-Hk4dIpcqOSb0hZjgyvFOP+cEmDXUKKNE/tT542ZbNQg=" crossorigin=""></script>
-  <script src="data/chapters.js"></script>
-  <script src="main.js" defer></script>
 </body>
 </html>
