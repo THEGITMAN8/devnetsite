@@ -265,14 +265,15 @@ h2,
 
 .js .mobile-menu.is-open {
   display: block;
-  position: fixed;
-  top: var(--header);
+  position: absolute;
+  top: 100%;
   left: 0;
   right: 0;
-  bottom: 0;
+  height: calc(100vh - var(--header));
   padding: 16px;
   background: var(--bg);
   overflow: auto;
+  z-index: 60;
 }
 
 .header-join,
