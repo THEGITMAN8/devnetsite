@@ -349,31 +349,48 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function renderCountdown() {
     if (!countdown || !intro) return;
+    var units = {
+      d: countdown.querySelector('[data-unit="d"]'),
+      h: countdown.querySelector('[data-unit="h"]'),
+      m: countdown.querySelector('[data-unit="m"]'),
+      s: countdown.querySelector('[data-unit="s"]')
+    };
+    function setBoxes(ms) {
+      var days = Math.floor(ms / 86400000);
+      var hours = Math.floor((ms % 86400000) / 3600000);
+      var minutes = Math.floor((ms % 3600000) / 60000);
+      var seconds = Math.floor((ms % 60000) / 1000);
+      if (units.d) units.d.textContent = String(days);
+      if (units.h) units.h.textContent = String(hours);
+      if (units.m) units.m.textContent = String(minutes);
+      if (units.s) units.s.textContent = String(seconds);
+    }
     var now = Date.now();
     if (now >= endMs) {
-      countdown.textContent = "Past";
+      setBoxes(0);
       intro.classList.add("is-past");
-      if (introButton) introButton.setAttribute("aria-label", "Intro workshop, past");
-      if (!intro.dataset.user && !intro.dataset.shifted) {
+      var plan = document.getElementById("plan-rest");
+      var planBtn = document.querySelector(".plan-toggle");
+      if (plan && !intro.dataset.shifted) {
         intro.dataset.shifted = "1";
-        openOnly(nextItem);
+        plan.hidden = false;
+        if (planBtn) {
+          planBtn.setAttribute("aria-expanded", "true");
+          planBtn.textContent = "Hide full plan";
+        }
       }
       return;
     }
     if (now >= startMs) {
-      countdown.textContent = "Happening now";
+      setBoxes(endMs - now);
       return;
     }
-    var diff = startMs - now;
-    var days = Math.floor(diff / 86400000);
-    var hours = Math.floor((diff % 86400000) / 3600000);
-    var minutes = Math.floor((diff % 3600000) / 60000);
-    countdown.textContent = days > 0 ? "Starts in " + days + "d " + hours + "h" : "Starts in " + hours + "h " + minutes + "m";
+    setBoxes(startMs - now);
   }
 
   if (intro) {
     renderCountdown();
-    window.setInterval(renderCountdown, 30000);
+    window.setInterval(renderCountdown, 1000);
     if (introButton) {
       introButton.addEventListener("click", function () {
         intro.dataset.user = "1";
@@ -415,6 +432,30 @@ document.addEventListener("DOMContentLoaded", function () {
       }
       document.body.removeChild(area);
     });
+  }
+
+  var planBtn = document.querySelector(".plan-toggle");
+  var planRest = document.getElementById("plan-rest");
+  if (planBtn && planRest) {
+    planBtn.addEventListener("click", function () {
+      var open = planBtn.getAttribute("aria-expanded") === "true";
+      planBtn.setAttribute("aria-expanded", open ? "false" : "true");
+      planRest.hidden = open;
+      planBtn.textContent = open ? "See full plan" : "Hide full plan";
+    });
+  }
+
+  var org = document.querySelector(".org");
+  function drawOrg() {
+    if (!org || org.classList.contains("is-drawn")) return;
+    var rect = org.getBoundingClientRect();
+    if (rect.top < window.innerHeight * 0.86 && rect.bottom > 40) org.classList.add("is-drawn");
+  }
+  if (org && reduce) {
+    org.classList.add("is-drawn");
+  } else if (org) {
+    drawOrg();
+    window.addEventListener("scroll", drawOrg, { passive: true });
   }
 
   document.querySelectorAll(".copy").forEach(function (button) {
