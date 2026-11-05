@@ -525,7 +525,7 @@ section {
 
 .map-stage {
   position: relative;
-  aspect-ratio: 960 / 719;
+  aspect-ratio: 960 / 517;
   border-radius: 16px;
   background: var(--card);
   border: 1px solid var(--line);
@@ -1751,23 +1751,23 @@ section {
 .spine.is-p20 .spine__fill { height: 100%; }
 
 /* city-pins:start */
-.pin[data-city="vancouver"]{left:7.176%;top:29.778%;}
-.pin[data-city="tucson"]{left:25.044%;top:77.167%;}
-.pin[data-city="toronto"]{left:71.500%;top:45.417%;}
-.ipin[data-city="toronto"]{left:46.585%;top:50.000%;}
-.pin[data-city="london"]{left:68.750%;top:47.278%;}
-.ipin[data-city="london"]{left:23.780%;top:72.333%;}
-.pin[data-city="waterloo"]{left:69.824%;top:45.917%;}
-.ipin[data-city="waterloo"]{left:32.683%;top:56.000%;}
-.pin[data-city="guelph"]{left:70.221%;top:45.694%;}
-.ipin[data-city="guelph"]{left:35.976%;top:53.333%;}
-.pin[data-city="kingston"]{left:75.750%;top:43.806%;}
-.ipin[data-city="kingston"]{left:81.829%;top:30.667%;}
-.pin[data-city="montreal"]{left:80.044%;top:40.278%;}
-.pin[data-city="halifax"]{left:94.750%;top:42.639%;}
-.pin[data-city="boston"]{left:83.735%;top:49.000%;}
-.pin[data-city="new-york-city"]{left:79.397%;top:53.583%;}
-.pin[data-city="miami"]{left:70.309%;top:95.111%;}
+.pin[data-city="vancouver"]{left:15.333%;top:20.992%;}
+.pin[data-city="tucson"]{left:29.792%;top:74.304%;}
+.pin[data-city="toronto"]{left:67.401%;top:38.584%;}
+.ipin[data-city="toronto"]{left:46.546%;top:49.893%;}
+.pin[data-city="london"]{left:65.184%;top:40.672%;}
+.ipin[data-city="london"]{left:23.838%;top:72.170%;}
+.pin[data-city="waterloo"]{left:66.047%;top:39.174%;}
+.ipin[data-city="waterloo"]{left:32.678%;top:56.190%;}
+.pin[data-city="guelph"]{left:66.371%;top:38.922%;}
+.ipin[data-city="guelph"]{left:35.998%;top:53.507%;}
+.pin[data-city="kingston"]{left:70.850%;top:36.777%;}
+.ipin[data-city="kingston"]{left:81.878%;top:30.627%;}
+.pin[data-city="montreal"]{left:74.325%;top:32.807%;}
+.pin[data-city="halifax"]{left:86.220%;top:35.472%;}
+.pin[data-city="boston"]{left:77.311%;top:42.625%;}
+.pin[data-city="new-york-city"]{left:73.802%;top:47.772%;}
+.pin[data-city="miami"]{left:66.438%;top:94.495%;}
 /* city-pins:end */
 
 @media (prefers-reduced-motion: reduce) {
@@ -2146,8 +2146,8 @@ section {
 }
 
 @media (min-width: 1440px) {
-  .spine { left: 24px; width: 140px; }
-  .spine__node span { display: inline; font-size: 12px; letter-spacing: 0.04em; text-transform: uppercase; color: var(--muted); }
+  .spine { left: 0; width: 24px; }
+  .spine__node span { display: none; }
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -2193,4 +2193,140 @@ section {
   .art__pulse { display: none; }
   .js .org__wires path { stroke-dashoffset: 0; animation: none; }
   .js .stagger > * { opacity: 1; }
+}
+
+/* round 4 */
+#about .band-a h2 { margin-bottom: 24px; }
+
+@media (min-width: 768px) {
+  .band-a { align-items: center; }
+
+  .rail__track {
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    position: relative;
+    padding-top: 40px;
+  }
+  .rail__track::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 7px;
+    height: 2px;
+    background: rgba(205, 184, 242, 0.55);
+  }
+  .rail__card:nth-child(2) .rail__node,
+  .rail__card:nth-child(3) .rail__node {
+    position: absolute;
+    top: 0;
+    margin: 0;
+    transform: translateX(-50%);
+  }
+  .rail__card:nth-child(2) .rail__node { left: 25%; }
+  .rail__card:nth-child(3) .rail__node { left: 75%; }
+  .rail__today {
+    display: block;
+    position: absolute;
+    left: 12px;
+    top: 8px;
+    z-index: 1;
+    width: 12px;
+    height: 12px;
+    border-radius: 999px;
+    background: var(--strong);
+    transform: translateY(-50%);
+  }
+
+  .org .org__roles {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+    margin-top: 28px;
+    background: linear-gradient(rgba(205, 184, 242, 0.55), rgba(205, 184, 242, 0.55)) 50% -12px / 1px 144px no-repeat;
+  }
+  .org .org__top { position: relative; }
+  .org .org__top::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 100%;
+    width: 1px;
+    height: 16px;
+    background: rgba(205, 184, 242, 0.55);
+    transform: translateX(-50%);
+  }
+  .org .org__roles::before,
+  .org .org__roles::after {
+    content: "";
+    position: absolute;
+    left: 12.5%;
+    right: 12.5%;
+    height: 1px;
+    background: rgba(205, 184, 242, 0.55);
+  }
+  .org .org__roles::before { top: -12px; }
+  .org .org__roles::after { top: calc(120px + 12px); }
+  .org .org__roles .org__node { position: relative; }
+  .org .org__roles .org__node::before,
+  .org .org__roles .org__node:nth-child(n + 5)::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    width: 1px;
+    background: rgba(205, 184, 242, 0.55);
+    transform: translateX(-50%);
+  }
+  .org .org__roles .org__node::before { top: -12px; height: 12px; }
+  .org .org__roles .org__node:nth-child(n + 5)::before { content: none; }
+  .org .org__roles .org__node:nth-child(n + 5)::after { top: -12px; height: 12px; }
+  .org__wires { display: none; }
+}
+
+.rail__track { display: grid; gap: 16px; }
+.rail__card {
+  padding: 24px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--card);
+}
+.rail__node {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  color: var(--accent);
+  font-size: 14px;
+  font-weight: 700;
+}
+.rail__node::before {
+  content: "";
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--accent);
+  border-radius: 999px;
+  background: var(--bg);
+}
+.rail__card h3 { margin: 0 0 12px; font-size: 18px; line-height: 24px; }
+@media (max-width: 767px) {
+  .rail__today { display: none; }
+}
+
+.west-hero { gap: 32px; }
+.upcoming { margin-top: 32px; }
+.event { margin-top: 0; }
+
+@media (max-width: 1099px) {
+  .spine { display: none; }
+}
+@media (min-width: 1100px) {
+  .spine { display: block; left: 0; width: 24px; }
+  .spine::before, .spine__fill { left: 11px; }
+  .spine__node {
+    left: 0;
+    width: 24px;
+    justify-content: center;
+    border: 0;
+    background: transparent;
+  }
+  .spine__node span { display: none; }
 }
