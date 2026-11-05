@@ -3452,6 +3452,7 @@ section {
   .tl-node.is-next { min-height: 180px; }
   .tl-node.is-next .event__date { width: 72px; height: 72px; }
   .tl-node.is-next .event__date span { font-size: 28px; line-height: 32px; }
+  .tl-node.is-next .event__date--week span { font-size: 13px; line-height: 15px; }
 }
 @media (max-width: 1239px) {
   .spine { display: none !important; }
