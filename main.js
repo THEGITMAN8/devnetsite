@@ -213,7 +213,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 
-  document.querySelectorAll(".chapter").forEach(function (button) {
+  document.querySelectorAll(".chapter, .city-row").forEach(function (button) {
     button.addEventListener("click", function () {
       var id = button.getAttribute("data-city") || "";
       lockedCity = lockedCity === id ? "" : id;

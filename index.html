@@ -32,7 +32,7 @@
   <script src="/main.js"></script>
 </head>
 <body>
-  <div class="spine" aria-hidden="true"><span class="spine__fill"></span><span class="spine__node" data-spine="about"><b>01</b><span>About</span></span><span class="spine__node" data-spine="network"><b>02</b><span>Network</span></span><span class="spine__node" data-spine="western"><b>03</b><span>Western</span></span></div>
+  <div class="spine" aria-hidden="true"><span class="spine__fill"></span><span class="spine__node" data-spine="about"><b>01</b><span>About</span></span><span class="spine__node" data-spine="network"><b>02</b><span>Network</span></span><span class="spine__node" data-spine="western"><b>03</b><span>Western</span></span><span class="spine__node" data-spine="socials"><b>04</b><span>Socials</span></span></div>
   <a href="#top" class="skip-link">Skip to content</a>
   <header class="site-header" id="site-header">
     <div class="bar">
@@ -47,7 +47,7 @@
           <a class="nav-link" href="#about" data-nav>About</a>
           <a class="nav-link" href="#network" data-nav>Network</a>
           <a class="nav-link" href="#western" data-nav>Western</a>
-          <a class="nav-link" href="/socials" data-nav>Socials</a>
+          <a class="nav-link nav-link--pill" href="/socials" data-nav>Socials</a>
       </nav>
       
       <button type="button" id="menu-toggle" class="menu-toggle" aria-expanded="false" aria-controls="mobile-menu" aria-label="Open menu">
@@ -60,7 +60,7 @@
           <a class="nav-link" href="#about" data-nav>About</a>
           <a class="nav-link" href="#network" data-nav>Network</a>
           <a class="nav-link" href="#western" data-nav>Western</a>
-          <a class="nav-link" href="/socials" data-nav>Socials</a>
+          <a class="nav-link nav-link--pill" href="/socials" data-nav>Socials</a>
           <a class="btn btn--primary sheet-join" href="https://docs.google.com/forms/d/e/1FAIpQLSf-zY-pXzwldWrckCPpmdXvuXlvv-fNodLRm0zabNjaP1JdvA/viewform?usp=dialog" target="_blank" rel="noopener noreferrer">Join</a>
       </nav>
     </div>
@@ -150,6 +150,20 @@
             <p>Surround yourself with people building.</p>
           </li>
         </ul>
+        
+        <div class="do-row">
+          <h3>What we do</h3>
+          <ul>
+            <li><strong>Workshops</strong><span>5+ workshops hosted at Western. Intro workshop Nov 6. Another workshop late Jan or early Feb.</span></li>
+            <li><strong>Hackathons</strong><span>2+ hackathons hosted. Chapter hackathon late Nov. DevNet-wide flagship hackathon in March with Western, Dalhousie, and Guelph.</span></li>
+            <li><strong>Build sessions</strong><span>We teach, we learn, and we build together. Public proof of work.</span></li>
+            <li><strong>Community</strong><span>A network of builders across 12 cities. Chapters are independent, run by local exec teams.</span></li>
+          </ul>
+        </div>
+        <div class="join-strip">
+          <p>Join low-commitment, build at your pace.</p>
+          <a class="btn btn--primary" href="https://docs.google.com/forms/d/e/1FAIpQLSf-zY-pXzwldWrckCPpmdXvuXlvv-fNodLRm0zabNjaP1JdvA/viewform?usp=dialog" target="_blank" rel="noopener noreferrer">Join</a>
+        </div>
         <div class="cursor-banner">
           <p class="cursor-banner__mark">Cursor</p>
           <p class="cursor-banner__title">Cursor Ambassadors</p>
@@ -163,77 +177,73 @@
         <p class="index">02 Network</p>
         <div class="section-head">
           <h2 id="network-heading">12 cities. One network.</h2>
-          <div class="head-actions">
-            <a class="btn btn--secondary" href="https://www.linkedin.com/company/dev-network/" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>DevNet on LinkedIn<svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2" d="M14 5h5v5M19 5l-9 9"/><path fill="none" stroke="currentColor" stroke-width="2" d="M19 13v5a1 1 0 01-1 1H6a1 1 0 01-1-1V6a1 1 0 011-1h5"/></svg></a>
-            <a class="btn btn--secondary" href="https://x.com/devnet_x" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>DevNet on X<svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2" d="M14 5h5v5M19 5l-9 9"/><path fill="none" stroke="currentColor" stroke-width="2" d="M19 13v5a1 1 0 01-1 1H6a1 1 0 01-1-1V6a1 1 0 011-1h5"/></svg></a>
-          
         </div>
-        </div>
-        <div class="map-frame">
-          <div class="map-card-head">
-            <p class="map-stat"><span class="map-stat__n" data-count="12">12</span> cities</p>
-            <p class="map-split"><span>Canada 8</span><span>United States 4</span></p>
-          </div>
+        <div class="map-board">
           <div class="map-stage">
-            <img class="matrix" src="/assets/na-dots.svg" alt="" width="960" height="517" loading="lazy" decoding="async"><svg class="matrix-lines" viewBox="0 0 960 517" aria-hidden="true"><rect x="603.4" y="175.3" width="93.7" height="48.5" rx="8" fill="none" stroke="rgba(245,208,254,0.85)" stroke-width="1.25"></rect><g class="links"><line x1="625.8" y1="210.3" x2="147.2" y2="108.5" pathLength="1"></line><line x1="625.8" y1="210.3" x2="286.0" y2="384.2" pathLength="1"></line><line x1="625.8" y1="210.3" x2="647.0" y2="199.5" pathLength="1"></line><line x1="625.8" y1="210.3" x2="634.1" y2="202.5" pathLength="1"></line><line x1="625.8" y1="210.3" x2="637.2" y2="201.2" pathLength="1"></line><line x1="625.8" y1="210.3" x2="680.2" y2="190.1" pathLength="1"></line><line x1="625.8" y1="210.3" x2="713.5" y2="169.6" pathLength="1"></line><line x1="625.8" y1="210.3" x2="827.7" y2="183.4" pathLength="1"></line><line x1="625.8" y1="210.3" x2="742.2" y2="220.4" pathLength="1"></line><line x1="625.8" y1="210.3" x2="708.5" y2="247.0" pathLength="1"></line><line x1="625.8" y1="210.3" x2="637.8" y2="488.5" pathLength="1"></line></g></svg>
-            <button type="button" class="pin" data-city="vancouver" aria-label="Vancouver, network city"><span class="pin__dot"></span><span class="pin__tip"><strong>Vancouver</strong><span>Network city</span></span></button>
-<button type="button" class="pin" data-city="tucson" aria-label="Tucson, network city"><span class="pin__dot"></span><span class="pin__tip"><strong>Tucson</strong><span>Network city</span></span></button>
-<button type="button" class="pin" data-city="toronto" aria-label="Toronto, network city"><span class="pin__dot"></span><span class="pin__tip"><strong>Toronto</strong><span>Network city</span></span></button>
-<button type="button" class="pin pin--founding" data-city="london" aria-label="London, founding chapter"><span class="pin__dot"></span><span class="pin__tip"><strong>London</strong><span>Founding chapter</span></span></button>
-<button type="button" class="pin" data-city="waterloo" aria-label="Waterloo, network city"><span class="pin__dot"></span><span class="pin__tip"><strong>Waterloo</strong><span>Network city</span></span></button>
-<button type="button" class="pin" data-city="guelph" aria-label="Guelph, network city"><span class="pin__dot"></span><span class="pin__tip"><strong>Guelph</strong><span>Network city</span></span></button>
-<button type="button" class="pin" data-city="kingston" aria-label="Kingston, network city"><span class="pin__dot"></span><span class="pin__tip"><strong>Kingston</strong><span>Network city</span></span></button>
-<button type="button" class="pin" data-city="montreal" aria-label="Montreal, network city"><span class="pin__dot"></span><span class="pin__tip"><strong>Montreal</strong><span>Network city</span></span></button>
-<button type="button" class="pin" data-city="halifax" aria-label="Halifax, network city"><span class="pin__dot"></span><span class="pin__tip"><strong>Halifax</strong><span>Network city</span></span></button>
-<button type="button" class="pin" data-city="boston" aria-label="Boston, network city"><span class="pin__dot"></span><span class="pin__tip"><strong>Boston</strong><span>Network city</span></span></button>
-<button type="button" class="pin" data-city="new-york-city" aria-label="New York City, network city"><span class="pin__dot"></span><span class="pin__tip"><strong>New York City</strong><span>Network city</span></span></button>
-<button type="button" class="pin" data-city="miami" aria-label="Miami, network city"><span class="pin__dot"></span><span class="pin__tip"><strong>Miami</strong><span>Network city</span></span></button>
+            <img class="matrix" src="/assets/na-dots.svg" alt="" width="760" height="538" loading="lazy" decoding="async">
+            <svg class="cluster-box" viewBox="0 0 760 538" aria-hidden="true"><rect x="472.2" y="226.6" width="79.0" height="40.9" rx="8" fill="none" stroke="rgba(245,208,254,0.9)" stroke-width="1.5"></rect></svg>
+            <button type="button" class="pin" data-city="vancouver" aria-label="Vancouver, network city"><span class="pin__dot"></span></button>
+<button type="button" class="pin pin--founding pin--cluster" data-city="london" aria-label="London, founding chapter"><span class="pin__dot"></span></button>
+<button type="button" class="pin pin--cluster" data-city="waterloo" aria-label="Waterloo, network city"><span class="pin__dot"></span></button>
+<button type="button" class="pin pin--cluster" data-city="guelph" aria-label="Guelph, network city"><span class="pin__dot"></span></button>
+<button type="button" class="pin pin--cluster" data-city="toronto" aria-label="Toronto, network city"><span class="pin__dot"></span></button>
+<button type="button" class="pin pin--cluster" data-city="kingston" aria-label="Kingston, network city"><span class="pin__dot"></span></button>
+<button type="button" class="pin" data-city="montreal" aria-label="Montreal, network city"><span class="pin__dot"></span></button>
+<button type="button" class="pin" data-city="halifax" aria-label="Halifax, network city"><span class="pin__dot"></span></button>
+<button type="button" class="pin" data-city="tucson" aria-label="Tucson, network city"><span class="pin__dot"></span></button>
+<button type="button" class="pin" data-city="miami" aria-label="Miami, network city"><span class="pin__dot"></span></button>
+<button type="button" class="pin" data-city="boston" aria-label="Boston, network city"><span class="pin__dot"></span></button>
+<button type="button" class="pin" data-city="new-york-city" aria-label="New York City, network city"><span class="pin__dot"></span></button>
           </div>
-          <div class="inset">
-            <img src="/assets/on-dots.svg" alt="" width="400" height="260" loading="lazy" decoding="async"><svg viewBox="0 0 400 260" aria-hidden="true"><line x1="186.2" y1="129.7" x2="214" y2="196" stroke="rgba(205,184,242,0.7)" stroke-width="1"></line><text x="220" y="214" fill="#F3EEFB" font-family="Inter, system-ui, sans-serif" font-size="14" font-weight="500">Toronto</text><line x1="95.4" y1="187.6" x2="48" y2="228" stroke="rgba(205,184,242,0.7)" stroke-width="1"></line><text x="8" y="248" fill="#F3EEFB" font-family="Inter, system-ui, sans-serif" font-size="14" font-weight="500">London</text><line x1="130.7" y1="146.1" x2="78" y2="96" stroke="rgba(205,184,242,0.7)" stroke-width="1"></line><text x="8" y="92" fill="#F3EEFB" font-family="Inter, system-ui, sans-serif" font-size="14" font-weight="500">Waterloo</text><line x1="144.0" y1="139.1" x2="168" y2="52" stroke="rgba(205,184,242,0.7)" stroke-width="1"></line><text x="176" y="44" fill="#F3EEFB" font-family="Inter, system-ui, sans-serif" font-size="14" font-weight="500">Guelph</text><line x1="327.5" y1="79.6" x2="340" y2="36" stroke="rgba(205,184,242,0.7)" stroke-width="1"></line><text x="268" y="28" fill="#F3EEFB" font-family="Inter, system-ui, sans-serif" font-size="14" font-weight="500">Kingston</text></svg>
-            <button type="button" class="ipin" data-city="toronto" aria-label="Toronto, network city"><span class="ipin__dot"></span><span class="ipin__tip"><strong>Toronto</strong><span>Network city</span></span></button>
-<button type="button" class="ipin ipin--founding" data-city="london" aria-label="London, founding chapter"><span class="ipin__dot"></span><span class="ipin__tip"><strong>London</strong><span>Founding chapter</span></span></button>
-<button type="button" class="ipin" data-city="waterloo" aria-label="Waterloo, network city"><span class="ipin__dot"></span><span class="ipin__tip"><strong>Waterloo</strong><span>Network city</span></span></button>
-<button type="button" class="ipin" data-city="guelph" aria-label="Guelph, network city"><span class="ipin__dot"></span><span class="ipin__tip"><strong>Guelph</strong><span>Network city</span></span></button>
-<button type="button" class="ipin" data-city="kingston" aria-label="Kingston, network city"><span class="ipin__dot"></span><span class="ipin__tip"><strong>Kingston</strong><span>Network city</span></span></button>
+          <div class="map-link" aria-hidden="true"></div>
+          <div class="map-side">
+            <div class="inset">
+              <img src="/assets/on-dots.svg" alt="" width="360" height="240" loading="lazy" decoding="async">
+              <button type="button" class="ipin" data-city="london" aria-label="London, founding chapter"><span class="ipin__n">1</span></button>
+<button type="button" class="ipin" data-city="waterloo" aria-label="Waterloo, network city"><span class="ipin__n">2</span></button>
+<button type="button" class="ipin" data-city="guelph" aria-label="Guelph, network city"><span class="ipin__n">3</span></button>
+<button type="button" class="ipin" data-city="toronto" aria-label="Toronto, network city"><span class="ipin__n">4</span></button>
+<button type="button" class="ipin" data-city="kingston" aria-label="Kingston, network city"><span class="ipin__n">5</span></button>
+            </div>
+            <div class="city-list">
+              <div>
+                <h3>Canada 8</h3>
+                <button type="button" class="city-row" data-city="vancouver"><span class="city-row__dot" aria-hidden="true"></span><span>Vancouver</span></button>
+<button type="button" class="city-row city-row--live" data-city="london"><span class="city-row__n">1</span><span class="city-row__dot" aria-hidden="true"></span><span>London</span></button>
+<button type="button" class="city-row" data-city="waterloo"><span class="city-row__n">2</span><span class="city-row__dot" aria-hidden="true"></span><span>Waterloo</span></button>
+<button type="button" class="city-row" data-city="guelph"><span class="city-row__n">3</span><span class="city-row__dot" aria-hidden="true"></span><span>Guelph</span></button>
+<button type="button" class="city-row" data-city="toronto"><span class="city-row__n">4</span><span class="city-row__dot" aria-hidden="true"></span><span>Toronto</span></button>
+<button type="button" class="city-row" data-city="kingston"><span class="city-row__n">5</span><span class="city-row__dot" aria-hidden="true"></span><span>Kingston</span></button>
+<button type="button" class="city-row" data-city="montreal"><span class="city-row__dot" aria-hidden="true"></span><span>Montreal</span></button>
+<button type="button" class="city-row" data-city="halifax"><span class="city-row__dot" aria-hidden="true"></span><span>Halifax</span></button>
+              </div>
+              <div>
+                <h3>United States 4</h3>
+                <button type="button" class="city-row" data-city="tucson"><span class="city-row__dot" aria-hidden="true"></span><span>Tucson</span></button>
+<button type="button" class="city-row" data-city="miami"><span class="city-row__dot" aria-hidden="true"></span><span>Miami</span></button>
+<button type="button" class="city-row" data-city="boston"><span class="city-row__dot" aria-hidden="true"></span><span>Boston</span></button>
+<button type="button" class="city-row" data-city="new-york-city"><span class="city-row__dot" aria-hidden="true"></span><span>New York City</span></button>
+              </div>
+            </div>
           </div>
         </div>
-        <div class="groups">
-          <div>
-            <h3>Canada</h3>
-            <div class="chips"><button type="button" class="chip" data-city="toronto">Toronto</button>
-<button type="button" class="chip is-founding" data-city="london" aria-label="London, founding chapter">London</button>
-<button type="button" class="chip" data-city="guelph">Guelph</button>
-<button type="button" class="chip" data-city="kingston">Kingston</button>
-<button type="button" class="chip" data-city="halifax">Halifax</button>
-<button type="button" class="chip" data-city="montreal">Montreal</button>
-<button type="button" class="chip" data-city="waterloo">Waterloo</button>
-<button type="button" class="chip" data-city="vancouver">Vancouver</button></div>
-          </div>
-          <div>
-            <h3>United States</h3>
-            <div class="chips"><button type="button" class="chip" data-city="tucson">Tucson</button>
-<button type="button" class="chip" data-city="miami">Miami</button>
-<button type="button" class="chip" data-city="boston">Boston</button>
-<button type="button" class="chip" data-city="new-york-city">New York City</button></div>
-          </div>
-        </div>
-        <div class="chapters chapters--row stagger">
-          <button type="button" class="chapter chapter--live" data-city="london">
-            <span class="status-dot" aria-hidden="true"></span>
-            <span class="chapter__id"><strong>Western</strong><span>London, Ontario</span></span>
-            <span class="pill pill--active">Active</span>
-          </button>
-          <button type="button" class="chapter" data-city="halifax">
-            <span class="status-dot" aria-hidden="true"></span>
-            <span class="chapter__id"><strong>Dalhousie</strong><span>Halifax</span></span>
-            <span class="pill">Launching this year</span>
-          </button>
-          <button type="button" class="chapter" data-city="guelph">
-            <span class="status-dot" aria-hidden="true"></span>
-            <span class="chapter__id"><strong>Guelph</strong></span>
-            <span class="pill">Launching</span>
-          </button>
+        <div class="map-notes">
+          <article>
+            <h3>Chapters</h3>
+            <p>Western, London, Ontario. Active.</p>
+            <p>Dalhousie, Halifax. Launching this year.</p>
+            <p>Guelph. Launching.</p>
+          </article>
+          <article>
+            <h3>Network</h3>
+            <p>12 cities.</p>
+            <p>Canada 8. United States 4.</p>
+            <p>50+ builders.</p>
+          </article>
+          <article>
+            <h3>Socials</h3>
+            <p><a href="/socials">DevNet socials</a></p>
+          </article>
         </div>
         <div class="rail">
           <div class="rail__track">
@@ -270,6 +280,14 @@
             <div class="tile"><p class="tile__n"><span data-count="5" data-suffix="+">5+</span></p><p class="tile__l">workshops hosted</p></div>
             <div class="tile"><p class="tile__n"><span data-count="21">21</span></p><p class="tile__l">execs</p></div>
           </div>
+        </div>
+        
+        <div class="hosted">
+          <h3>Hosted</h3>
+          <ul>
+            <li>2+ hackathons hosted</li>
+            <li>5+ workshops hosted</li>
+          </ul>
         </div>
         <div class="upcoming">
           <article class="event" id="event-intro">
@@ -322,6 +340,22 @@
       </div>
     </section>
 
+
+    <section id="socials" class="block reveal" aria-labelledby="socials-heading">
+      <div class="wrap">
+        <p class="index">04 Socials</p>
+        <div class="section-head">
+          <h2 id="socials-heading">Follow DevNet</h2>
+          <a class="btn btn--secondary" href="/socials">All socials</a>
+        </div>
+        <ul class="social-row">
+          <li><a href="https://www.linkedin.com/company/dev-network/" target="_blank" rel="noopener noreferrer"><strong>LinkedIn</strong><span>DevNet company page</span></a></li>
+          <li><a href="https://x.com/devnet_x" target="_blank" rel="noopener noreferrer"><strong>X</strong><span>@devnet_x</span></a></li>
+          <li><a href="https://www.instagram.com/devnet_western" target="_blank" rel="noopener noreferrer"><strong>Instagram</strong><span>Western chapter account</span></a></li>
+          <li><a href="mailto:devnetwork8@gmail.com"><strong>Email</strong><span>devnetwork8@gmail.com</span></a></li>
+        </ul>
+      </div>
+    </section>
     <section class="join-band" aria-labelledby="join-heading">
       <div class="wrap">
         <h2 id="join-heading">Build with us.</h2>

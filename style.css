@@ -400,7 +400,7 @@ h2,
 }
 
 section {
-  scroll-margin-top: 80px;
+  scroll-margin-top: 104px;
 }
 
 .block {
@@ -525,7 +525,7 @@ section {
 
 .map-stage {
   position: relative;
-  aspect-ratio: 960 / 517;
+  aspect-ratio: 760 / 538;
   border-radius: 16px;
   background: var(--card);
   border: 1px solid var(--line);
@@ -1751,23 +1751,23 @@ section {
 .spine.is-p20 .spine__fill { height: 100%; }
 
 /* city-pins:start */
-.pin[data-city="vancouver"]{left:15.333%;top:20.992%;}
-.pin[data-city="tucson"]{left:29.792%;top:74.304%;}
-.pin[data-city="toronto"]{left:67.401%;top:38.584%;}
-.ipin[data-city="toronto"]{left:46.546%;top:49.893%;}
-.pin[data-city="london"]{left:65.184%;top:40.672%;}
-.ipin[data-city="london"]{left:23.838%;top:72.170%;}
-.pin[data-city="waterloo"]{left:66.047%;top:39.174%;}
-.ipin[data-city="waterloo"]{left:32.678%;top:56.190%;}
-.pin[data-city="guelph"]{left:66.371%;top:38.922%;}
-.ipin[data-city="guelph"]{left:35.998%;top:53.507%;}
-.pin[data-city="kingston"]{left:70.850%;top:36.777%;}
-.ipin[data-city="kingston"]{left:81.878%;top:30.627%;}
-.pin[data-city="montreal"]{left:74.325%;top:32.807%;}
-.pin[data-city="halifax"]{left:86.220%;top:35.472%;}
-.pin[data-city="boston"]{left:77.311%;top:42.625%;}
-.pin[data-city="new-york-city"]{left:73.802%;top:47.772%;}
-.pin[data-city="miami"]{left:66.438%;top:94.495%;}
+.pin[data-city="vancouver"]{left:9.172%;top:30.190%;}
+.pin[data-city="london"]{left:65.006%;top:47.930%;}
+.ipin[data-city="london"]{left:28.716%;top:74.659%;}
+.pin[data-city="waterloo"]{left:65.973%;top:46.579%;}
+.ipin[data-city="waterloo"]{left:37.556%;top:58.128%;}
+.pin[data-city="guelph"]{left:66.336%;top:46.353%;}
+.ipin[data-city="guelph"]{left:40.876%;top:55.352%;}
+.pin[data-city="toronto"]{left:67.489%;top:46.047%;}
+.ipin[data-city="toronto"]{left:51.424%;top:51.614%;}
+.pin[data-city="kingston"]{left:71.352%;top:44.419%;}
+.ipin[data-city="kingston"]{left:86.756%;top:31.683%;}
+.pin[data-city="montreal"]{left:75.244%;top:40.840%;}
+.pin[data-city="halifax"]{left:88.566%;top:43.243%;}
+.pin[data-city="tucson"]{left:25.367%;top:78.246%;}
+.pin[data-city="miami"]{left:66.411%;top:96.446%;}
+.pin[data-city="boston"]{left:78.588%;top:49.690%;}
+.pin[data-city="new-york-city"]{left:74.659%;top:54.330%;}
 /* city-pins:end */
 
 @media (prefers-reduced-motion: reduce) {
@@ -2329,4 +2329,150 @@ section {
     background: transparent;
   }
   .spine__node span { display: none; }
+}
+
+/* round 5 */
+.brand { flex: 0 0 auto; }
+.brand picture { display: block; flex: 0 0 auto; }
+.brand img { width: 78px; height: 36px; max-width: none; object-fit: contain; }
+.site-header, .bar { overflow: visible; }
+
+.nav-link--pill {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 8px 16px;
+  background: var(--strong);
+  color: #0b0614;
+  font-weight: 700;
+}
+.nav-link--pill:hover { color: #0b0614; background: #a888f6; }
+
+.beliefs p, .tile__l, .do-row span, .city-row, .map-notes p, .hosted li, .faq p, .info-card p, .social-card p, .social-row span {
+  color: #e4d8f5;
+}
+
+.map-board { display: grid; gap: 16px; margin-top: 24px; }
+.map-stage { aspect-ratio: 760 / 538; }
+.cluster-box { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.map-link { display: none; }
+.inset { width: 100%; aspect-ratio: 360 / 240; margin-top: 0; }
+.city-list { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px; }
+.city-list h3 { margin: 0 0 8px; font-size: 14px; }
+.city-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 44px;
+  padding: 8px 12px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+}
+.city-row + .city-row { margin-top: 8px; }
+.city-row__dot, .ipin__n {
+  width: 10px; height: 10px; border-radius: 999px; background: var(--strong); display: inline-block; flex: 0 0 auto;
+}
+.city-row__n { width: 16px; color: var(--accent); font-weight: 700; }
+.city-row.is-hot, .city-row:hover { border-color: rgba(138,92,240,0.85); }
+.city-row--live .city-row__dot { background: var(--london); width: 12px; height: 12px; }
+.pin--cluster { width: 24px; height: 24px; pointer-events: none; }
+.pin--cluster .pin__dot { margin: 7px auto 0; }
+.pin--cluster.pin--founding .pin__dot { margin-top: 4px; }
+.socials-hero h1 { font-size: 32px; line-height: 36px; }
+.pin--founding .pin__dot { width: 16px; height: 16px; margin-top: 4px; background: var(--london); }
+.pin.is-hot .pin__dot, .ipin.is-hot .ipin__n { box-shadow: 0 0 0 4px rgba(138,92,240,0.45); }
+.ipin { width: 28px; height: 28px; }
+.ipin__n {
+  position: absolute; left: 50%; top: 50%;
+  width: 18px; height: 18px;
+  display: grid; place-items: center;
+  color: #0b0614; background: var(--accent);
+  font-size: 11px; font-weight: 700;
+  transform: translate(-50%, -50%);
+}
+.ipin[data-city="waterloo"] .ipin__n { transform: translate(-160%, -50%); }
+.ipin[data-city="guelph"] .ipin__n { transform: translate(-50%, -170%); }
+.ipin[data-city="toronto"] .ipin__n { transform: translate(60%, -50%); }
+.ipin[data-city="london"] .ipin__n { transform: translate(-50%, 70%); }
+.ipin[data-city="kingston"] .ipin__n { transform: translate(70%, -140%); }
+.map-notes { display: grid; gap: 16px; margin-top: 24px; }
+.map-notes article, .info-card, .social-card, .do-row li, .hosted, .faq {
+  padding: 24px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--card);
+}
+.map-notes h3, .do-row h3, .hosted h3 { margin: 0 0 8px; font-size: 18px; }
+.map-notes a { color: var(--accent); font-weight: 700; }
+.do-row { margin-top: 32px; }
+.do-row ul { display: grid; gap: 16px; }
+.do-row li { display: grid; gap: 8px; }
+.do-row strong { font-size: 18px; }
+.join-strip {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
+  gap: 16px; margin-top: 24px; padding: 24px;
+  border: 1px solid var(--line); border-radius: 16px; background: var(--card);
+}
+.hosted { margin-top: 32px; }
+.hosted ul { display: grid; gap: 8px; }
+.social-row { display: grid; gap: 16px; margin-top: 24px; }
+.social-row a {
+  display: flex; flex-direction: column; justify-content: center; gap: 4px;
+  min-height: 88px; padding: 16px 24px;
+  border: 1px solid var(--line); border-radius: 16px; background: var(--card);
+  text-decoration: none;
+}
+.socials-hero { padding: 64px 0 32px; }
+.socials-hero img { width: 156px; height: auto; }
+.socials-hero h1 { margin: 16px 0 24px; letter-spacing: -0.03em; }
+.social-grid { display: grid; gap: 16px; }
+.social-card { display: grid; gap: 12px; align-content: start; min-height: 180px; }
+.social-card h2 { font-size: 24px; }
+.social-ico { color: var(--accent); }
+.social-card .btn, .info-card .btn { justify-self: start; min-height: 44px; }
+.socials-extra { display: grid; gap: 16px; }
+.faq { display: grid; gap: 8px; }
+.faq summary { min-height: 44px; display: flex; align-items: center; cursor: pointer; font-weight: 700; }
+.org__wires, .org .org__top::after, .org .org__roles::before, .org .org__roles::after { display: none !important; content: none !important; }
+.org .org__roles { background: none !important; gap: 16px !important; margin-top: 16px; grid-template-columns: 1fr !important; }
+.org .org__roles .org__node::before, .org .org__roles .org__node::after { content: none !important; display: none !important; }
+@media (min-width: 768px) {
+  .block { padding: 96px 0; }
+  .map-notes, .do-row ul, .social-grid, .social-row { grid-template-columns: 1fr 1fr; }
+  .socials-extra { grid-template-columns: 1fr 1fr; }
+  .faq { grid-column: 1 / -1; }
+  .org .org__roles { grid-template-columns: 1fr 1fr !important; }
+  .rail__track { padding-top: 64px; }
+}
+@media (min-width: 1000px) {
+  .map-board { grid-template-columns: minmax(0, 1.45fr) 24px minmax(260px, 0.75fr); align-items: start; }
+  .map-link { display: block; position: relative; }
+  .map-link::before {
+    content: "";
+    position: absolute;
+    left: 0; right: 0;
+    top: 45.9%;
+    height: 2px;
+    background: rgba(245, 208, 254, 0.9);
+  }
+  .map-side .city-list { grid-template-columns: 1fr; }
+  .social-row, .do-row ul { grid-template-columns: repeat(4, 1fr); }
+  .map-notes { grid-template-columns: repeat(3, 1fr); }
+}
+@media (min-width: 1100px) {
+  .org .org__roles { grid-template-columns: repeat(4, 1fr) !important; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .pin__dot, .ipin__n { animation: livepulse 2.4s ease-out infinite; }
+}
+
+@media (min-width: 768px) {
+  .socials-hero h1 { font-size: 48px; line-height: 52px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pin__dot, .ipin__n { animation: none; }
 }
