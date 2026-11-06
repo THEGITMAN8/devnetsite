@@ -858,17 +858,19 @@ document.addEventListener("DOMContentLoaded", function () {
     window.addEventListener("scroll", paintSpine, { passive: true });
   }
 
-  var upcomingEvents = document.getElementById("upcoming");
-  if (upcomingEvents) {
+  function retirePastEvents() {
     var nowMs = Date.now();
-    Array.prototype.slice.call(upcomingEvents.querySelectorAll("[data-end]")).forEach(function (card) {
+    Array.prototype.slice.call(document.querySelectorAll("#upcoming [data-end], .hub-events [data-end]")).forEach(function (card) {
       var end = Date.parse(card.getAttribute("data-end"));
-      if (!isFinite(end) || nowMs < end) return;
-      card.classList.add("is-past");
-      var rsvpLink = card.querySelector(".rsvp");
-      if (rsvpLink) rsvpLink.hidden = true;
+      var past = isFinite(end) && nowMs >= end;
+      card.classList.toggle("is-past", past);
+      card.hidden = past;
+      var rsvpLink = card.querySelector(".rsvp, .btn");
+      if (rsvpLink && past) rsvpLink.hidden = true;
     });
   }
+
+  retirePastEvents();
 
   var countdown = document.getElementById("countdown");
   var intro = document.getElementById("event-intro");
@@ -914,6 +916,7 @@ document.addEventListener("DOMContentLoaded", function () {
     var past = now >= endMs;
     intro.classList.toggle("is-past", past);
     intro.classList.toggle("is-next", !past);
+    intro.hidden = past;
     if (week) week.classList.toggle("is-next", past);
     if (countdown) countdown.hidden = past;
     if (rsvp) rsvp.hidden = past;

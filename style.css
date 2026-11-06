@@ -3930,6 +3930,7 @@ section {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   justify-content: start;
+  align-items: start;
   gap: 12px;
   margin-top: 16px;
 }
@@ -3939,6 +3940,7 @@ section {
 .build-card {
   display: grid;
   gap: 8px;
+  height: auto;
   align-content: start;
   padding: 20px;
   border: 1px solid var(--line);
