@@ -104,7 +104,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-  var sectionIds = ["about", "network", "western", "socials"];
+  var sectionIds = ["events", "about", "builds", "landed", "cursor", "western", "network", "faq"];
   var sections = sectionIds
     .map(function (id) {
       return document.getElementById(id);
@@ -224,6 +224,31 @@ document.addEventListener("DOMContentLoaded", function () {
     var minScale = 1;
     var maxScale = 16;
     var drag = null;
+    var exploring = false;
+    var pan = null;
+
+    function phoneMap() {
+      return window.matchMedia("(max-width: 767px)").matches;
+    }
+
+    function allowGesture() {
+      return !phoneMap() || exploring;
+    }
+
+    function setExplore(on) {
+      exploring = !!on;
+      mapStage.classList.toggle("is-exploring", exploring);
+      var exploreBtn = mapStage.querySelector('[data-map="explore"]');
+      var doneBtn = mapStage.querySelector('[data-map="done"]');
+      if (exploreBtn) exploreBtn.hidden = exploring;
+      if (doneBtn) doneBtn.hidden = !exploring;
+      if (!exploring) {
+        drag = null;
+        pan = null;
+        gesture = null;
+        viewport.classList.remove("is-drag");
+      }
+    }
 
     function clamp() {
       var w = viewport.clientWidth;
@@ -256,7 +281,9 @@ document.addEventListener("DOMContentLoaded", function () {
           pin: pin,
           x: pin.offsetLeft,
           y: pin.offsetTop,
-          name: label ? label.textContent : pin.getAttribute("data-city")
+          name: label ? label.textContent : pin.getAttribute("data-city"),
+          place: pin.getAttribute("data-place") || "",
+          country: pin.getAttribute("data-country") || ""
         };
       });
       var parent = centers.map(function (_, index) { return index; });
@@ -298,13 +325,18 @@ document.addEventListener("DOMContentLoaded", function () {
         });
         cx /= group.length;
         cy /= group.length;
+        var place = group[0].place;
+        var samePlace = place && group.every(function (center) { return center.place === place; });
+        var country = group[0].country;
+        var sameCountry = country && group.every(function (center) { return center.country === country; });
+        var label = samePlace ? place : sameCountry ? country : "North America";
         var button = document.createElement("button");
         button.type = "button";
         button.className = "map-cluster" + (live ? " map-cluster--live" : "");
         button.style.left = (cx / world.clientWidth * 100) + "%";
         button.style.top = (cy / world.clientHeight * 100) + "%";
-        button.textContent = group.length + " cities";
-        button.setAttribute("aria-label", group.length + " cities: " + names.join(", "));
+        button.textContent = label;
+        button.setAttribute("aria-label", label + ": " + names.join(", "));
         button.addEventListener("click", function (event) {
           event.stopPropagation();
           expandGroup(group);
@@ -382,6 +414,7 @@ document.addEventListener("DOMContentLoaded", function () {
       scale = 1;
       x = 0;
       y = 0;
+      if (phoneMap()) setExplore(false);
       if (!reduced) world.classList.add("is-anim");
       apply();
     }
@@ -404,8 +437,9 @@ document.addEventListener("DOMContentLoaded", function () {
     apply();
 
     viewport.addEventListener("pointerdown", function (event) {
+      if (!allowGesture()) return;
       if (event.pointerType !== "mouse" || event.button !== 0) return;
-      if (event.target.closest(".pin, .map-cluster")) return;
+      if (event.target.closest(".pin, .map-cluster, .map-explore, .map-controls")) return;
       drag = { id: event.pointerId, x: event.clientX, y: event.clientY };
       world.classList.remove("is-anim");
       viewport.classList.add("is-drag");
@@ -428,6 +462,7 @@ document.addEventListener("DOMContentLoaded", function () {
     viewport.addEventListener("pointercancel", endDrag);
 
     viewport.addEventListener("wheel", function (event) {
+      if (!allowGesture()) return;
       var pinch = event.ctrlKey;
       var coarse = event.deltaMode !== 0 || Math.abs(event.deltaY) >= 40 || Math.abs(event.deltaX) >= 40;
       if (!pinch && !coarse) return;
@@ -450,12 +485,15 @@ document.addEventListener("DOMContentLoaded", function () {
       return Object.keys(touches).map(function (key) { return touches[key]; });
     }
     viewport.addEventListener("touchstart", function (event) {
+      if (!allowGesture()) return;
       for (var i = 0; i < event.changedTouches.length; i++) {
         var t = event.changedTouches[i];
         touches[t.identifier] = { x: t.clientX, y: t.clientY };
       }
       var pts = points();
+      if (pts.length === 1) pan = { x: pts[0].x, y: pts[0].y };
       if (pts.length >= 2) {
+        pan = null;
         skipTap = true;
         world.classList.remove("is-anim");
         var dx = pts[0].x - pts[1].x;
@@ -471,11 +509,21 @@ document.addEventListener("DOMContentLoaded", function () {
       }
     }, { passive: true });
     viewport.addEventListener("touchmove", function (event) {
+      if (!allowGesture()) return;
       for (var i = 0; i < event.changedTouches.length; i++) {
         var t = event.changedTouches[i];
         if (touches[t.identifier]) touches[t.identifier] = { x: t.clientX, y: t.clientY };
       }
       var pts = points();
+      if (pts.length === 1 && pan) {
+        if (event.cancelable) event.preventDefault();
+        world.classList.remove("is-anim");
+        x += pts[0].x - pan.x;
+        y += pts[0].y - pan.y;
+        pan = { x: pts[0].x, y: pts[0].y };
+        apply();
+        return;
+      }
       if (pts.length < 2 || !gesture) return;
       if (event.cancelable) event.preventDefault();
       var dx = pts[0].x - pts[1].x;
@@ -493,9 +541,11 @@ document.addEventListener("DOMContentLoaded", function () {
         delete touches[event.changedTouches[i].identifier];
       }
       if (points().length < 2) gesture = null;
+      if (!points().length) pan = null;
     }
     viewport.addEventListener("touchend", function (event) {
       clearTouch(event);
+      if (!allowGesture()) return;
       if (event.touches.length !== 0 || skipTap) {
         if (event.touches.length === 0) skipTap = false;
         return;
@@ -521,6 +571,14 @@ document.addEventListener("DOMContentLoaded", function () {
     mapStage.querySelectorAll("[data-map]").forEach(function (button) {
       button.addEventListener("click", function () {
         var action = button.getAttribute("data-map");
+        if (action === "explore") {
+          setExplore(true);
+          return;
+        }
+        if (action === "done") {
+          setExplore(false);
+          return;
+        }
         if (!reduced) world.classList.add("is-anim");
         if (action === "in") zoomBy(1.5);
         else if (action === "out") zoomBy(1 / 1.5);
@@ -529,6 +587,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     mapStage.addEventListener("keydown", function (event) {
+      if (!allowGesture()) return;
       var key = event.key;
       if (key === "ArrowLeft" || key === "ArrowRight" || key === "ArrowUp" || key === "ArrowDown") {
         event.preventDefault();
@@ -638,6 +697,24 @@ document.addEventListener("DOMContentLoaded", function () {
   if (spine && !reduce) {
     paintSpine();
     window.addEventListener("scroll", paintSpine, { passive: true });
+  }
+
+  var upcomingEvents = document.getElementById("upcoming");
+  var recentEvents = document.getElementById("recent");
+  if (upcomingEvents && recentEvents) {
+    var nowMs = Date.now();
+    Array.prototype.slice.call(upcomingEvents.querySelectorAll("[data-end]")).forEach(function (card) {
+      var end = Date.parse(card.getAttribute("data-end"));
+      if (!isFinite(end) || nowMs < end) return;
+      card.classList.add("is-past");
+      var rsvpLink = card.querySelector(".rsvp");
+      if (rsvpLink) rsvpLink.hidden = true;
+      var instagramCard = recentEvents.querySelector(".ig-card");
+      if (instagramCard) recentEvents.insertBefore(card, instagramCard);
+      else recentEvents.appendChild(card);
+    });
+    var upcomingHeading = document.getElementById("events-heading");
+    if (upcomingHeading) upcomingHeading.hidden = upcomingEvents.children.length === 0;
   }
 
   var countdown = document.getElementById("countdown");
