@@ -4158,3 +4158,51 @@ section {
   .event-list { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   #recent { grid-template-columns: 1fr; }
 }
+
+.map-world .pin,
+.map-world .pin--cluster {
+  pointer-events: none;
+  cursor: default;
+}
+
+.map-world .pin__label { display: none; }
+
+button.map-cluster.map-label {
+  width: auto;
+  height: auto;
+  min-width: 0;
+  padding: 7px 12px;
+  overflow: visible;
+  background: var(--strong);
+  color: #0b0614;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+button.map-cluster.map-label.map-cluster--live { background: var(--london); }
+
+.ig-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  margin-top: 8px;
+  font-weight: 700;
+}
+
+@media (min-width: 768px) {
+  .block,
+  .page,
+  .join-band {
+    padding: 40px 0;
+  }
+
+  .hero {
+    overflow: visible;
+    padding: 20px 0 4px;
+  }
+
+  .map-stage {
+    aspect-ratio: auto;
+    height: 440px;
+  }
+}
