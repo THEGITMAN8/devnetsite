@@ -317,23 +317,49 @@ document.addEventListener("DOMContentLoaded", function () {
         groups[root].push(center);
       });
       var placed = [];
+      var chrome = controlRects();
       function screenPoint(wx, wy) {
         return { sx: x + wx * scale, sy: y + wy * scale };
       }
-      function fits(anchorX, anchorY, boxW, boxH) {
-        var point = screenPoint(anchorX, anchorY);
-        var left = point.sx - boxW / 2;
-        var top = point.sy - boxH / 2;
-        if (left < 4 || top < 4) return false;
-        if (left + boxW > viewport.clientWidth - 4) return false;
-        if (top + boxH > viewport.clientHeight - 4) return false;
-        for (var p = 0; p < placed.length; p++) {
-          var other = placed[p];
-          if (Math.abs(point.sx - other.sx) < (boxW + other.w) / 2 + 6 &&
-              Math.abs(point.sy - other.sy) < (boxH + other.h) / 2 + 6) return false;
-        }
-        return true;
+      function overlaps(a, b, gap) {
+        var pad = gap || 0;
+        return a.left < b.right + pad && a.right > b.left - pad && a.top < b.bottom + pad && a.bottom > b.top - pad;
       }
+      function hitsChrome(rect) {
+        for (var c = 0; c < chrome.length; c++) {
+          if (overlaps(rect, chrome[c], 0)) return true;
+        }
+        return false;
+      }
+      function hitsLabels(rect) {
+        for (var p = 0; p < placed.length; p++) {
+          if (overlaps(rect, placed[p], 6)) return true;
+        }
+        return false;
+      }
+      function onScreen(rect) {
+        return rect.left >= 4 && rect.top >= 4 && rect.right <= viewport.clientWidth - 4 && rect.bottom <= viewport.clientHeight - 4;
+      }
+      function visualRect(sx, sy, layoutW, layoutH) {
+        return {
+          left: sx - layoutW / 2,
+          top: sy - layoutH / 2,
+          right: sx + layoutW / 2,
+          bottom: sy + layoutH / 2
+        };
+      }
+      function labelShifts() {
+        var shifts = [[0, -40]];
+        var radii = [28, 48, 72, 104, 144, 188];
+        for (var r = 0; r < radii.length; r++) {
+          for (var a = 0; a < 16; a++) {
+            var ang = -Math.PI / 2 + (Math.PI * 2 * a) / 16;
+            shifts.push([Math.cos(ang) * radii[r], Math.sin(ang) * radii[r]]);
+          }
+        }
+        return shifts;
+      }
+      var shifts = labelShifts();
       Object.keys(groups).sort(function (a, b) {
         return groups[b].length - groups[a].length;
       }).forEach(function (key) {
@@ -352,31 +378,11 @@ document.addEventListener("DOMContentLoaded", function () {
         cy /= group.length;
         var label = group.length > 1 ? group[0].place : group[0].name;
         if (!label) label = names[0];
-        var boxW = Math.max(72, label.length * 7.4 + 20);
-        var boxH = 28;
-        var shifts = [
-          [0, -46], [0, 46], [64, -28], [-64, -28], [0, -78], [88, 8], [-88, 8]
-        ];
-        var posX = cx;
-        var posY = cy - 26 / scale;
-        for (var s = 0; s < shifts.length; s++) {
-          var tryX = cx + shifts[s][0] / scale;
-          var tryY = cy + shifts[s][1] / scale;
-          if (fits(tryX, tryY, boxW, boxH)) {
-            posX = tryX;
-            posY = tryY;
-            break;
-          }
-        }
         var anchor = screenPoint(cx, cy);
         if (anchor.sx < -8 || anchor.sy < -8 || anchor.sx > viewport.clientWidth + 8 || anchor.sy > viewport.clientHeight + 8) return;
-        var point = screenPoint(posX, posY);
-        placed.push({ sx: point.sx, sy: point.sy, w: boxW, h: boxH });
         var button = document.createElement("button");
         button.type = "button";
         button.className = "map-cluster map-label" + (live ? " map-cluster--live" : "");
-        button.style.left = (posX / world.clientWidth * 100) + "%";
-        button.style.top = (posY / world.clientHeight * 100) + "%";
         button.textContent = label;
         button.setAttribute("aria-label", group.length > 1 ? label + ": " + names.join(", ") : label);
         button.addEventListener("click", function (event) {
@@ -385,7 +391,53 @@ document.addEventListener("DOMContentLoaded", function () {
           else framePin(group[0].pin);
         });
         clusterLayer.appendChild(button);
+        var layoutW = Math.max(button.offsetWidth, 44);
+        var layoutH = Math.max(button.offsetHeight, 28);
+        var chosen = null;
+        var spare = null;
+        for (var s = 0; s < shifts.length; s++) {
+          var tryX = cx + shifts[s][0] / scale;
+          var tryY = cy + shifts[s][1] / scale;
+          var point = screenPoint(tryX, tryY);
+          var rect = visualRect(point.sx, point.sy, layoutW, layoutH);
+          if (!onScreen(rect) || hitsChrome(rect)) continue;
+          if (!hitsLabels(rect)) {
+            chosen = { x: tryX, y: tryY, rect: rect };
+            break;
+          }
+          if (!spare) spare = { x: tryX, y: tryY, rect: rect };
+        }
+        if (!chosen) chosen = spare;
+        if (!chosen) {
+          button.remove();
+          return;
+        }
+        button.style.left = (chosen.x / world.clientWidth * 100) + "%";
+        button.style.top = (chosen.y / world.clientHeight * 100) + "%";
+        placed.push(chosen.rect);
       });
+    }
+
+    function controlRects() {
+      var origin = viewport.getBoundingClientRect();
+      var pad = 8;
+      var rects = [];
+      var nodes = mapStage.querySelectorAll(".map-ctl, .map-explore button");
+      for (var i = 0; i < nodes.length; i++) {
+        var el = nodes[i];
+        if (el.hidden) continue;
+        var computed = window.getComputedStyle(el);
+        if (computed.display === "none" || computed.visibility === "hidden") continue;
+        var rect = el.getBoundingClientRect();
+        if (rect.width < 1 || rect.height < 1) continue;
+        rects.push({
+          left: rect.left - origin.left - pad,
+          top: rect.top - origin.top - pad,
+          right: rect.right - origin.left + pad,
+          bottom: rect.bottom - origin.top + pad
+        });
+      }
+      return rects;
     }
 
     function expandGroup(group) {
@@ -722,6 +774,10 @@ document.addEventListener("DOMContentLoaded", function () {
       }
       apply();
     });
+
+    if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(function () { placeClusters(); });
+    }
 
     return { framePin: framePin };
   }

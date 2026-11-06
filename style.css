@@ -3882,7 +3882,7 @@ section {
 
 @media (min-width: 768px) {
   .hub { grid-template-columns: 1fr 1fr; }
-  .hub-events { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .hub-events { grid-template-columns: repeat(auto-fit, minmax(240px, 360px)); justify-content: start; }
 }
 
 .hero {
@@ -3928,6 +3928,8 @@ section {
 
 .event-list {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  justify-content: start;
   gap: 12px;
   margin-top: 16px;
 }
@@ -4155,7 +4157,7 @@ section {
   .build-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .chapter-facts { grid-template-columns: repeat(4, minmax(0, 1fr)); }
   .chapter-facts .is-featured { grid-column: auto; }
-  .event-list { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .event-list { grid-template-columns: repeat(auto-fit, minmax(240px, 360px)); }
   #recent { grid-template-columns: 1fr; }
 }
 
