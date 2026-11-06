@@ -166,6 +166,9 @@ document.addEventListener("DOMContentLoaded", function () {
         if (!svg || String(svg.tagName).toLowerCase() !== "svg") return;
         svg.removeAttribute("width");
         svg.removeAttribute("height");
+        svg.removeAttribute("style");
+        var styled = svg.querySelectorAll("[style]");
+        for (var s = 0; s < styled.length; s++) styled[s].removeAttribute("style");
         svg.setAttribute("class", "matrix");
         svg.setAttribute("aria-hidden", "true");
         svg.setAttribute("preserveAspectRatio", "xMidYMid meet");

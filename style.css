@@ -546,6 +546,10 @@ section {
   height: 100%;
 }
 
+.matrix image {
+  image-rendering: pixelated;
+}
+
 .matrix-lines { pointer-events: none; }
 
 .links line {
