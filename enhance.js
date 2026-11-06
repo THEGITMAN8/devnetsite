@@ -29,6 +29,8 @@ function wrapPi(value) {
 }
 
 function mountGlobe() {
+  var board = document.querySelector(".map-board");
+  if (!board || board.getAttribute("data-network") !== "globe") return;
   var canvas = document.getElementById("network-globe");
   var stage = canvas ? canvas.closest(".globe-stage") : null;
   if (!canvas || !stage) return;

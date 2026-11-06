@@ -3681,6 +3681,15 @@ section {
   flex: none;
 }
 
+.map-board[data-network="map"] .globe-stage,
+.map-board:not([data-network="globe"]) .globe-stage {
+  display: none;
+}
+
+.map-board[data-network="globe"] .map-stage {
+  display: none;
+}
+
 .globe-stage {
   position: relative;
   width: min(100%, 280px);

@@ -140,13 +140,322 @@ document.addEventListener("DOMContentLoaded", function () {
   window.addEventListener("scroll", placeNav, { passive: true });
   window.addEventListener("resize", placeNav);
 
+  var stage = document.querySelector(".map-stage");
+  var matrix = stage ? stage.querySelector(".matrix") : null;
+  function showMapFallback() {
+    if (!stage) return;
+    stage.classList.add("map-stage--fallback");
+    if (matrix) matrix.hidden = true;
+  }
+  if (matrix) {
+    matrix.addEventListener("error", showMapFallback);
+    if (matrix.complete && matrix.naturalWidth === 0) showMapFallback();
+    var mapSrc = matrix.getAttribute("src");
+    var sharpened = false;
+    function sharpenMap() {
+      if (sharpened || !mapSrc || !window.fetch || !window.DOMParser) return;
+      if (!matrix || !matrix.parentNode || String(matrix.tagName).toLowerCase() !== "img") return;
+      sharpened = true;
+      fetch(mapSrc).then(function (res) {
+        if (!res.ok) throw new Error("map");
+        return res.text();
+      }).then(function (text) {
+        if (!matrix.parentNode) return;
+        var doc = new DOMParser().parseFromString(text, "image/svg+xml");
+        var svg = doc.documentElement;
+        if (!svg || String(svg.tagName).toLowerCase() !== "svg") return;
+        svg.removeAttribute("width");
+        svg.removeAttribute("height");
+        svg.setAttribute("class", "matrix");
+        svg.setAttribute("aria-hidden", "true");
+        svg.setAttribute("preserveAspectRatio", "xMidYMid meet");
+        matrix.replaceWith(svg);
+        matrix = svg;
+      }).catch(function () {
+        sharpened = false;
+        if (matrix.complete && matrix.naturalWidth === 0) showMapFallback();
+      });
+    }
+    if (stage && "IntersectionObserver" in window) {
+      var sharpenObserver = new IntersectionObserver(function (entries) {
+        if (!entries.some(function (entry) { return entry.isIntersecting; })) return;
+        sharpenObserver.disconnect();
+        sharpenMap();
+      }, { rootMargin: "160px" });
+      sharpenObserver.observe(stage);
+    } else {
+      sharpenMap();
+    }
+    if (stage) stage.addEventListener("pointerdown", sharpenMap, { once: true });
+  }
+  function drawMap() {
+    if (!stage || stage.classList.contains("is-drawn")) return;
+    var rect = stage.getBoundingClientRect();
+    if (rect.top < window.innerHeight * 0.8 && rect.bottom > 80) stage.classList.add("is-drawn");
+  }
+  if (stage && !reduce && "IntersectionObserver" in window) {
+    var mapObserver = new IntersectionObserver(
+      function (entries) {
+        entries.forEach(function (entry) {
+          if (!entry.isIntersecting) return;
+          stage.classList.add("is-drawn");
+          mapObserver.unobserve(stage);
+        });
+      },
+      { threshold: 0.2 }
+    );
+    mapObserver.observe(stage);
+    drawMap();
+    window.addEventListener("scroll", drawMap, { passive: true });
+  } else if (stage) {
+    stage.classList.add("is-drawn");
+  }
+
+  function setupMap(mapStage, reduced) {
+    var viewport = mapStage ? mapStage.querySelector(".map-viewport") : null;
+    var world = mapStage ? mapStage.querySelector(".map-world") : null;
+    if (!viewport || !world) return null;
+    var scale = 1;
+    var x = 0;
+    var y = 0;
+    var minScale = 1;
+    var maxScale = 16;
+    var drag = null;
+
+    function clamp() {
+      var w = viewport.clientWidth;
+      var h = viewport.clientHeight;
+      var minX = w * (1 - scale);
+      var minY = h * (1 - scale);
+      if (x > 0) x = 0;
+      if (y > 0) y = 0;
+      if (x < minX) x = minX;
+      if (y < minY) y = minY;
+    }
+
+    function apply() {
+      clamp();
+      world.style.transform = "translate3d(" + x.toFixed(2) + "px," + y.toFixed(2) + "px,0) scale(" + scale.toFixed(4) + ")";
+      world.style.setProperty("--pin-scale", String(1 / scale));
+      var zoomIn = mapStage.querySelector('[data-map="in"]');
+      var zoomOut = mapStage.querySelector('[data-map="out"]');
+      var reset = mapStage.querySelector('[data-map="reset"]');
+      if (zoomIn) zoomIn.disabled = scale >= maxScale - 0.001;
+      if (zoomOut) zoomOut.disabled = scale <= minScale + 0.001;
+    }
+
+    function zoomAt(clientX, clientY, next) {
+      var rect = viewport.getBoundingClientRect();
+      var px = clientX - rect.left;
+      var py = clientY - rect.top;
+      var clamped = Math.min(maxScale, Math.max(minScale, next));
+      var cx = (px - x) / scale;
+      var cy = (py - y) / scale;
+      scale = clamped;
+      x = px - cx * scale;
+      y = py - cy * scale;
+      apply();
+    }
+
+    function zoomBy(factor, clientX, clientY) {
+      var rect = viewport.getBoundingClientRect();
+      var cx = clientX == null ? rect.left + rect.width / 2 : clientX;
+      var cy = clientY == null ? rect.top + rect.height / 2 : clientY;
+      zoomAt(cx, cy, scale * factor);
+    }
+
+    function resetView() {
+      scale = 1;
+      x = 0;
+      y = 0;
+      if (!reduced) world.classList.add("is-anim");
+      apply();
+    }
+
+    function framePin(pin) {
+      var worldRect = world.getBoundingClientRect();
+      var pinRect = pin.getBoundingClientRect();
+      var px = (pinRect.left + pinRect.width / 2 - worldRect.left) / scale;
+      var py = (pinRect.top + pinRect.height / 2 - worldRect.top) / scale;
+      var rect = viewport.getBoundingClientRect();
+      var next = Math.max(scale, 4);
+      if (next > maxScale) next = maxScale;
+      scale = next;
+      x = rect.width / 2 - px * scale;
+      y = rect.height / 2 - py * scale;
+      if (!reduced) world.classList.add("is-anim");
+      apply();
+    }
+
+    apply();
+
+    viewport.addEventListener("pointerdown", function (event) {
+      if (event.pointerType !== "mouse" || event.button !== 0) return;
+      if (event.target.closest(".pin")) return;
+      drag = { id: event.pointerId, x: event.clientX, y: event.clientY };
+      world.classList.remove("is-anim");
+      viewport.classList.add("is-drag");
+      viewport.setPointerCapture(event.pointerId);
+    });
+    viewport.addEventListener("pointermove", function (event) {
+      if (!drag || event.pointerId !== drag.id) return;
+      x += event.clientX - drag.x;
+      y += event.clientY - drag.y;
+      drag.x = event.clientX;
+      drag.y = event.clientY;
+      apply();
+    });
+    function endDrag(event) {
+      if (!drag || event.pointerId !== drag.id) return;
+      drag = null;
+      viewport.classList.remove("is-drag");
+    }
+    viewport.addEventListener("pointerup", endDrag);
+    viewport.addEventListener("pointercancel", endDrag);
+
+    viewport.addEventListener("wheel", function (event) {
+      var pinch = event.ctrlKey;
+      var coarse = event.deltaMode !== 0 || Math.abs(event.deltaY) >= 40 || Math.abs(event.deltaX) >= 40;
+      if (!pinch && !coarse) return;
+      event.preventDefault();
+      world.classList.remove("is-anim");
+      var delta = event.deltaY;
+      if (event.deltaMode === 1) delta *= 16;
+      if (event.deltaMode === 2) delta *= viewport.clientHeight;
+      var factor = Math.exp(-delta * (pinch ? 0.01 : 0.0016));
+      zoomBy(factor, event.clientX, event.clientY);
+    }, { passive: false });
+
+    var touches = {};
+    var gesture = null;
+    var lastTap = 0;
+    var lastTapX = 0;
+    var lastTapY = 0;
+    var skipTap = false;
+    function points() {
+      return Object.keys(touches).map(function (key) { return touches[key]; });
+    }
+    viewport.addEventListener("touchstart", function (event) {
+      for (var i = 0; i < event.changedTouches.length; i++) {
+        var t = event.changedTouches[i];
+        touches[t.identifier] = { x: t.clientX, y: t.clientY };
+      }
+      var pts = points();
+      if (pts.length >= 2) {
+        skipTap = true;
+        world.classList.remove("is-anim");
+        var dx = pts[0].x - pts[1].x;
+        var dy = pts[0].y - pts[1].y;
+        gesture = {
+          dist: Math.hypot(dx, dy) || 1,
+          x: (pts[0].x + pts[1].x) / 2,
+          y: (pts[0].y + pts[1].y) / 2,
+          scale: scale,
+          tx: x,
+          ty: y
+        };
+      }
+    }, { passive: true });
+    viewport.addEventListener("touchmove", function (event) {
+      for (var i = 0; i < event.changedTouches.length; i++) {
+        var t = event.changedTouches[i];
+        if (touches[t.identifier]) touches[t.identifier] = { x: t.clientX, y: t.clientY };
+      }
+      var pts = points();
+      if (pts.length < 2 || !gesture) return;
+      if (event.cancelable) event.preventDefault();
+      var dx = pts[0].x - pts[1].x;
+      var dy = pts[0].y - pts[1].y;
+      var dist = Math.hypot(dx, dy) || 1;
+      var mx = (pts[0].x + pts[1].x) / 2;
+      var my = (pts[0].y + pts[1].y) / 2;
+      x = gesture.tx + (mx - gesture.x);
+      y = gesture.ty + (my - gesture.y);
+      scale = gesture.scale;
+      zoomAt(mx, my, gesture.scale * (dist / gesture.dist));
+    }, { passive: false });
+    function clearTouch(event) {
+      for (var i = 0; i < event.changedTouches.length; i++) {
+        delete touches[event.changedTouches[i].identifier];
+      }
+      if (points().length < 2) gesture = null;
+    }
+    viewport.addEventListener("touchend", function (event) {
+      clearTouch(event);
+      if (event.touches.length !== 0 || skipTap) {
+        if (event.touches.length === 0) skipTap = false;
+        return;
+      }
+      if (event.target.closest(".pin")) return;
+      var t = event.changedTouches[0];
+      var now = Date.now();
+      if (now - lastTap < 280 && Math.hypot(t.clientX - lastTapX, t.clientY - lastTapY) < 28) {
+        if (!reduced) world.classList.add("is-anim");
+        zoomBy(1.8, t.clientX, t.clientY);
+        lastTap = 0;
+      } else {
+        lastTap = now;
+        lastTapX = t.clientX;
+        lastTapY = t.clientY;
+      }
+    });
+    viewport.addEventListener("touchcancel", function (event) {
+      clearTouch(event);
+      skipTap = false;
+    });
+
+    mapStage.querySelectorAll("[data-map]").forEach(function (button) {
+      button.addEventListener("click", function () {
+        var action = button.getAttribute("data-map");
+        if (!reduced) world.classList.add("is-anim");
+        if (action === "in") zoomBy(1.5);
+        else if (action === "out") zoomBy(1 / 1.5);
+        else resetView();
+      });
+    });
+
+    mapStage.addEventListener("keydown", function (event) {
+      var key = event.key;
+      if (key === "ArrowLeft" || key === "ArrowRight" || key === "ArrowUp" || key === "ArrowDown") {
+        event.preventDefault();
+        world.classList.remove("is-anim");
+        if (key === "ArrowLeft") x += 48;
+        if (key === "ArrowRight") x -= 48;
+        if (key === "ArrowUp") y += 48;
+        if (key === "ArrowDown") y -= 48;
+        apply();
+        return;
+      }
+      if (key === "+" || key === "=" || key === "Add") {
+        event.preventDefault();
+        if (!reduced) world.classList.add("is-anim");
+        zoomBy(1.25);
+      } else if (key === "-" || key === "_" || key === "Subtract") {
+        event.preventDefault();
+        if (!reduced) world.classList.add("is-anim");
+        zoomBy(1 / 1.25);
+      } else if (key === "0" || key === "Home") {
+        event.preventDefault();
+        resetView();
+      }
+    });
+
+    world.addEventListener("transitionend", function (event) {
+      if (event.propertyName === "transform") world.classList.remove("is-anim");
+    });
+    window.addEventListener("resize", apply);
+
+    return { framePin: framePin };
+  }
+
+  var mapApi = setupMap(stage, reduce);
   var lockedCity = "";
   function setCity(id) {
     var active = id || lockedCity;
     document.querySelectorAll("[data-city]").forEach(function (el) {
       var on = active !== "" && el.getAttribute("data-city") === active;
       el.classList.toggle("is-hot", on);
-      if (el.classList.contains("city-row")) {
+      if (el.classList.contains("pin") || el.classList.contains("city-row")) {
         el.setAttribute("aria-pressed", lockedCity !== "" && el.getAttribute("data-city") === lockedCity ? "true" : "false");
       }
     });
@@ -175,14 +484,24 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 
-  document.querySelectorAll(".city-row").forEach(function (button) {
+  document.querySelectorAll(".chapter, .city-row, .map-stage .pin").forEach(function (button) {
     button.addEventListener("click", function () {
       var id = button.getAttribute("data-city") || "";
       lockedCity = lockedCity === id ? "" : id;
       setCity(lockedCity);
       document.dispatchEvent(new CustomEvent("devnet:city", { detail: lockedCity }));
+      if (!lockedCity) return;
+      var pin = document.querySelector('.map-stage .pin[data-city="' + lockedCity + '"]');
+      var row = document.querySelector('.city-row[data-city="' + lockedCity + '"]');
+      if (button.classList.contains("pin")) {
+        if (row) row.scrollIntoView({ block: "nearest", inline: "nearest", behavior: reduce ? "auto" : "smooth" });
+        return;
+      }
+      var boardNow = document.querySelector(".map-board");
+      if (pin && mapApi && (!boardNow || boardNow.getAttribute("data-network") !== "globe")) mapApi.framePin(pin);
     });
   });
+
   document.addEventListener("devnet:spin", function () {
     lockedCity = "";
     setCity("");
@@ -335,8 +654,9 @@ document.addEventListener("DOMContentLoaded", function () {
     if (!board || board.dataset.sequenced === "1") return;
     board.dataset.sequenced = "1";
     if (reduce) return;
-    board.classList.add("is-sequencing");
     var pins = Array.prototype.slice.call(board.querySelectorAll(".map-stage .pin"));
+    if (!pins.length) return;
+    board.classList.add("is-sequencing");
     pins.sort(function (a, b) {
       var aLondon = a.getAttribute("data-city") === "london" ? 0 : 1;
       var bLondon = b.getAttribute("data-city") === "london" ? 0 : 1;
