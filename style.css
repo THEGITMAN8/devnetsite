@@ -3822,52 +3822,13 @@ section {
   pointer-events: none;
 }
 
-.exec-team {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  margin: 16px 0 0;
-  padding: 0;
-  list-style: none;
-}
+.org .org__stat { margin-bottom: 0; }
 
-.exec-team li {
-  display: grid;
-  gap: 10px;
-  align-content: start;
-  min-height: 96px;
-  padding: 16px;
-  border: 1px solid var(--line);
-  border-radius: 16px;
-  background: var(--card);
-}
-
-.exec-team__faces {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-}
-
-.exec-team__faces i {
-  width: 36px;
-  height: 36px;
-  display: grid;
-  place-items: center;
-  border-radius: 999px;
-  background: #8a5cf0;
-  color: #0b0614;
-  font-style: normal;
-  font-size: 12px;
-  font-weight: 700;
-}
-
-.exec-team li:nth-child(3n) .exec-team__faces i { background: #cdb8f2; }
-.exec-team li:nth-child(3n + 2) .exec-team__faces i { background: #f5d0fe; }
-
-.exec-team li > span:last-child {
-  font-size: 16px;
-  font-weight: 700;
-  line-height: 22px;
+.org__count {
+  margin: 4px 0 16px;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 20px;
 }
 
 .hub {
@@ -3916,7 +3877,6 @@ section {
 }
 
 @media (min-width: 768px) {
-  .exec-team { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .hub { grid-template-columns: 1fr 1fr; }
   .hub-events { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
