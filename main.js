@@ -611,7 +611,7 @@ document.addEventListener("DOMContentLoaded", function () {
           var target = Number(el.getAttribute("data-count"));
           var plus = el.getAttribute("data-plus") === "1";
           var begin = performance.now() + index * 80;
-          el.textContent = "0" + (plus ? "+" : "");
+          el.textContent = "0";
           function frame(now) {
             var t = (now - begin) / 900;
             if (t < 0) {
@@ -621,8 +621,9 @@ document.addEventListener("DOMContentLoaded", function () {
             if (t > 1) t = 1;
             var eased = 1 - Math.pow(1 - t, 3);
             var value = Math.round(eased * target);
-            el.textContent = String(t === 1 ? target : value) + (plus ? "+" : "");
-            if (t < 1) window.requestAnimationFrame(frame);
+            var done = t === 1;
+            el.textContent = String(done ? target : value) + (plus && done ? "+" : "");
+            if (!done) window.requestAnimationFrame(frame);
           }
           window.requestAnimationFrame(frame);
         });
