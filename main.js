@@ -69,6 +69,7 @@ document.addEventListener("DOMContentLoaded", function () {
   onScroll();
   window.addEventListener("scroll", onScroll, { passive: true });
 
+  var motionOn = document.documentElement.classList.contains("motion-on");
   var revealNodes = document.querySelectorAll(".reveal");
   function markVisible(node) {
     var rect = node.getBoundingClientRect();
@@ -77,7 +78,11 @@ document.addEventListener("DOMContentLoaded", function () {
   function markAllVisible() {
     revealNodes.forEach(markVisible);
   }
-  if (!reduce && "IntersectionObserver" in window) {
+  if (motionOn || reduce || !("IntersectionObserver" in window)) {
+    revealNodes.forEach(function (node) {
+      node.classList.add("is-in");
+    });
+  } else if ("IntersectionObserver" in window) {
     var revealObserver = new IntersectionObserver(
       function (entries) {
         entries.forEach(function (entry) {
@@ -484,6 +489,7 @@ document.addEventListener("DOMContentLoaded", function () {
       var id = button.getAttribute("data-city") || "";
       lockedCity = lockedCity === id ? "" : id;
       setCity(lockedCity);
+      document.dispatchEvent(new CustomEvent("devnet:city", { detail: lockedCity }));
       if (!lockedCity) return;
       var pin = document.querySelector('.map-stage .pin[data-city="' + lockedCity + '"]');
       var row = document.querySelector('.city-row[data-city="' + lockedCity + '"]');
@@ -491,8 +497,14 @@ document.addEventListener("DOMContentLoaded", function () {
         if (row) row.scrollIntoView({ block: "nearest", inline: "nearest", behavior: reduce ? "auto" : "smooth" });
         return;
       }
-      if (pin && mapApi) mapApi.framePin(pin);
+      var boardNow = document.querySelector(".map-board");
+      if (pin && mapApi && (!boardNow || boardNow.getAttribute("data-network") !== "globe")) mapApi.framePin(pin);
     });
+  });
+
+  document.addEventListener("devnet:spin", function () {
+    lockedCity = "";
+    setCity("");
   });
 
   var spine = document.querySelector(".spine");
@@ -642,8 +654,9 @@ document.addEventListener("DOMContentLoaded", function () {
     if (!board || board.dataset.sequenced === "1") return;
     board.dataset.sequenced = "1";
     if (reduce) return;
-    board.classList.add("is-sequencing");
     var pins = Array.prototype.slice.call(board.querySelectorAll(".map-stage .pin"));
+    if (!pins.length) return;
+    board.classList.add("is-sequencing");
     pins.sort(function (a, b) {
       var aLondon = a.getAttribute("data-city") === "london" ? 0 : 1;
       var bLondon = b.getAttribute("data-city") === "london" ? 0 : 1;
@@ -691,7 +704,9 @@ document.addEventListener("DOMContentLoaded", function () {
       node.classList.toggle("is-lit", rect.top <= window.innerHeight * 0.72);
     });
   }
-  if (timeline) {
+  if (timeline && document.documentElement.classList.contains("motion-on")) {
+    timeline.classList.add("is-motion");
+  } else if (timeline) {
     if (reduce) {
       timeline.classList.add("is-complete");
       Array.prototype.forEach.call(timelineNodes, function (node) {
