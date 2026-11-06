@@ -233,15 +233,126 @@ document.addEventListener("DOMContentLoaded", function () {
       if (y < minY) y = minY;
     }
 
+    var clusterLayer = document.createElement("div");
+    clusterLayer.className = "map-clusters";
+    world.appendChild(clusterLayer);
+    var clusterTimer = 0;
+
+    function placeClusters() {
+      window.clearTimeout(clusterTimer);
+      var pins = Array.prototype.slice.call(world.querySelectorAll(".pin"));
+      pins.forEach(function (pin) {
+        pin.classList.remove("is-bunched");
+        pin.removeAttribute("aria-hidden");
+      });
+      clusterLayer.replaceChildren();
+      if (!pins.length || !world.clientWidth) return;
+      var centers = pins.map(function (pin) {
+        var label = pin.querySelector(".pin__label");
+        return {
+          pin: pin,
+          x: pin.offsetLeft,
+          y: pin.offsetTop,
+          name: label ? label.textContent : pin.getAttribute("data-city")
+        };
+      });
+      var parent = centers.map(function (_, index) { return index; });
+      function find(index) {
+        while (parent[index] !== index) {
+          parent[index] = parent[parent[index]];
+          index = parent[index];
+        }
+        return index;
+      }
+      var threshold = 15;
+      for (var i = 0; i < centers.length; i++) {
+        for (var j = i + 1; j < centers.length; j++) {
+          var dx = (centers[i].x - centers[j].x) * scale;
+          var dy = (centers[i].y - centers[j].y) * scale;
+          if (Math.hypot(dx, dy) < threshold) parent[find(i)] = find(j);
+        }
+      }
+      var groups = {};
+      centers.forEach(function (center, index) {
+        var root = find(index);
+        if (!groups[root]) groups[root] = [];
+        groups[root].push(center);
+      });
+      Object.keys(groups).forEach(function (key) {
+        var group = groups[key];
+        if (group.length < 2) return;
+        var cx = 0;
+        var cy = 0;
+        var names = [];
+        var live = false;
+        group.forEach(function (center) {
+          cx += center.x;
+          cy += center.y;
+          names.push(center.name);
+          center.pin.classList.add("is-bunched");
+          center.pin.setAttribute("aria-hidden", "true");
+          if (center.pin.classList.contains("pin--founding")) live = true;
+        });
+        cx /= group.length;
+        cy /= group.length;
+        var button = document.createElement("button");
+        button.type = "button";
+        button.className = "map-cluster" + (live ? " map-cluster--live" : "");
+        button.style.left = (cx / world.clientWidth * 100) + "%";
+        button.style.top = (cy / world.clientHeight * 100) + "%";
+        button.textContent = group.length + " cities";
+        button.setAttribute("aria-label", group.length + " cities: " + names.join(", "));
+        button.addEventListener("click", function (event) {
+          event.stopPropagation();
+          expandGroup(group);
+        });
+        clusterLayer.appendChild(button);
+      });
+    }
+
+    function expandGroup(group) {
+      var minD = Infinity;
+      for (var i = 0; i < group.length; i++) {
+        for (var j = i + 1; j < group.length; j++) {
+          var d = Math.hypot(group[i].x - group[j].x, group[i].y - group[j].y);
+          if (d > 0 && d < minD) minD = d;
+        }
+      }
+      if (!isFinite(minD)) minD = 1;
+      var rect = viewport.getBoundingClientRect();
+      var cx = 0;
+      var cy = 0;
+      group.forEach(function (center) {
+        cx += center.x;
+        cy += center.y;
+      });
+      cx /= group.length;
+      cy /= group.length;
+      scale = Math.min(maxScale, Math.max(scale * 1.35, 24 / minD));
+      x = rect.width / 2 - cx * scale;
+      y = rect.height / 2 - cy * scale;
+      if (!reduced) world.classList.add("is-anim");
+      apply();
+    }
+
     function apply() {
       clamp();
-      world.style.transform = "translate3d(" + x.toFixed(2) + "px," + y.toFixed(2) + "px,0) scale(" + scale.toFixed(4) + ")";
+      var next = "translate3d(" + x.toFixed(2) + "px," + y.toFixed(2) + "px,0) scale(" + scale.toFixed(4) + ")";
+      var changed = world.style.transform !== next;
+      world.style.transform = next;
       world.style.setProperty("--pin-scale", String(1 / scale));
       var zoomIn = mapStage.querySelector('[data-map="in"]');
       var zoomOut = mapStage.querySelector('[data-map="out"]');
       var reset = mapStage.querySelector('[data-map="reset"]');
       if (zoomIn) zoomIn.disabled = scale >= maxScale - 0.001;
       if (zoomOut) zoomOut.disabled = scale <= minScale + 0.001;
+      if (!changed) world.classList.remove("is-anim");
+      window.clearTimeout(clusterTimer);
+      if (world.classList.contains("is-anim") && !reduced) {
+        clusterTimer = window.setTimeout(placeClusters, 360);
+        return;
+      }
+      placeClusters();
     }
 
     function zoomAt(clientX, clientY, next) {
@@ -291,7 +402,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     viewport.addEventListener("pointerdown", function (event) {
       if (event.pointerType !== "mouse" || event.button !== 0) return;
-      if (event.target.closest(".pin")) return;
+      if (event.target.closest(".pin, .map-cluster")) return;
       drag = { id: event.pointerId, x: event.clientX, y: event.clientY };
       world.classList.remove("is-anim");
       viewport.classList.add("is-drag");
@@ -386,7 +497,7 @@ document.addEventListener("DOMContentLoaded", function () {
         if (event.touches.length === 0) skipTap = false;
         return;
       }
-      if (event.target.closest(".pin")) return;
+      if (event.target.closest(".pin, .map-cluster")) return;
       var t = event.changedTouches[0];
       var now = Date.now();
       if (now - lastTap < 280 && Math.hypot(t.clientX - lastTapX, t.clientY - lastTapY) < 28) {
@@ -441,7 +552,9 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     world.addEventListener("transitionend", function (event) {
-      if (event.propertyName === "transform") world.classList.remove("is-anim");
+      if (event.propertyName !== "transform") return;
+      world.classList.remove("is-anim");
+      placeClusters();
     });
     window.addEventListener("resize", apply);
 
@@ -611,7 +724,7 @@ document.addEventListener("DOMContentLoaded", function () {
           var target = Number(el.getAttribute("data-count"));
           var plus = el.getAttribute("data-plus") === "1";
           var begin = performance.now() + index * 80;
-          el.textContent = "0" + (plus ? "+" : "");
+          el.textContent = "0";
           function frame(now) {
             var t = (now - begin) / 900;
             if (t < 0) {
@@ -621,8 +734,9 @@ document.addEventListener("DOMContentLoaded", function () {
             if (t > 1) t = 1;
             var eased = 1 - Math.pow(1 - t, 3);
             var value = Math.round(eased * target);
-            el.textContent = String(t === 1 ? target : value) + (plus ? "+" : "");
-            if (t < 1) window.requestAnimationFrame(frame);
+            var done = t === 1;
+            el.textContent = String(done ? target : value) + (plus && done ? "+" : "");
+            if (!done) window.requestAnimationFrame(frame);
           }
           window.requestAnimationFrame(frame);
         });
