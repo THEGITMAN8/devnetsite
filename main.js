@@ -302,12 +302,56 @@ document.addEventListener("DOMContentLoaded", function () {
           if (Math.hypot(dx, dy) < threshold) parent[find(i)] = find(j);
         }
       }
-      var groups = {};
-      centers.forEach(function (center, index) {
-        var root = find(index);
-        if (!groups[root]) groups[root] = [];
-        groups[root].push(center);
-      });
+      if (scale < 3) {
+        var byPlace = {};
+        centers.forEach(function (center, index) {
+          if (!center.place) return;
+          if (!byPlace[center.place]) byPlace[center.place] = [];
+          byPlace[center.place].push(index);
+        });
+        Object.keys(byPlace).forEach(function (place) {
+          var ids = byPlace[place];
+          for (var n = 1; n < ids.length; n++) parent[find(ids[n])] = find(ids[0]);
+        });
+      }
+      function regroup() {
+        var next = {};
+        centers.forEach(function (center, index) {
+          var root = find(index);
+          if (!next[root]) next[root] = [];
+          next[root].push(center);
+        });
+        return next;
+      }
+      var groups = regroup();
+      var mergeDistance = 46 / scale;
+      var merging = true;
+      while (merging) {
+        merging = false;
+        var roots = Object.keys(groups);
+        for (var a = 0; a < roots.length && !merging; a++) {
+          for (var b = a + 1; b < roots.length; b++) {
+            var ga = groups[roots[a]];
+            var gb = groups[roots[b]];
+            var ax = 0;
+            var ay = 0;
+            var bx = 0;
+            var by = 0;
+            ga.forEach(function (center) { ax += center.x; ay += center.y; });
+            gb.forEach(function (center) { bx += center.x; by += center.y; });
+            ax /= ga.length;
+            ay /= ga.length;
+            bx /= gb.length;
+            by /= gb.length;
+            if (Math.hypot(ax - bx, ay - by) < mergeDistance) {
+              parent[find(centers.indexOf(ga[0]))] = find(centers.indexOf(gb[0]));
+              groups = regroup();
+              merging = true;
+              break;
+            }
+          }
+        }
+      }
       Object.keys(groups).forEach(function (key) {
         var group = groups[key];
         if (group.length < 2) return;
@@ -335,8 +379,15 @@ document.addEventListener("DOMContentLoaded", function () {
         button.className = "map-cluster" + (live ? " map-cluster--live" : "");
         button.style.left = (cx / world.clientWidth * 100) + "%";
         button.style.top = (cy / world.clientHeight * 100) + "%";
-        button.textContent = label;
         button.setAttribute("aria-label", label + ": " + names.join(", "));
+        var dot = document.createElement("span");
+        dot.className = "map-cluster__dot";
+        dot.setAttribute("aria-hidden", "true");
+        var nameEl = document.createElement("span");
+        nameEl.className = "map-cluster__name";
+        nameEl.textContent = label;
+        button.appendChild(dot);
+        button.appendChild(nameEl);
         button.addEventListener("click", function (event) {
           event.stopPropagation();
           expandGroup(group);
