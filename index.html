@@ -11,15 +11,15 @@
   <meta property="og:title" content="DevNet | Western University chapter">
   <meta property="og:description" content="Free to join. DevNet is a network of builders across 12 cities. The Western University chapter is in London, Ontario.">
   <meta property="og:url" content="https://www.devnetwork.app/">
-  <meta property="og:image" content="https://www.devnetwork.app/assets/og-image.png">
+  <meta property="og:image" content="https://devnetwork.app/assets/og-home.png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
-  <meta property="og:image:alt" content="DevNet logo">
+  <meta property="og:image:alt" content="DevNet, Western University chapter">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="DevNet | Western University chapter">
   <meta name="twitter:description" content="Free to join. DevNet is a network of builders across 12 cities. The Western University chapter is in London, Ontario.">
-  <meta name="twitter:image" content="https://www.devnetwork.app/assets/og-image.png">
-  <meta name="twitter:image:alt" content="DevNet logo">
+  <meta name="twitter:image" content="https://devnetwork.app/assets/og-home.png">
+  <meta name="twitter:image:alt" content="DevNet, Western University chapter">
   <meta name="theme-color" content="#0B0614">
   <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
   <link rel="icon" href="/favicon.ico" sizes="any">
@@ -80,13 +80,18 @@
             <source srcset="/assets/logo.webp" type="image/webp">
             <img src="/assets/logo.png" alt="" width="207" height="96" fetchpriority="high" decoding="async">
           </picture>
-          <h1 id="hero-heading">DevNet</h1>
+          <h1 id="hero-heading" aria-label="DevNet"><span class="split" aria-hidden="true"><span class="split__ch"><span>D</span></span><span class="split__ch"><span>e</span></span><span class="split__ch"><span>v</span></span><span class="split__ch"><span>N</span></span><span class="split__ch"><span>e</span></span><span class="split__ch"><span>t</span></span></span></h1>
           <div class="hero-actions">
             <a class="btn btn--primary" href="https://docs.google.com/forms/d/e/1FAIpQLSepIp21u2-UWk3RKEXfqirkb2ZRyZ3W1cim90FPCFbdUjWC2w/viewform" target="_blank" rel="noopener noreferrer">Join</a>
             <a class="btn btn--secondary" href="#network">See the network</a>
             <span class="free-chip">Free to join</span>
             <p class="partner">In partnership with Cursor</p>
           </div>
+          <ul class="badges">
+            <li><img src="/assets/badges/cursor-ambassadors.svg" alt="Cursor Ambassadors" width="198" height="20"></li>
+            <li><img src="/assets/badges/western-chapter.svg" alt="Western chapter" width="176" height="20"></li>
+            <li><img src="/assets/badges/cities.svg" alt="12 cities" width="128" height="20"></li>
+          </ul>
         </div>
         <ul class="stats" aria-label="DevNet in numbers">
           <li class="stats__lead"><b class="stats__n" data-count="7" data-plus="1">7+</b><span class="stats__l">events hosted</span></li>
@@ -98,6 +103,40 @@
         </ul>
       </div>
     </section>
+
+    <div class="ticker" aria-label="Now building">
+      <p class="ticker__kicker">Now building</p>
+      <div class="ticker__viewport">
+        <div class="ticker__track">
+          <ul>
+            <li>Intro workshop</li>
+            <li>Ivey 1130</li>
+            <li>Nov 6</li>
+            <li>Chapter event</li>
+            <li>November week 3</li>
+            <li>Hackathon</li>
+            <li>Dec 4</li>
+            <li>Workshops</li>
+            <li>Build sessions</li>
+            <li>Cursor Ambassadors</li>
+            <li>Western · London</li>
+          </ul>
+          <ul aria-hidden="true">
+            <li>Intro workshop</li>
+            <li>Ivey 1130</li>
+            <li>Nov 6</li>
+            <li>Chapter event</li>
+            <li>November week 3</li>
+            <li>Hackathon</li>
+            <li>Dec 4</li>
+            <li>Workshops</li>
+            <li>Build sessions</li>
+            <li>Cursor Ambassadors</li>
+            <li>Western · London</li>
+          </ul>
+        </div>
+      </div>
+    </div>
 
     <section id="about" class="block reveal" aria-labelledby="about-heading">
       <div class="wrap">
@@ -179,29 +218,8 @@
           <h2 id="network-heading">12 cities. One network.</h2>
         </div>
         <div class="map-board">
-          <div class="map-stage">
-            <div class="map-viewport" tabindex="0" aria-label="Network map">
-              <div class="map-world">
-            <img class="matrix" src="/assets/na-dots.svg" alt="" width="760" height="538" loading="lazy" decoding="async">
-            <button type="button" class="pin" data-city="vancouver" aria-label="Vancouver, network city"><span class="pin__dot"></span><span class="pin__label" aria-hidden="true">Vancouver</span></button>
-<button type="button" class="pin pin--founding pin--cluster" data-city="london" aria-label="London, founding chapter"><span class="pin__dot"></span><span class="pin__label" aria-hidden="true">London</span></button>
-<button type="button" class="pin pin--cluster" data-city="waterloo" aria-label="Waterloo, network city"><span class="pin__dot"></span><span class="pin__label" aria-hidden="true">Waterloo</span></button>
-<button type="button" class="pin pin--cluster" data-city="guelph" aria-label="Guelph, network city"><span class="pin__dot"></span><span class="pin__label" aria-hidden="true">Guelph</span></button>
-<button type="button" class="pin pin--cluster" data-city="toronto" aria-label="Toronto, network city"><span class="pin__dot"></span><span class="pin__label" aria-hidden="true">Toronto</span></button>
-<button type="button" class="pin pin--cluster" data-city="kingston" aria-label="Kingston, network city"><span class="pin__dot"></span><span class="pin__label" aria-hidden="true">Kingston</span></button>
-<button type="button" class="pin" data-city="montreal" aria-label="Montreal, network city"><span class="pin__dot"></span><span class="pin__label" aria-hidden="true">Montreal</span></button>
-<button type="button" class="pin" data-city="halifax" aria-label="Halifax, network city"><span class="pin__dot"></span><span class="pin__label" aria-hidden="true">Halifax</span></button>
-<button type="button" class="pin" data-city="tucson" aria-label="Tucson, network city"><span class="pin__dot"></span><span class="pin__label" aria-hidden="true">Tucson</span></button>
-<button type="button" class="pin" data-city="miami" aria-label="Miami, network city"><span class="pin__dot"></span><span class="pin__label" aria-hidden="true">Miami</span></button>
-<button type="button" class="pin" data-city="boston" aria-label="Boston, network city"><span class="pin__dot"></span><span class="pin__label" aria-hidden="true">Boston</span></button>
-<button type="button" class="pin" data-city="new-york-city" aria-label="New York City, network city"><span class="pin__dot"></span><span class="pin__label" aria-hidden="true">New York City</span></button>
-              </div>
-            </div>
-            <div class="map-controls">
-              <button type="button" class="map-ctl" data-map="in" aria-label="Zoom in"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M11 5h2v6h6v2h-6v6h-2v-6H5v-2h6z"/></svg></button>
-              <button type="button" class="map-ctl" data-map="out" aria-label="Zoom out"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M5 11h14v2H5z"/></svg></button>
-              <button type="button" class="map-ctl" data-map="reset" aria-label="Reset map"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M12 5V2L7 7l5 5V8a4 4 0 1 1-3.3 6.3l-1.5 1.3A6 6 0 1 0 12 5z"/></svg></button>
-            </div>
+          <div class="globe-stage">
+            <canvas id="network-globe" class="globe" role="img" aria-label="DevNet cities. London, the Western chapter, is highlighted."></canvas>
           </div>
             <div class="city-list">
               <div>
@@ -381,5 +399,8 @@
       <p class="footer-copy">© 2026 DevNet</p>
     </div>
   </footer>
+  <script defer src="/vendor/gsap.min.js"></script>
+  <script defer src="/vendor/ScrollTrigger.min.js"></script>
+  <script type="module" src="/enhance.js"></script>
 </body>
 </html>

@@ -4,6 +4,10 @@
   "private": true,
   "description": "DevNet, a network of builders across 12 cities. Static site for devnetwork.app.",
   "scripts": {
-    "build": "node --check main.js"
+    "build": "node --check main.js && node --check enhance.js && node --check vendor/cobe.js"
+  },
+  "devDependencies": {
+    "cobe": "0.6.5",
+    "gsap": "3.13.0"
   }
 }

@@ -7,8 +7,10 @@ Static site for [devnetwork.app](https://www.devnetwork.app). DevNet is a networ
 - Static HTML
 - One stylesheet (`style.css`) and one script (`main.js`)
 - Inter, self-hosted, weights 400, 500, and 700
-- Inline SVG map, no map library
-- Vercel (`vercel.json`: clean URLs, security headers, Content-Security-Policy)
+- Network globe: cobe 0.6.5 and phenomenon 1.6.0, vendored in `vendor/` (no CDN)
+- Scroll motion: GSAP 3.13.0 and ScrollTrigger 3.13.0, vendored in `vendor/` (standard license, no CDN, no smooth-scroll)
+- Share cards: `assets/og-home.png`, `assets/og-western.png`, `assets/og-socials.png` (1200×630)
+- Vercel (`vercel.json`: clean URLs, security headers, Content-Security-Policy with `script-src 'self'`)
 
 ## Pages
 
