@@ -69,6 +69,7 @@ document.addEventListener("DOMContentLoaded", function () {
   onScroll();
   window.addEventListener("scroll", onScroll, { passive: true });
 
+  var phoneQuery = window.matchMedia("(max-width: 767px)");
   var motionOn = document.documentElement.classList.contains("motion-on");
   var revealNodes = document.querySelectorAll(".reveal");
   function markVisible(node) {
@@ -78,7 +79,7 @@ document.addEventListener("DOMContentLoaded", function () {
   function markAllVisible() {
     revealNodes.forEach(markVisible);
   }
-  if (motionOn || reduce || !("IntersectionObserver" in window)) {
+  if (motionOn || reduce || phoneQuery.matches || !("IntersectionObserver" in window)) {
     revealNodes.forEach(function (node) {
       node.classList.add("is-in");
     });
@@ -1737,7 +1738,7 @@ document.addEventListener("DOMContentLoaded", function () {
       }, index * 60);
     });
   }
-  if (board && !reduce && "IntersectionObserver" in window) {
+  if (board && !reduce && !phoneQuery.matches && "IntersectionObserver" in window) {
     var pinObserver = new IntersectionObserver(
       function (entries) {
         if (!entries.some(function (entry) { return entry.isIntersecting; })) return;
@@ -1819,8 +1820,11 @@ document.addEventListener("DOMContentLoaded", function () {
   function paintStory() {
     if (!story || !storyStage) return;
     var beats = story.querySelectorAll(".story-beat");
-    if (reduce) {
+    if (reduce || phoneQuery.matches) {
       story.classList.remove("is-live");
+      Array.prototype.forEach.call(beats, function (beat) {
+        beat.classList.remove("is-on", "is-lit");
+      });
       return;
     }
     story.classList.add("is-live");
@@ -1836,9 +1840,16 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
   if (story) {
+    var storyWasPhone = phoneQuery.matches;
     paintStory();
     window.addEventListener("scroll", paintStory, { passive: true });
-    window.addEventListener("resize", paintStory);
+    window.addEventListener("resize", function () {
+      paintStory();
+      var nowPhone = phoneQuery.matches;
+      if (nowPhone === storyWasPhone) return;
+      storyWasPhone = nowPhone;
+      if (window.ScrollTrigger) window.ScrollTrigger.refresh();
+    });
   }
 
   var pickInput = document.getElementById("chapter-pick");

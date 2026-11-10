@@ -217,8 +217,12 @@ function mountGlobe() {
   });
 }
 
+function plainMotion() {
+  return reduceQuery.matches || window.matchMedia("(max-width: 767px)").matches;
+}
+
 function mountMotion() {
-  if (reduceQuery.matches || !window.gsap || !window.ScrollTrigger) return;
+  if (plainMotion() || !window.gsap || !window.ScrollTrigger) return;
   var gsap = window.gsap;
   var ScrollTrigger = window.ScrollTrigger;
   try {
@@ -360,7 +364,7 @@ function mountCounts() {
     el.setAttribute("data-count", String(chapters));
     el.textContent = String(chapters);
   });
-  var reduced = reduceQuery.matches || !window.gsap || !window.ScrollTrigger;
+  var reduced = plainMotion() || !window.gsap || !window.ScrollTrigger;
   document.querySelectorAll(".chapter-facts, .hero-count, .story-seq").forEach(function (group) {
     Array.prototype.forEach.call(group.querySelectorAll("[data-count]"), function (el, index) {
       var target = Number(el.getAttribute("data-count"));
@@ -438,6 +442,18 @@ function mountCounts() {
 function mountConstellation() {
   var canvas = document.getElementById("constellation");
   if (!canvas || !canvas.getContext) return;
+  var phone = window.matchMedia("(max-width: 767px)");
+  if (phone.matches) {
+    if (phone.addEventListener) {
+      phone.addEventListener("change", function startWhenWide(event) {
+        if (event.matches) return;
+        phone.removeEventListener("change", startWhenWide);
+        mountConstellation();
+        if (window.ScrollTrigger) window.ScrollTrigger.refresh();
+      });
+    }
+    return;
+  }
   var stars = [
     { id: "vancouver", lon: -123.12, lat: 49.28 },
     { id: "tucson", lon: -110.97, lat: 32.22 },
@@ -591,6 +607,13 @@ function mountConstellation() {
   }
 
   function resize() {
+    if (phone.matches) {
+      if (raf) {
+        window.cancelAnimationFrame(raf);
+        raf = 0;
+      }
+      return;
+    }
     var rect = canvas.getBoundingClientRect();
     var dpr = Math.min(window.devicePixelRatio || 1, 2);
     var w = Math.max(1, Math.round(rect.width * dpr));
@@ -641,6 +664,7 @@ function mountConstellation() {
   resize();
   window.addEventListener("resize", resize);
   if (fine.addEventListener) fine.addEventListener("change", resize);
+  if (phone.addEventListener) phone.addEventListener("change", resize);
 }
 
 mountGlobe();
@@ -649,3 +673,6 @@ mountTilt();
 mountMotion();
 mountCounts();
 mountConstellation();
+window.addEventListener("load", function () {
+  if (window.ScrollTrigger) window.ScrollTrigger.refresh();
+});
