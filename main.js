@@ -249,11 +249,11 @@ document.addEventListener("DOMContentLoaded", function () {
     };
     var bias = {
       vancouver: [-1, -0.35],
-      london: [-1, 0.45],
+      london: [-1, 0.55],
       waterloo: [-1, -1],
-      guelph: [0.15, -1],
-      toronto: [0.35, 1],
-      kingston: [1, 0.1],
+      guelph: [0.9, -1],
+      toronto: [0.1, 1],
+      kingston: [1, -0.15],
       montreal: [0.1, -1],
       halifax: [-1, -0.15],
       tucson: [0.35, 1],
@@ -274,7 +274,7 @@ document.addEventListener("DOMContentLoaded", function () {
     svg.insertBefore(arcs, pinLayer);
 
     var cluster = svgEl("g", {
-      class: "pin pin--cluster",
+      class: "pin na-pin pin--cluster",
       "data-city": "ontario",
       "data-cluster": "ontario",
       "data-name": "Ontario",
@@ -422,15 +422,24 @@ document.addEventListener("DOMContentLoaded", function () {
       return "M" + x1.toFixed(1) + " " + y1.toFixed(1) + " Q" + cx.toFixed(1) + " " + cy.toFixed(1) + " " + x2.toFixed(1) + " " + y2.toFixed(1);
     }
 
+    function updateArcVisibility() {
+      var padX = view.w * 0.08;
+      var padY = view.h * 0.08;
+      arcs.querySelectorAll(".na-arc").forEach(function (path) {
+        var x = Number(path.getAttribute("data-x"));
+        var y = Number(path.getAttribute("data-y"));
+        var inside = x >= view.x - padX && x <= view.x + view.w + padX && y >= view.y - padY && y <= view.y + view.h + padY;
+        path.classList.toggle("is-offscreen", !inside);
+      });
+    }
+
     function syncArcs(mode) {
       if (mode === arcMode) return;
       arcMode = mode;
       if (window.gsap) window.gsap.killTweensOf(".na-arc");
       arcs.replaceChildren();
-      var origin = mode === "hub"
-        ? centroid
-        : { x: Number(ontarioPins[0] && document.querySelector('.na-pin[data-city="london"]') ? document.querySelector('.na-pin[data-city="london"]').getAttribute("data-x") : centroid.x), y: Number(document.querySelector('.na-pin[data-city="london"]') ? document.querySelector('.na-pin[data-city="london"]').getAttribute("data-y") : centroid.y) };
       var london = document.querySelector('.na-pin[data-city="london"]');
+      var origin = centroid;
       if (mode !== "hub" && london) {
         origin = { x: Number(london.getAttribute("data-x")), y: Number(london.getAttribute("data-y")) };
       }
@@ -438,9 +447,11 @@ document.addEventListener("DOMContentLoaded", function () {
         var id = pin.getAttribute("data-city");
         if (mode === "hub" && ONTARIO[id]) return;
         if (mode !== "hub" && id === "london") return;
-        var d = arcPath(origin.x, origin.y, Number(pin.getAttribute("data-x")), Number(pin.getAttribute("data-y")));
+        var x = Number(pin.getAttribute("data-x"));
+        var y = Number(pin.getAttribute("data-y"));
+        var d = arcPath(origin.x, origin.y, x, y);
         if (!d) return;
-        var path = svgEl("path", { class: "na-arc", d: d });
+        var path = svgEl("path", { class: "na-arc", d: d, "data-x": String(x), "data-y": String(y) });
         arcs.appendChild(path);
         if (reduced || arcsPlayed) return;
         var length = 0;
@@ -449,6 +460,7 @@ document.addEventListener("DOMContentLoaded", function () {
         path.setAttribute("stroke-dasharray", String(length));
         path.setAttribute("stroke-dashoffset", String(length));
       });
+      updateArcVisibility();
     }
 
     function playArcs() {
@@ -496,9 +508,10 @@ document.addEventListener("DOMContentLoaded", function () {
       var collapse = !exploded && gap < 26;
       clustered = collapse;
       mapStage.dataset.clustered = collapse ? "1" : "0";
+      var tightOntario = exploded && view.w < 145;
       pins.forEach(function (pin) {
         var id = pin.getAttribute("data-city");
-        hidePin(pin, collapse && !!ONTARIO[id]);
+        hidePin(pin, (collapse && !!ONTARIO[id]) || (tightOntario && !ONTARIO[id]));
         if (!(exploded && ONTARIO[id] && gap < 26)) placeAtGeo(pin);
       });
       if (exploded && gap < 26) separateOntario();
@@ -631,6 +644,15 @@ document.addEventListener("DOMContentLoaded", function () {
         var el = pin._label;
         var dot = pin.querySelector(".pin__dot");
         if (!el || !dot) return;
+        if (exploded && view.w < 145 && id !== "ontario" && !ONTARIO[id]) {
+          el.hidden = true;
+          var farLine = pin.querySelector(".pin__leader");
+          if (farLine) {
+            farLine.setAttribute("x2", "0");
+            farLine.setAttribute("y2", "0");
+          }
+          return;
+        }
         el.hidden = false;
         var w = Math.max(24, el.offsetWidth);
         var h = Math.max(16, el.offsetHeight);
@@ -678,14 +700,16 @@ document.addEventListener("DOMContentLoaded", function () {
         items.forEach(function (it) {
           var left = it.x;
           var top = it.y;
-          var rad = 12;
-          var hitX = Math.min(it.x + it.w, it.cx + rad) - Math.max(it.x, it.cx - rad);
-          var hitY = Math.min(it.y + it.h, it.cy + rad) - Math.max(it.y, it.cy - rad);
-          if (hitX > 0 && hitY > 0) {
-            if (hitX < hitY) it.x += it.cx < it.x + it.w / 2 ? hitX + 2 : -(hitX + 2);
-            else it.y += it.cy < it.y + it.h / 2 ? hitY + 2 : -(hitY + 2);
+          items.forEach(function (other) {
+            var hx = Math.min(it.x + it.w, other.cx + 11) - Math.max(it.x, other.cx - 11);
+            var hy = Math.min(it.y + it.h, other.cy + 11) - Math.max(it.y, other.cy - 11);
+            if (hx <= 0 || hy <= 0) return;
+            var dx = (it.x + it.w / 2) - other.cx;
+            var dy = (it.y + it.h / 2) - other.cy;
+            if (Math.abs(dx) >= Math.abs(dy)) it.x += dx >= 0 ? hx + 3 : -(hx + 3);
+            else it.y += dy >= 0 ? hy + 3 : -(hy + 3);
             moved = true;
-          }
+          });
           if (controls) {
             var cx0 = Math.min(it.x + it.w, controls.x + controls.w) - Math.max(it.x, controls.x);
             var cy0 = Math.min(it.y + it.h, controls.y + controls.h) - Math.max(it.y, controls.y);
@@ -761,6 +785,7 @@ document.addEventListener("DOMContentLoaded", function () {
       );
       applyCluster();
       syncDots();
+      updateArcVisibility();
       placeControls();
       layoutLabels();
       if (window.positionChapterCard) window.positionChapterCard();
@@ -813,7 +838,7 @@ document.addEventListener("DOMContentLoaded", function () {
       });
       var cx = (minX + maxX) / 2;
       var cy = (minY + maxY) / 2;
-      var w = Math.max(150, (maxX - minX) + 108, ((maxY - minY) + 78) * aspect);
+      var w = 128;
       var h = w / aspect;
       return { x: cx - w / 2, y: cy - h / 2, w: w, h: h };
     }
@@ -1444,45 +1469,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-  function anchorPin(pin) {
-    if (!pin) return null;
-    if (pin.classList.contains("is-hidden")) {
-      var hub = document.querySelector(".map-stage .pin--cluster");
-      if (hub && !hub.classList.contains("is-hidden")) return hub;
-    }
-    return pin;
-  }
-
-  function positionChapterCard() {
-    var card = document.querySelector(".chapter-card");
-    var viewport = document.querySelector(".map-viewport");
-    if (!card || !viewport || card.hidden) return;
-    var pin = card._pin ? anchorPin(card._pin) : null;
-    if (!pin) return;
-    var dot = pin.querySelector(".pin__dot") || pin;
-    var vp = viewport.getBoundingClientRect();
-    var r = dot.getBoundingClientRect();
-    var cardW = card.offsetWidth || 148;
-    var cardH = card.offsetHeight || 58;
-    var cx = r.left + r.width / 2 - vp.left;
-    var cy = r.top + r.height / 2 - vp.top;
-    var x = cx + 18;
-    var y = cy - cardH - 14;
-    if (x + cardW > vp.width - 8) x = cx - cardW - 18;
-    if (x < 8) x = 8;
-    if (y < 8) y = cy + 18;
-    if (y + cardH > vp.height - 8) y = Math.max(8, vp.height - cardH - 8);
-    var controls = viewport.querySelector(".map-controls");
-    if (controls) {
-      var c = controls.getBoundingClientRect();
-      var cl = c.left - vp.left;
-      var ct = c.top - vp.top;
-      var overlap = x < cl + c.width + 8 && x + cardW > cl - 8 && y < ct + c.height + 8 && y + cardH > ct - 8;
-      if (overlap) y = ct > vp.height / 2 ? 8 : Math.max(8, vp.height - cardH - 8);
-    }
-    card.style.left = x + "px";
-    card.style.top = y + "px";
-  }
+  function positionChapterCard() {}
   window.positionChapterCard = positionChapterCard;
 
   function showCard(pin) {

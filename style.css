@@ -4731,11 +4731,13 @@ button.map-cluster.map-label.map-cluster--live { background: var(--london); }
 
 .na-map .na-arc {
   fill: none;
-  stroke: rgba(196, 181, 253, 0.62);
+  stroke: rgba(216, 199, 255, 0.5);
   stroke-width: 1.35px;
   stroke-linecap: round;
   vector-effect: non-scaling-stroke;
 }
+
+.na-map .na-arc.is-offscreen { stroke: transparent; }
 
 .na-map .pin.is-hidden,
 .na-map .pin--cluster.is-hidden {
@@ -4752,19 +4754,26 @@ button.map-cluster.map-label.map-cluster--live { background: var(--london); }
 .na-map .pin--cluster .pin__hit { fill: transparent; pointer-events: auto; }
 .na-map .pin--cluster .pin__pulse,
 .na-map .pin--cluster .pin__leader { pointer-events: none; }
+.na-map .pin--cluster .pin__dot,
+.na-map .pin--cluster .pin__pulse,
+.na-map .pin--cluster .pin__hit {
+  width: auto;
+  height: auto;
+  margin: 0;
+  background: none;
+}
 .na-map .pin--cluster .pin__dot { fill: #d8c7ff; }
 
 .chapter-card {
-  position: absolute;
-  z-index: 7;
-  width: max-content;
-  max-width: 190px;
-  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px 10px;
+  margin-top: 10px;
   padding: 10px 12px;
   border: 1px solid rgba(168, 140, 230, 0.45);
   border-radius: 12px;
-  background: rgba(16, 8, 24, 0.94);
-  pointer-events: none;
+  background: rgba(22, 12, 36, 0.96);
 }
 
 .chapter-card p { margin: 0; }
@@ -4777,14 +4786,12 @@ button.map-cluster.map-label.map-cluster--live { background: var(--london); }
 }
 
 .chapter-card__country {
-  margin-top: 2px;
   color: #c4b5fd;
   font-size: 13px;
   line-height: 18px;
 }
 
 .chapter-card__flag {
-  margin-top: 4px;
   color: #f5d0fe;
   font-size: 12px;
   font-weight: 700;
