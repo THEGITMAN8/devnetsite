@@ -361,7 +361,7 @@ function mountCounts() {
     el.textContent = String(chapters);
   });
   var reduced = reduceQuery.matches || !window.gsap || !window.ScrollTrigger;
-  document.querySelectorAll(".chapter-facts, .hero-count").forEach(function (group) {
+  document.querySelectorAll(".chapter-facts, .hero-count, .story-seq").forEach(function (group) {
     Array.prototype.forEach.call(group.querySelectorAll("[data-count]"), function (el, index) {
       var target = Number(el.getAttribute("data-count"));
       var suffix = el.getAttribute("data-suffix") || "";
@@ -435,8 +435,181 @@ function mountCounts() {
   }
 }
 
+function mountConstellation() {
+  var canvas = document.getElementById("constellation");
+  if (!canvas || !canvas.getContext) return;
+  var stars = [
+    { id: "vancouver", lon: -123.12, lat: 49.28 },
+    { id: "tucson", lon: -110.97, lat: 32.22 },
+    { id: "london", lon: -81.25, lat: 42.98, lead: true },
+    { id: "waterloo", lon: -80.52, lat: 43.46 },
+    { id: "guelph", lon: -80.25, lat: 43.54 },
+    { id: "toronto", lon: -79.38, lat: 43.65 },
+    { id: "kingston", lon: -76.49, lat: 44.23 },
+    { id: "montreal", lon: -73.57, lat: 45.5 },
+    { id: "new-york-city", lon: -74.01, lat: 40.71 },
+    { id: "boston", lon: -71.06, lat: 42.36 },
+    { id: "miami", lon: -80.19, lat: 25.76 },
+    { id: "halifax", lon: -63.58, lat: 44.65 }
+  ];
+  var ctx = canvas.getContext("2d");
+  var fine = window.matchMedia("(min-width: 1100px)");
+  var points = [];
+  var links = [];
+  var pointer = { x: 0, y: 0, tx: 0, ty: 0 };
+  var raf = 0;
+
+  function km(a, b) {
+    var dLat = (b.lat - a.lat) * Math.PI / 180;
+    var dLon = (b.lon - a.lon) * Math.PI / 180;
+    var s = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(a.lat * Math.PI / 180) * Math.cos(b.lat * Math.PI / 180) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    return 2 * 6371 * Math.asin(Math.min(1, Math.sqrt(s)));
+  }
+
+  function project() {
+    var w = canvas.width;
+    var h = canvas.height;
+    var pad = Math.min(w, h) * 0.14;
+    var lon0 = -123.12;
+    var lon1 = -63.58;
+    var lat0 = 25.76;
+    var lat1 = 49.28;
+    points = stars.map(function (star) {
+      return {
+        lead: !!star.lead,
+        lock: !!star.lead,
+        x: pad + ((star.lon - lon0) / (lon1 - lon0)) * (w - pad * 2),
+        y: pad + ((lat1 - star.lat) / (lat1 - lat0)) * (h - pad * 2)
+      };
+    });
+    var min = Math.min(w, h) * 0.075;
+    var n;
+    var i;
+    var j;
+    for (n = 0; n < 40; n += 1) {
+      for (i = 0; i < points.length; i += 1) {
+        for (j = i + 1; j < points.length; j += 1) {
+          var a = points[i];
+          var b = points[j];
+          var dx = b.x - a.x;
+          var dy = b.y - a.y;
+          var dist = Math.hypot(dx, dy) || 0.01;
+          if (dist >= min) continue;
+          var push = (min - dist) / 2;
+          var ux = dx / dist;
+          var uy = dy / dist;
+          if (!a.lock) {
+            a.x -= ux * push;
+            a.y -= uy * push;
+          }
+          if (!b.lock) {
+            b.x += ux * push;
+            b.y += uy * push;
+          }
+        }
+      }
+      points.forEach(function (p) {
+        p.x = Math.max(pad * 0.4, Math.min(w - pad * 0.4, p.x));
+        p.y = Math.max(pad * 0.4, Math.min(h - pad * 0.4, p.y));
+      });
+    }
+    links = [];
+    for (i = 0; i < stars.length; i += 1) {
+      for (j = i + 1; j < stars.length; j += 1) {
+        if (km(stars[i], stars[j]) < 480) links.push([i, j]);
+      }
+    }
+  }
+
+  function draw(still) {
+    var w = canvas.width;
+    var h = canvas.height;
+    ctx.clearRect(0, 0, w, h);
+    var ox = still ? 0 : pointer.x;
+    var oy = still ? 0 : pointer.y;
+    ctx.lineWidth = Math.max(1, w / 640);
+    ctx.strokeStyle = "rgba(205, 184, 242, 0.32)";
+    links.forEach(function (pair) {
+      var a = points[pair[0]];
+      var b = points[pair[1]];
+      ctx.beginPath();
+      ctx.moveTo(a.x + ox * 0.45, a.y + oy * 0.45);
+      ctx.lineTo(b.x + ox * 0.45, b.y + oy * 0.45);
+      ctx.stroke();
+    });
+    points.forEach(function (p, index) {
+      var shift = 0.3 + (index % 5) * 0.1;
+      var x = p.x + (still ? 0 : ox * (p.lead ? 0.15 : shift));
+      var y = p.y + (still ? 0 : oy * (p.lead ? 0.15 : shift));
+      if (p.lead) {
+        ctx.beginPath();
+        ctx.fillStyle = "rgba(245, 208, 254, 0.18)";
+        ctx.arc(x, y, Math.max(10, w * 0.026), 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.beginPath();
+      ctx.fillStyle = p.lead ? "#f5d0fe" : "rgba(205, 184, 242, 0.92)";
+      ctx.arc(x, y, p.lead ? Math.max(3.5, w * 0.007) : Math.max(2, w * 0.0038), 0, Math.PI * 2);
+      ctx.fill();
+    });
+  }
+
+  function resize() {
+    var rect = canvas.getBoundingClientRect();
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    var w = Math.max(1, Math.round(rect.width * dpr));
+    var h = Math.max(1, Math.round(rect.height * dpr));
+    if (canvas.width !== w || canvas.height !== h) {
+      canvas.width = w;
+      canvas.height = h;
+    }
+    project();
+    draw(true);
+  }
+
+  function moving() {
+    return !reduceQuery.matches && fine.matches;
+  }
+
+  function loop() {
+    raf = 0;
+    if (!moving()) {
+      pointer.x = 0;
+      pointer.y = 0;
+      draw(true);
+      return;
+    }
+    pointer.x += (pointer.tx - pointer.x) * 0.08;
+    pointer.y += (pointer.ty - pointer.y) * 0.08;
+    draw(false);
+    if (Math.hypot(pointer.tx - pointer.x, pointer.ty - pointer.y) > 0.35) {
+      raf = window.requestAnimationFrame(loop);
+    }
+  }
+
+  canvas.addEventListener("pointermove", function (event) {
+    if (!moving()) return;
+    var rect = canvas.getBoundingClientRect();
+    if (!rect.width || !rect.height) return;
+    var scale = canvas.width / rect.width;
+    pointer.tx = ((event.clientX - rect.left) / rect.width - 0.5) * 16 * scale;
+    pointer.ty = ((event.clientY - rect.top) / rect.height - 0.5) * 12 * scale;
+    if (!raf) raf = window.requestAnimationFrame(loop);
+  });
+  canvas.addEventListener("pointerleave", function () {
+    pointer.tx = 0;
+    pointer.ty = 0;
+    if (moving() && !raf) raf = window.requestAnimationFrame(loop);
+  });
+
+  resize();
+  window.addEventListener("resize", resize);
+  if (fine.addEventListener) fine.addEventListener("change", resize);
+}
+
 mountGlobe();
 mountMarquee();
 mountTilt();
 mountMotion();
 mountCounts();
+mountConstellation();

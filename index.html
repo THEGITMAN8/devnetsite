@@ -3,21 +3,21 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>DevNet at Western</title>
-  <meta name="description" content="DevNet at Western is a student community learning AI tools and building together. Free to join.">
+  <title>DevNet</title>
+  <meta name="description" content="DevNet. 75+ members across 12 chapters.">
   <link rel="canonical" href="https://www.devnetwork.app/">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="DevNet">
-  <meta property="og:title" content="DevNet at Western">
-  <meta property="og:description" content="DevNet at Western is a student community learning AI tools and building together. Free to join.">
+  <meta property="og:title" content="DevNet">
+  <meta property="og:description" content="DevNet. 75+ members across 12 chapters.">
   <meta property="og:url" content="https://www.devnetwork.app/">
   <meta property="og:image" content="https://devnetwork.app/assets/og-home.png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta property="og:image:alt" content="DevNet at Western">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="DevNet at Western">
-  <meta name="twitter:description" content="DevNet at Western is a student community learning AI tools and building together. Free to join.">
+  <meta name="twitter:title" content="DevNet">
+  <meta name="twitter:description" content="DevNet. 75+ members across 12 chapters.">
   <meta name="twitter:image" content="https://devnetwork.app/assets/og-home.png">
   <meta name="twitter:image:alt" content="DevNet at Western">
   <meta name="theme-color" content="#0B0614">
@@ -77,38 +77,67 @@
       <div class="hero-glow" aria-hidden="true"></div>
       <div class="wrap hero-inner">
         <div class="hero-copy">
-          <p class="hero-count"><b data-count="75" data-suffix="+">75+</b> total members</p>
           <picture>
             <source srcset="/assets/logo.webp" type="image/webp">
             <img src="/assets/logo.png" alt="" width="207" height="96" fetchpriority="high" decoding="async">
           </picture>
-          <h1 id="hero-heading">DevNet at Western</h1>
+          <h1 id="hero-heading">DevNet</h1>
+          <p class="hero-count">
+            <span><b data-count="75" data-suffix="+">75+</b> total members</span>
+            <span><b data-count-chapters data-count="12">12</b> chapters</span>
+          </p>
           <div class="hero-actions">
             <a class="btn btn--primary" href="https://docs.google.com/forms/d/e/1FAIpQLSepIp21u2-UWk3RKEXfqirkb2ZRyZ3W1cim90FPCFbdUjWC2w/viewform" target="_blank" rel="noopener noreferrer">Join DevNet</a>
-            <a class="btn btn--secondary" href="https://www.instagram.com/devnet_western" target="_blank" rel="noopener noreferrer">Follow on Instagram</a>
+            <a class="btn btn--secondary" href="https://www.instagram.com/devnet_western" target="_blank" rel="noopener noreferrer">Instagram</a>
           </div>
         </div>
+        <canvas class="constellation" id="constellation" width="720" height="720" aria-hidden="true"></canvas>
       </div>
     </section>
 
     <section id="events" class="block reveal" aria-labelledby="events-heading">
       <div class="wrap">
-        <h2 id="events-heading">Next up</h2>
-        <div class="event-list" id="upcoming">
-          <article class="event-card" id="event-intro" data-end="2026-11-06T16:00:00-05:00">
-            <p class="event-card__when">Nov 6</p>
-            <h3>Intro workshop</h3>
-            <p>Friday, 2:00 to 4:00 PM · Ivey Building Room 1130 · Two guest speakers</p>
-            <a class="btn btn--secondary rsvp" href="https://forms.gle/V3QFE7BKYfyYbkzh8" target="_blank" rel="noopener noreferrer">RSVP</a>
-          </article>
-          <article class="event-card event-card--dated" id="event-dec4" data-end="2026-12-05T05:00:00Z">
-            <p class="date-block"><span>Dec</span><b>4</b></p>
-            <div class="event-card__main">
-              <h3>Hackathon</h3>
-              <a class="btn btn--secondary" href="https://www.instagram.com/devnet_western" target="_blank" rel="noopener noreferrer">Instagram</a>
+        <h2 id="events-heading">Events</h2>
+        <ol class="events-line">
+          <li class="events-line__item is-past">
+            <a class="events-line__row" href="#recap">
+              <time datetime="2026-11-06">Fri Nov 6, 2026</time>
+              <span class="events-line__name">Event 01, Build with AI Workshop</span>
+              <span class="events-line__place">Ivey Building, Room 1130</span>
+            </a>
+          </li>
+          <li class="events-line__item is-next">
+            <div class="events-line__row">
+              <time datetime="2026-12-04">Dec 4, 2026</time>
+              <span class="events-line__name">Hackathon</span>
             </div>
-          </article>
-        </div>
+          </li>
+          <li class="events-line__item">
+            <div class="events-line__row">
+              <time datetime="2027-01">January 2027</time>
+              <span class="events-line__name">Kickoff event</span>
+            </div>
+          </li>
+          <li class="events-line__item">
+            <div class="events-line__row">
+              <time datetime="2027-02">End of February 2027</time>
+              <span class="events-line__name">Workshop</span>
+            </div>
+          </li>
+          <li class="events-line__item">
+            <div class="events-line__row">
+              <time datetime="2027-03">End of March 2027</time>
+              <span class="events-line__name">Hackathon</span>
+            </div>
+          </li>
+          <li class="events-line__item">
+            <div class="events-line__row">
+              <time datetime="2027-04">April to September 2027</time>
+              <span class="events-line__name">Next year's registration</span>
+            </div>
+          </li>
+        </ol>
+        <div data-instagram>
         <a class="ig-preview" href="https://www.instagram.com/devnet_western" target="_blank" rel="noopener noreferrer">
           <span class="ig-preview__shot" aria-hidden="true"></span>
           <span class="ig-preview__meta">
@@ -116,37 +145,56 @@
             <strong>@devnet_western</strong>
           </span>
         </a>
+        </div>
       </div>
     </section>
 
-    <section id="about" class="block reveal" aria-labelledby="about-heading">
+    <section id="recap" class="block" aria-labelledby="recap-heading">
       <div class="wrap">
-        <h2 id="about-heading">About</h2>
-        <p class="prose">DevNet has been around for about a year and a half. The network started in September 2025 and the Western chapter in December 2025, with strong growth across chapters and 75+ members. Our mission: help students in any degree use AI tools well.</p>
-        <ul class="chapter-facts flight-stats">
-          <li><b data-count-chapters data-count="12">12</b><span>chapters</span></li>
-          <li><b data-count="6">6</b><span>companies</span></li>
-          <li><b data-count="2" data-suffix="+">2+</b><span>hackathons</span></li>
+        <h2 id="recap-heading">Event 01</h2>
+        <div class="recap-roll">
+          <figure>
+            <img src="/assets/events/01-recap-group.webp" width="1280" height="1600" alt="Members in Ivey Building Room 1130 at the Build with AI Workshop, Friday November 6." loading="lazy" decoding="async">
+          </figure>
+          <figure>
+            <img src="/assets/events/02-debow.webp" width="1280" height="1600" alt="Daniel Debow on a video call during the Build with AI Workshop. He joined virtually." loading="lazy" decoding="async">
+          </figure>
+          <figure>
+            <img src="/assets/events/03-conrad.webp" width="1280" height="1600" alt="Parker Conrad on a video call during the Build with AI Workshop. He joined virtually." loading="lazy" decoding="async">
+          </figure>
+          <figure>
+            <img src="/assets/events/04-truell-slide.webp" width="1600" height="1200" alt="A slide about Michael Truell projected in Ivey Building Room 1130 during the Build with AI Workshop." loading="lazy" decoding="async">
+          </figure>
+          <figure>
+            <img src="/assets/events/05-workshop-title.webp" width="1600" height="1200" alt="The DevNet Workshop title slide in Ivey Building Room 1130." loading="lazy" decoding="async">
+          </figure>
+        </div>
+        <ul class="speakers">
+          <li>
+            <h3>Daniel Debow</h3>
+            <p>Serial entrepreneur (Workbrain, Rypple, Helpful), ex SVP Salesforce and VP at Shopify, now building Torch.</p>
+          </li>
+          <li>
+            <h3>Parker Conrad</h3>
+            <p>Software engineer on voice at SpaceX Super Intelligence, the company behind Grok and Cursor; before that, Starlink.</p>
+          </li>
         </ul>
-        <figure class="timechart">
-          <svg viewBox="0 0 640 96" role="img" aria-label="Founded September 2025. DevNet Western December 2025.">
-            <line class="timechart__line" x1="78" y1="40" x2="562" y2="40"></line>
-            <g class="timechart__node">
-              <circle cx="78" cy="40" r="6"></circle>
-              <text x="78" y="22" text-anchor="middle">Founded</text>
-              <text x="78" y="72" text-anchor="middle">Sep 2025</text>
-            </g>
-            <g class="timechart__node">
-              <circle cx="181.7" cy="40" r="6"></circle>
-              <text x="181.7" y="22" text-anchor="middle">Dec 2025</text>
-              <text x="181.7" y="72" text-anchor="middle">Western</text>
-            </g>
-            <g class="timechart__node">
-              <circle cx="562" cy="40" r="6"></circle>
-              <text x="562" y="72" text-anchor="middle">Now</text>
-            </g>
-          </svg>
-        </figure>
+      </div>
+    </section>
+
+    <section id="about" class="block story" aria-labelledby="about-heading">
+      <div class="story-stage">
+        <div class="wrap story-sticky">
+          <h2 id="about-heading" class="visually-hidden">Founded</h2>
+          <ol class="story-seq">
+            <li class="story-beat"><span class="story-when">Sep 2025</span><span class="story-what">Network founded</span></li>
+            <li class="story-beat"><span class="story-when">Dec 2025</span><span class="story-what">DevNet Western</span></li>
+            <li class="story-beat"><span class="story-when"><b data-count="75" data-suffix="+">75+</b></span><span class="story-what">members</span></li>
+            <li class="story-beat"><span class="story-when"><b data-count-chapters data-count="12">12</b></span><span class="story-what">chapters</span></li>
+            <li class="story-beat"><span class="story-when"><b data-count="2" data-suffix="+">2+</b></span><span class="story-what">Cursor hackathons</span></li>
+            <li class="story-beat"><span class="story-when">Nov 6, 2026</span><span class="story-what">Event 01</span></li>
+          </ol>
+        </div>
       </div>
     </section>
 
@@ -217,42 +265,19 @@
           <li><b data-count="5">5</b><span>first-year reps</span></li>
           <li><b data-count="50" data-suffix="+">50+</b><span>members</span></li>
         </ul>
-        <figure class="chart chart--bars">
-          <svg viewBox="0 0 360 156" role="img" aria-label="DevNet Western: 2 co-presidents, 20+ exec, 5 first-year reps, 50+ members">
-            <g transform="translate(0 4)">
-              <text class="chart__k" x="0" y="14">Co-presidents</text>
-              <text class="chart__n" x="360" y="14" text-anchor="end">2</text>
-              <rect class="chart__track" x="0" y="22" width="360" height="8" rx="4"></rect>
-              <rect class="chart__bar" x="0" y="22" width="14.4" height="8" rx="4"></rect>
-            </g>
-            <g transform="translate(0 42)">
-              <text class="chart__k" x="0" y="14">Exec</text>
-              <text class="chart__n" x="360" y="14" text-anchor="end">20+</text>
-              <rect class="chart__track" x="0" y="22" width="360" height="8" rx="4"></rect>
-              <rect class="chart__bar" x="0" y="22" width="144" height="8" rx="4"></rect>
-            </g>
-            <g transform="translate(0 80)">
-              <text class="chart__k" x="0" y="14">First-year reps</text>
-              <text class="chart__n" x="360" y="14" text-anchor="end">5</text>
-              <rect class="chart__track" x="0" y="22" width="360" height="8" rx="4"></rect>
-              <rect class="chart__bar" x="0" y="22" width="36" height="8" rx="4"></rect>
-            </g>
-            <g transform="translate(0 118)">
-              <text class="chart__k" x="0" y="14">Members</text>
-              <text class="chart__n" x="360" y="14" text-anchor="end">50+</text>
-              <rect class="chart__track" x="0" y="22" width="360" height="8" rx="4"></rect>
-              <rect class="chart__bar" x="0" y="22" width="360" height="8" rx="4"></rect>
-            </g>
-          </svg>
-        </figure>
-        <p class="prose">Instagram is the main social. Members talk in WhatsApp group chats.</p>
-        <a class="btn btn--secondary" href="https://www.instagram.com/devnet_western" target="_blank" rel="noopener noreferrer">Instagram</a>
       </div>
     </section>
 
     <section id="network" class="block reveal" aria-labelledby="network-heading">
       <div class="wrap">
-        <h2 id="network-heading">Network</h2>
+        <div class="network-head">
+          <h2 id="network-heading">Network</h2>
+          <div class="chapter-pick">
+            <label class="visually-hidden" for="chapter-pick">Chapter</label>
+            <input id="chapter-pick" type="text" role="combobox" aria-expanded="false" aria-controls="chapter-list" aria-autocomplete="list" autocomplete="off" placeholder="City" spellcheck="false">
+            <ul id="chapter-list" class="chapter-pick__list" role="listbox" hidden></ul>
+          </div>
+        </div>
         <div class="map-board" data-network="map">
           <div class="map-stage">
             <div class="map-viewport" tabindex="0" aria-label="Network map">
@@ -369,6 +394,7 @@
   </footer>
   <script defer src="/vendor/gsap.min.js"></script>
   <script defer src="/vendor/ScrollTrigger.min.js"></script>
+  <script defer src="/instagram.js"></script>
   <script type="module" src="/enhance.js"></script>
 </body>
 </html>
