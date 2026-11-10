@@ -214,7 +214,397 @@ document.addEventListener("DOMContentLoaded", function () {
     stage.classList.add("is-drawn");
   }
 
+  function setupGeoMap(mapStage, svg, reduced) {
+    var viewport = mapStage.querySelector(".map-viewport");
+    var labelLayer = mapStage.querySelector(".map-labels");
+    var parts = (svg.getAttribute("viewBox") || "0 0 1000 599").split(/[\s,]+/).map(Number);
+    var homeBox = { x: parts[0], y: parts[1], w: parts[2], h: parts[3] };
+    var view = { x: homeBox.x, y: homeBox.y, w: homeBox.w, h: homeBox.h };
+    var maxZoom = 5.2;
+    var pins = Array.prototype.slice.call(svg.querySelectorAll(".na-pin"));
+    var tween = null;
+    var bias = {
+      vancouver: [-1, -0.2],
+      london: [-1.2, 0.2],
+      waterloo: [-0.15, -1],
+      guelph: [0.2, -1],
+      toronto: [1.1, -0.15],
+      kingston: [1, 0.45],
+      montreal: [0.2, -1],
+      halifax: [-1, -0.1],
+      tucson: [0.3, 1],
+      miami: [0.1, -1],
+      boston: [1, -0.8],
+      "new-york-city": [0.15, 1]
+    };
+
+    if (labelLayer) {
+      pins.forEach(function (pin) {
+        var el = document.createElement("button");
+        el.type = "button";
+        el.className = "map-label";
+        el.setAttribute("data-city", pin.getAttribute("data-city") || "");
+        el.textContent = pin.getAttribute("data-name") || "";
+        el.setAttribute("aria-pressed", "false");
+        labelLayer.appendChild(el);
+        pin._label = el;
+      });
+    }
+
+    function applyBox(box) {
+      view.x = box.x;
+      view.y = box.y;
+      view.w = box.w;
+      view.h = box.h;
+      svg.setAttribute(
+        "viewBox",
+        view.x.toFixed(2) + " " + view.y.toFixed(2) + " " + view.w.toFixed(2) + " " + view.h.toFixed(2)
+      );
+      syncDots();
+      layoutLabels();
+      var zoomIn = mapStage.querySelector('[data-map="in"]');
+      var zoomOut = mapStage.querySelector('[data-map="out"]');
+      if (zoomIn) zoomIn.disabled = view.w <= homeBox.w / maxZoom + 0.2;
+      if (zoomOut) zoomOut.disabled = view.w >= homeBox.w - 0.6;
+    }
+
+    function syncDots() {
+      var rect = svg.getBoundingClientRect();
+      if (!rect.width) return;
+      var unit = view.w / rect.width;
+      pins.forEach(function (pin) {
+        var founding = pin.classList.contains("pin--founding");
+        var r = (founding ? 6.4 : 5) * unit;
+        var dot = pin.querySelector(".pin__dot");
+        var pulse = pin.querySelector(".pin__pulse");
+        var hit = pin.querySelector(".pin__hit");
+        if (dot) dot.setAttribute("r", r.toFixed(3));
+        if (pulse) pulse.setAttribute("r", r.toFixed(3));
+        if (hit) {
+          var nearest = nearestPx(pin);
+          var hitPx = nearest > 0 ? Math.max(8, Math.min(22, nearest * 0.42)) : 16;
+          hit.setAttribute("r", (hitPx * unit).toFixed(3));
+        }
+      });
+    }
+
+    function nearestPx(pin) {
+      var dot = pin.querySelector(".pin__dot");
+      if (!dot) return 0;
+      var a = dot.getBoundingClientRect();
+      var ax = a.left + a.width / 2;
+      var ay = a.top + a.height / 2;
+      var best = Infinity;
+      pins.forEach(function (other) {
+        if (other === pin) return;
+        var b = other.querySelector(".pin__dot");
+        if (!b) return;
+        var r = b.getBoundingClientRect();
+        var d = Math.hypot(r.left + r.width / 2 - ax, r.top + r.height / 2 - ay);
+        if (d < best) best = d;
+      });
+      return best === Infinity ? 0 : best;
+    }
+
+    function measure(name) {
+      if (!measure.ctx) measure.ctx = document.createElement("canvas").getContext("2d");
+      measure.ctx.font = "700 12px Inter, system-ui, sans-serif";
+      return Math.ceil(measure.ctx.measureText(name).width) + 8;
+    }
+
+    function layoutLabels() {
+      if (!labelLayer || !viewport) return;
+      var vp = viewport.getBoundingClientRect();
+      if (!vp.width || !vp.height) return;
+      var items = [];
+      pins.forEach(function (pin) {
+        var id = pin.getAttribute("data-city");
+        var name = pin.getAttribute("data-name") || "";
+        var dot = pin.querySelector(".pin__dot");
+        var r = dot.getBoundingClientRect();
+        var w = measure(name);
+        var h = 16;
+        var cx = r.left + r.width / 2 - vp.left;
+        var cy = r.top + r.height / 2 - vp.top;
+        var inside = cx >= -6 && cy >= -6 && cx <= vp.width + 6 && cy <= vp.height + 6;
+        var line = pin.querySelector(".pin__leader");
+        if (!inside) {
+          if (pin._label) pin._label.hidden = true;
+          if (line) {
+            line.setAttribute("x2", "0");
+            line.setAttribute("y2", "0");
+          }
+          return;
+        }
+        if (pin._label) pin._label.hidden = false;
+        items.push({
+          id: id,
+          pin: pin,
+          w: w,
+          h: h,
+          cx: cx,
+          cy: cy,
+          x: cx - w / 2,
+          y: cy - h - 10
+        });
+      });
+      var edge = 2;
+      for (var n = 0; n < 100; n++) {
+        var moved = false;
+        for (var i = 0; i < items.length; i++) {
+          for (var j = i + 1; j < items.length; j++) {
+            var a = items[i];
+            var b = items[j];
+            var overlapX = Math.min(a.x + a.w + 4 - b.x, b.x + b.w + 4 - a.x);
+            var overlapY = Math.min(a.y + a.h + 4 - b.y, b.y + b.h + 4 - a.y);
+            if (overlapX <= 0 || overlapY <= 0) continue;
+            var ba = bias[a.id] || [0, -1];
+            var bb = bias[b.id] || [0, -1];
+            if (overlapX < overlapY) {
+              var dir = (a.cx + ba[0] * 8) <= (b.cx + bb[0] * 8) ? -1 : 1;
+              var push = overlapX / 2 + 0.6;
+              a.x += dir * push;
+              b.x -= dir * push;
+            } else {
+              var vdir = (a.cy + ba[1] * 8) <= (b.cy + bb[1] * 8) ? -1 : 1;
+              var vpush = overlapY / 2 + 0.6;
+              a.y += vdir * vpush;
+              b.y -= vdir * vpush;
+            }
+            moved = true;
+          }
+        }
+        items.forEach(function (it) {
+          if (it.x < edge) it.x = edge;
+          if (it.y < edge) it.y = edge;
+          if (it.x + it.w > vp.width - edge) it.x = Math.max(edge, vp.width - edge - it.w);
+          if (it.y + it.h > vp.height - edge) it.y = Math.max(edge, vp.height - edge - it.h);
+        });
+        if (!moved) break;
+      }
+      var ctm = svg.getScreenCTM();
+      items.forEach(function (it) {
+        var el = it.pin._label;
+        if (el) {
+          el.style.left = (it.x + it.w / 2) + "px";
+          el.style.top = (it.y + it.h / 2) + "px";
+        }
+        var line = it.pin.querySelector(".pin__leader");
+        if (!line || !ctm) return;
+        var lx = it.x + it.w / 2;
+        var ly = it.y + it.h / 2;
+        var dx = lx - it.cx;
+        var dy = ly - it.cy;
+        var dist = Math.hypot(dx, dy);
+        if (dist < 18) {
+          line.setAttribute("x2", "0");
+          line.setAttribute("y2", "0");
+          return;
+        }
+        var halfW = it.w / 2;
+        var halfH = it.h / 2;
+        var sx = Math.abs(dx) > 0.01 ? halfW / Math.abs(dx) : 1;
+        var sy = Math.abs(dy) > 0.01 ? halfH / Math.abs(dy) : 1;
+        var scale = Math.min(sx, sy, 0.92);
+        var endX = vp.left + lx - dx * scale;
+        var endY = vp.top + ly - dy * scale;
+        var pt = svg.createSVGPoint();
+        pt.x = endX;
+        pt.y = endY;
+        var local = pt.matrixTransform(ctm.inverse());
+        var origin = svg.createSVGPoint();
+        origin.x = vp.left + it.cx;
+        origin.y = vp.top + it.cy;
+        var o = origin.matrixTransform(ctm.inverse());
+        line.setAttribute("x1", "0");
+        line.setAttribute("y1", "0");
+        line.setAttribute("x2", (local.x - o.x).toFixed(2));
+        line.setAttribute("y2", (local.y - o.y).toFixed(2));
+      });
+    }
+
+    function clampBox(box) {
+      var minW = homeBox.w / maxZoom;
+      var w = Math.max(minW, Math.min(homeBox.w, box.w));
+      var h = w * (homeBox.h / homeBox.w);
+      var x = box.x + (box.w - w) / 2;
+      var y = box.y + (box.h - h) / 2;
+      var slackX = w * 0.28;
+      var slackY = h * 0.28;
+      if (x < homeBox.x - slackX) x = homeBox.x - slackX;
+      if (y < homeBox.y - slackY) y = homeBox.y - slackY;
+      if (x + w > homeBox.x + homeBox.w + slackX) x = homeBox.x + homeBox.w + slackX - w;
+      if (y + h > homeBox.y + homeBox.h + slackY) y = homeBox.y + homeBox.h + slackY - h;
+      return { x: x, y: y, w: w, h: h };
+    }
+
+    function animateTo(box) {
+      var next = clampBox(box);
+      if (tween && window.gsap) tween.kill();
+      if (reduced || !window.gsap) {
+        applyBox(next);
+        return;
+      }
+      var proxy = { x: view.x, y: view.y, w: view.w, h: view.h };
+      tween = window.gsap.to(proxy, {
+        x: next.x,
+        y: next.y,
+        w: next.w,
+        h: next.h,
+        duration: 0.7,
+        ease: "power2.inOut",
+        onUpdate: function () { applyBox(proxy); }
+      });
+    }
+
+    function framePin(pin) {
+      var cx = Number(pin.getAttribute("data-x"));
+      var cy = Number(pin.getAttribute("data-y"));
+      var boxW = homeBox.w / 4.4;
+      var boxH = boxW * homeBox.h / homeBox.w;
+      animateTo({ x: cx - boxW / 2, y: cy - boxH / 2, w: boxW, h: boxH });
+    }
+
+    function home() {
+      animateTo({ x: homeBox.x, y: homeBox.y, w: homeBox.w, h: homeBox.h });
+    }
+
+    function resetView() {
+      home();
+      document.dispatchEvent(new CustomEvent("devnet:mapreset"));
+    }
+
+    applyBox(homeBox);
+    window.requestAnimationFrame(function () { applyBox(view); });
+
+    mapStage.querySelectorAll("[data-map]").forEach(function (button) {
+      button.addEventListener("click", function () {
+        var action = button.getAttribute("data-map");
+        if (action === "in") zoomBy(1.6);
+        else if (action === "out") zoomBy(1 / 1.6);
+        else if (action === "reset") resetView();
+      });
+    });
+
+    function zoomBy(factor, clientX, clientY) {
+      var rect = viewport.getBoundingClientRect();
+      var px = clientX == null ? rect.left + rect.width / 2 : clientX;
+      var py = clientY == null ? rect.top + rect.height / 2 : clientY;
+      var ctm = svg.getScreenCTM();
+      if (!ctm) return;
+      var pt = svg.createSVGPoint();
+      pt.x = px;
+      pt.y = py;
+      var focus = pt.matrixTransform(ctm.inverse());
+      var w = view.w / factor;
+      var h = view.h / factor;
+      animateTo({
+        x: focus.x - ((px - rect.left) / rect.width) * w,
+        y: focus.y - ((py - rect.top) / rect.height) * h,
+        w: w,
+        h: h
+      });
+    }
+
+    var drag = null;
+    viewport.addEventListener("pointerdown", function (event) {
+      if (event.pointerType === "touch") return;
+      if (event.button !== 0) return;
+      if (event.target.closest(".na-pin, .map-label, .map-controls")) return;
+      drag = { id: event.pointerId, x: event.clientX, y: event.clientY };
+      if (tween && window.gsap) tween.kill();
+      viewport.classList.add("is-drag");
+      viewport.setPointerCapture(event.pointerId);
+    });
+    viewport.addEventListener("pointermove", function (event) {
+      if (!drag || event.pointerId !== drag.id) return;
+      var rect = viewport.getBoundingClientRect();
+      var dx = ((event.clientX - drag.x) / rect.width) * view.w;
+      var dy = ((event.clientY - drag.y) / rect.height) * view.h;
+      drag.x = event.clientX;
+      drag.y = event.clientY;
+      applyBox(clampBox({ x: view.x - dx, y: view.y - dy, w: view.w, h: view.h }));
+    });
+    function endDrag(event) {
+      if (!drag || event.pointerId !== drag.id) return;
+      drag = null;
+      viewport.classList.remove("is-drag");
+    }
+    viewport.addEventListener("pointerup", endDrag);
+    viewport.addEventListener("pointercancel", endDrag);
+
+    viewport.addEventListener("wheel", function (event) {
+      var pinch = event.ctrlKey;
+      var coarse = event.deltaMode !== 0 || Math.abs(event.deltaY) >= 40;
+      if (!pinch && !coarse) return;
+      event.preventDefault();
+      if (tween && window.gsap) tween.kill();
+      var rect = viewport.getBoundingClientRect();
+      var ctm = svg.getScreenCTM();
+      if (!ctm) return;
+      var delta = event.deltaY;
+      if (event.deltaMode === 1) delta *= 16;
+      var factor = Math.exp(-delta * (pinch ? 0.01 : 0.0016));
+      var pt = svg.createSVGPoint();
+      pt.x = event.clientX;
+      pt.y = event.clientY;
+      var focus = pt.matrixTransform(ctm.inverse());
+      var w = view.w / factor;
+      var h = view.h / factor;
+      applyBox(clampBox({
+        x: focus.x - ((event.clientX - rect.left) / rect.width) * w,
+        y: focus.y - ((event.clientY - rect.top) / rect.height) * h,
+        w: w,
+        h: h
+      }));
+    }, { passive: false });
+
+    mapStage.addEventListener("keydown", function (event) {
+      var key = event.key;
+      if (key === "ArrowLeft" || key === "ArrowRight" || key === "ArrowUp" || key === "ArrowDown") {
+        event.preventDefault();
+        var box = { x: view.x, y: view.y, w: view.w, h: view.h };
+        if (key === "ArrowLeft") box.x -= view.w * 0.08;
+        if (key === "ArrowRight") box.x += view.w * 0.08;
+        if (key === "ArrowUp") box.y -= view.h * 0.08;
+        if (key === "ArrowDown") box.y += view.h * 0.08;
+        applyBox(clampBox(box));
+        return;
+      }
+      if (key === "+" || key === "=") {
+        event.preventDefault();
+        zoomBy(1.25);
+      } else if (key === "-" || key === "_") {
+        event.preventDefault();
+        zoomBy(1 / 1.25);
+      } else if (key === "0" || key === "Home") {
+        event.preventDefault();
+        resetView();
+      }
+    });
+
+    pins.forEach(function (pin) {
+      pin.addEventListener("keydown", function (event) {
+        if (event.key !== "Enter" && event.key !== " ") return;
+        event.preventDefault();
+        pin.click();
+      });
+    });
+
+    window.addEventListener("resize", function () {
+      syncDots();
+      layoutLabels();
+    });
+    if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(function () { layoutLabels(); });
+    }
+
+    return { framePin: framePin, resetView: resetView, home: home, layoutLabels: layoutLabels };
+  }
+
   function setupMap(mapStage, reduced) {
+    var geo = mapStage ? mapStage.querySelector(".na-map") : null;
+    if (geo) return setupGeoMap(mapStage, geo, reduced);
     var viewport = mapStage ? mapStage.querySelector(".map-viewport") : null;
     var world = mapStage ? mapStage.querySelector(".map-world") : null;
     if (!viewport || !world) return null;
@@ -627,15 +1017,14 @@ document.addEventListener("DOMContentLoaded", function () {
     document.querySelectorAll("[data-city]").forEach(function (el) {
       var on = active !== "" && el.getAttribute("data-city") === active;
       el.classList.toggle("is-hot", on);
-      if (el.classList.contains("pin") || el.classList.contains("city-row")) {
+      if (el.classList.contains("pin") || el.classList.contains("city-row") || el.classList.contains("map-label")) {
         el.setAttribute("aria-pressed", lockedCity !== "" && el.getAttribute("data-city") === lockedCity ? "true" : "false");
       }
     });
     var readout = document.querySelector("[data-map-readout]");
     if (readout) {
       var pin = active ? document.querySelector('.map-stage .pin[data-city="' + active + '"]') : null;
-      var label = pin ? pin.querySelector(".pin__label") : null;
-      readout.textContent = label ? label.textContent : "";
+      readout.textContent = pin ? (pin.getAttribute("data-name") || "") : "";
     }
     var hotPin = active ? document.querySelector('.map-stage .pin[data-city="' + active + '"]') : null;
     var hotPlace = hotPin ? hotPin.getAttribute("data-place") || "" : "";
@@ -667,18 +1056,23 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 
-  document.querySelectorAll(".chapter, .city-row, .map-stage .pin").forEach(function (button) {
+  document.querySelectorAll(".chapter, .city-row, .map-stage .pin, .map-label").forEach(function (button) {
     button.addEventListener("click", function () {
       var id = button.getAttribute("data-city") || "";
-      lockedCity = lockedCity === id ? "" : id;
+      var pin = document.querySelector('.map-stage .pin[data-city="' + id + '"]');
+      var row = document.querySelector('.city-row[data-city="' + id + '"]');
+      if (lockedCity === id) {
+        lockedCity = "";
+        setCity("");
+        document.dispatchEvent(new CustomEvent("devnet:city", { detail: "" }));
+        if (mapApi && mapApi.home) mapApi.home();
+        return;
+      }
+      lockedCity = id;
       setCity(lockedCity);
       document.dispatchEvent(new CustomEvent("devnet:city", { detail: lockedCity }));
-      if (!lockedCity) return;
-      var pin = document.querySelector('.map-stage .pin[data-city="' + lockedCity + '"]');
-      var row = document.querySelector('.city-row[data-city="' + lockedCity + '"]');
-      if (button.classList.contains("pin")) {
-        if (row) row.scrollIntoView({ block: "nearest", inline: "nearest", behavior: reduce ? "auto" : "smooth" });
-        return;
+      if ((button.classList.contains("pin") || button.classList.contains("map-label")) && row) {
+        row.scrollIntoView({ block: "nearest", inline: "nearest", behavior: reduce ? "auto" : "smooth" });
       }
       var boardNow = document.querySelector(".map-board");
       if (pin && mapApi && (!boardNow || boardNow.getAttribute("data-network") !== "globe")) mapApi.framePin(pin);
@@ -686,6 +1080,11 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   document.addEventListener("devnet:spin", function () {
+    lockedCity = "";
+    setCity("");
+  });
+
+  document.addEventListener("devnet:mapreset", function () {
     lockedCity = "";
     setCity("");
   });
@@ -913,22 +1312,4 @@ document.addEventListener("DOMContentLoaded", function () {
     }, { passive: true });
   }
 
-  document.querySelectorAll(".copy").forEach(function (button) {
-    button.addEventListener("click", function (event) {
-      event.preventDefault();
-      event.stopPropagation();
-      var url = button.getAttribute("data-copy") || "";
-      var live = button.parentElement.querySelector(".copy-live");
-      copyText(url).then(function () {
-        button.classList.add("is-copied");
-        if (live) live.textContent = "Copied";
-        window.setTimeout(function () {
-          button.classList.remove("is-copied");
-          if (live) live.textContent = "";
-        }, 1500);
-      }).catch(function () {
-        if (live) live.textContent = "";
-      });
-    });
-  });
 });

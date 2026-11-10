@@ -308,5 +308,135 @@ function mountMotion() {
   }
 }
 
+function mountMarquee() {
+  if (reduceQuery.matches) return;
+  var strip = document.querySelector(".logo-strip");
+  if (!strip || strip.dataset.marquee === "1") return;
+  var items = Array.prototype.slice.call(strip.children);
+  if (items.length < 2) return;
+  for (var copy = 0; copy < 3; copy += 1) {
+    items.forEach(function (item) {
+      var clone = item.cloneNode(true);
+      clone.setAttribute("aria-hidden", "true");
+      strip.appendChild(clone);
+    });
+  }
+  strip.dataset.marquee = "1";
+  strip.classList.add("is-marquee");
+}
+
+function mountTilt() {
+  if (reduceQuery.matches) return;
+  document.querySelectorAll(".build-card").forEach(function (card) {
+    card.addEventListener("pointermove", function (event) {
+      if (event.pointerType !== "mouse") return;
+      var rect = card.getBoundingClientRect();
+      var px = (event.clientX - rect.left) / rect.width - 0.5;
+      var py = (event.clientY - rect.top) / rect.height - 0.5;
+      card.style.transform = "rotateX(" + (-py * 6).toFixed(2) + "deg) rotateY(" + (px * 8).toFixed(2) + "deg) translateY(-2px)";
+    });
+    card.addEventListener("pointerleave", function () {
+      card.style.transform = "";
+    });
+  });
+  document.querySelectorAll(".btn--primary").forEach(function (btn) {
+    btn.addEventListener("pointermove", function (event) {
+      if (event.pointerType !== "mouse") return;
+      var rect = btn.getBoundingClientRect();
+      var px = (event.clientX - rect.left) / rect.width - 0.5;
+      var py = (event.clientY - rect.top) / rect.height - 0.5;
+      btn.style.transform = "translate(" + (px * 6).toFixed(1) + "px," + (py * 4).toFixed(1) + "px)";
+    });
+    btn.addEventListener("pointerleave", function () {
+      btn.style.transform = "";
+    });
+  });
+}
+
+function mountCounts() {
+  var chapters = document.querySelectorAll(".na-map .na-pin").length;
+  document.querySelectorAll("[data-count-chapters]").forEach(function (el) {
+    if (!chapters) return;
+    el.setAttribute("data-count", String(chapters));
+    el.textContent = String(chapters);
+  });
+  var reduced = reduceQuery.matches || !window.gsap || !window.ScrollTrigger;
+  document.querySelectorAll(".chapter-facts, .hero-count").forEach(function (group) {
+    Array.prototype.forEach.call(group.querySelectorAll("[data-count]"), function (el, index) {
+      var target = Number(el.getAttribute("data-count"));
+      var suffix = el.getAttribute("data-suffix") || "";
+      if (!isFinite(target)) return;
+      el.textContent = String(target) + suffix;
+      if (reduced) return;
+      var obj = { n: 0 };
+      window.gsap.to(obj, {
+        n: target,
+        duration: 1.15,
+        delay: index * 0.08,
+        ease: "power2.out",
+        scrollTrigger: {
+          trigger: el,
+          start: "top 90%",
+          toggleActions: "play none none none"
+        },
+        onStart: function () {
+          el.textContent = "0" + suffix;
+        },
+        onUpdate: function () {
+          el.textContent = String(Math.round(obj.n)) + suffix;
+        }
+      });
+    });
+  });
+  if (reduced) return;
+  document.querySelectorAll(".chart__bar").forEach(function (bar, index) {
+    var width = Number(bar.getAttribute("width"));
+    if (!isFinite(width)) return;
+    window.gsap.fromTo(bar, { attr: { width: 0 } }, {
+      attr: { width: width },
+      duration: 0.9,
+      delay: index * 0.08,
+      ease: "power2.out",
+      scrollTrigger: {
+        trigger: bar.closest(".chart") || bar,
+        start: "top 84%",
+        toggleActions: "play none none none"
+      }
+    });
+  });
+  var line = document.querySelector(".timechart__line");
+  if (line && typeof line.getTotalLength === "function") {
+    var length = line.getTotalLength();
+    window.gsap.fromTo(line, { strokeDasharray: length, strokeDashoffset: length }, {
+      strokeDashoffset: 0,
+      duration: 1.15,
+      ease: "power2.out",
+      scrollTrigger: {
+        trigger: ".timechart",
+        start: "top 84%",
+        toggleActions: "play none none none"
+      }
+    });
+  }
+  if (window.gsap.utils && window.gsap.utils.toArray) {
+    window.gsap.from(window.gsap.utils.toArray(".timechart__node"), {
+      autoAlpha: 0,
+      y: 8,
+      duration: 0.45,
+      stagger: 0.12,
+      delay: 0.15,
+      ease: "power2.out",
+      scrollTrigger: {
+        trigger: ".timechart",
+        start: "top 84%",
+        toggleActions: "play none none none"
+      }
+    });
+  }
+}
+
 mountGlobe();
+mountMarquee();
+mountTilt();
 mountMotion();
+mountCounts();
