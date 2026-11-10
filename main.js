@@ -317,7 +317,7 @@ document.addEventListener("DOMContentLoaded", function () {
       pin.addEventListener("keydown", function (event) {
         if (event.key !== "Enter" && event.key !== " ") return;
         event.preventDefault();
-        pin.click();
+        pin.dispatchEvent(new MouseEvent("click", { bubbles: true }));
       });
     }
     pins.forEach(onKey);
