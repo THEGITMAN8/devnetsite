@@ -18,6 +18,7 @@ document.addEventListener("DOMContentLoaded", function () {
     frame.width = "400";
     frame.height = "480";
     frame.referrerPolicy = "strict-origin-when-cross-origin";
+    frame.setAttribute("sandbox", "allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox");
     list.appendChild(frame);
   });
   if (!list.childElementCount) return;
