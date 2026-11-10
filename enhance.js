@@ -469,20 +469,54 @@ function mountConstellation() {
   function project() {
     var w = canvas.width;
     var h = canvas.height;
-    var pad = Math.min(w, h) * 0.14;
     var lon0 = -123.12;
     var lon1 = -63.58;
     var lat0 = 25.76;
     var lat1 = 49.28;
-    points = stars.map(function (star) {
+    var raw = stars.map(function (star) {
       return {
         lead: !!star.lead,
-        lock: !!star.lead,
-        x: pad + ((star.lon - lon0) / (lon1 - lon0)) * (w - pad * 2),
-        y: pad + ((lat1 - star.lat) / (lat1 - lat0)) * (h - pad * 2)
+        x: (star.lon - lon0) / (lon1 - lon0),
+        y: (lat1 - star.lat) / (lat1 - lat0)
       };
     });
-    var min = Math.min(w, h) * 0.075;
+    var hub = raw.filter(function (star) { return star.lead; })[0] || raw[0];
+    points = raw.map(function (star) {
+      var dx = star.x - hub.x;
+      var dy = star.y - hub.y;
+      var dist = Math.hypot(dx, dy) || 0.001;
+      var opened = star.lead ? 0 : Math.pow(dist, 0.46);
+      return {
+        lead: star.lead,
+        lock: star.lead,
+        x: hub.x + (dx / dist) * opened,
+        y: hub.y + (dy / dist) * opened
+      };
+    });
+    function fit() {
+      var minX = Infinity;
+      var maxX = -Infinity;
+      var minY = Infinity;
+      var maxY = -Infinity;
+      points.forEach(function (p) {
+        if (p.x < minX) minX = p.x;
+        if (p.x > maxX) maxX = p.x;
+        if (p.y < minY) minY = p.y;
+        if (p.y > maxY) maxY = p.y;
+      });
+      var spanX = Math.max(0.001, maxX - minX);
+      var spanY = Math.max(0.001, maxY - minY);
+      var margin = Math.min(w, h) * 0.1;
+      var scale = Math.min((w - margin * 2) / spanX, (h - margin * 2) / spanY);
+      var originX = (w - spanX * scale) / 2;
+      var originY = (h - spanY * scale) / 2;
+      points.forEach(function (p) {
+        p.x = originX + (p.x - minX) * scale;
+        p.y = originY + (p.y - minY) * scale;
+      });
+    }
+    fit();
+    var min = Math.min(w, h) * 0.11;
     var n;
     var i;
     var j;
@@ -508,11 +542,13 @@ function mountConstellation() {
           }
         }
       }
+      var edge = Math.min(w, h) * 0.06;
       points.forEach(function (p) {
-        p.x = Math.max(pad * 0.4, Math.min(w - pad * 0.4, p.x));
-        p.y = Math.max(pad * 0.4, Math.min(h - pad * 0.4, p.y));
+        p.x = Math.max(edge, Math.min(w - edge, p.x));
+        p.y = Math.max(edge, Math.min(h - edge, p.y));
       });
     }
+    fit();
     links = [];
     for (i = 0; i < stars.length; i += 1) {
       for (j = i + 1; j < stars.length; j += 1) {
