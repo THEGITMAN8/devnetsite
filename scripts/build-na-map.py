@@ -2,6 +2,7 @@
 """Build assets/na-map.svg from Natural Earth 50m (public domain).
 
 Coastlines, the Canada–US border, and the Great Lakes. No runtime dependency.
+The live page inlines this SVG in index.html. Do not commit both copies.
 """
 
 import json
