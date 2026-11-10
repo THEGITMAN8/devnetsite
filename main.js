@@ -317,7 +317,7 @@ document.addEventListener("DOMContentLoaded", function () {
       pin.addEventListener("keydown", function (event) {
         if (event.key !== "Enter" && event.key !== " ") return;
         event.preventDefault();
-        pin.click();
+        pin.dispatchEvent(new MouseEvent("click", { bubbles: true }));
       });
     }
     pins.forEach(onKey);
@@ -1812,6 +1812,125 @@ document.addEventListener("DOMContentLoaded", function () {
       heroFrame = true;
       window.requestAnimationFrame(paintHero);
     }, { passive: true });
+  }
+
+  var story = document.querySelector(".story-seq");
+  var storyStage = document.querySelector(".story-stage");
+  function paintStory() {
+    if (!story || !storyStage) return;
+    var beats = story.querySelectorAll(".story-beat");
+    if (reduce) {
+      story.classList.remove("is-live");
+      return;
+    }
+    story.classList.add("is-live");
+    var rect = storyStage.getBoundingClientRect();
+    var total = storyStage.offsetHeight - window.innerHeight;
+    var scrolled = Math.min(Math.max(-rect.top, 0), Math.max(total, 1));
+    var progress = total <= 0 ? 1 : scrolled / total;
+    var index = Math.min(beats.length - 1, Math.floor(progress * beats.length));
+    if (progress >= 0.98) index = beats.length - 1;
+    Array.prototype.forEach.call(beats, function (beat, i) {
+      beat.classList.toggle("is-on", i === index);
+      beat.classList.toggle("is-lit", i <= index);
+    });
+  }
+  if (story) {
+    paintStory();
+    window.addEventListener("scroll", paintStory, { passive: true });
+    window.addEventListener("resize", paintStory);
+  }
+
+  var pickInput = document.getElementById("chapter-pick");
+  var pickList = document.getElementById("chapter-list");
+  if (pickInput && pickList) {
+    var chapterOptions = Array.prototype.map.call(document.querySelectorAll(".city-row[data-city]"), function (row) {
+      return { id: row.getAttribute("data-city"), name: row.textContent.replace(/\s+/g, " ").trim() };
+    });
+    var activeIndex = -1;
+    function shownOptions(filter) {
+      var query = (filter || "").trim().toLowerCase();
+      return chapterOptions.filter(function (opt) {
+        return !query || opt.name.toLowerCase().indexOf(query) !== -1 || opt.id.indexOf(query) !== -1;
+      });
+    }
+    function renderPick(filter) {
+      var shown = shownOptions(filter);
+      pickList.replaceChildren();
+      shown.forEach(function (opt, i) {
+        var item = document.createElement("li");
+        item.id = "chapter-opt-" + opt.id;
+        item.setAttribute("role", "option");
+        item.setAttribute("data-city", opt.id);
+        item.setAttribute("aria-selected", i === activeIndex ? "true" : "false");
+        item.textContent = opt.name;
+        pickList.appendChild(item);
+      });
+      var open = shown.length > 0;
+      pickList.hidden = !open;
+      pickInput.setAttribute("aria-expanded", open ? "true" : "false");
+      if (activeIndex >= 0 && shown[activeIndex]) pickInput.setAttribute("aria-activedescendant", "chapter-opt-" + shown[activeIndex].id);
+      else pickInput.removeAttribute("aria-activedescendant");
+    }
+    function chooseChapter(id) {
+      var row = document.querySelector('.city-row[data-city="' + id + '"]');
+      var pin = document.querySelector('.map-stage .pin[data-city="' + id + '"]');
+      if (!row) return;
+      if (!pin || pin.getAttribute("aria-pressed") !== "true") row.click();
+      var match = chapterOptions.filter(function (opt) { return opt.id === id; })[0];
+      pickInput.value = match ? match.name : "";
+      pickList.hidden = true;
+      pickInput.setAttribute("aria-expanded", "false");
+      var viewport = document.querySelector(".map-viewport");
+      if (viewport) viewport.scrollIntoView({ block: "center", behavior: reduce ? "auto" : "smooth" });
+    }
+    pickInput.addEventListener("focus", function () {
+      activeIndex = -1;
+      renderPick(pickInput.value);
+    });
+    pickInput.addEventListener("input", function () {
+      activeIndex = -1;
+      renderPick(pickInput.value);
+    });
+    pickInput.addEventListener("keydown", function (event) {
+      var items = pickList.querySelectorAll('[role="option"]');
+      if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+        event.preventDefault();
+        if (!items.length) renderPick(pickInput.value);
+        items = pickList.querySelectorAll('[role="option"]');
+        if (!items.length) return;
+        activeIndex += event.key === "ArrowDown" ? 1 : -1;
+        if (activeIndex < 0) activeIndex = items.length - 1;
+        if (activeIndex >= items.length) activeIndex = 0;
+        renderPick(pickInput.value);
+        return;
+      }
+      if (event.key === "Enter") {
+        event.preventDefault();
+        var current = activeIndex >= 0 ? shownOptions(pickInput.value)[activeIndex] : shownOptions(pickInput.value)[0];
+        if (!current) {
+          var typed = pickInput.value.trim().toLowerCase();
+          current = chapterOptions.filter(function (opt) { return opt.name.toLowerCase() === typed; })[0];
+        }
+        if (current) chooseChapter(current.id);
+        return;
+      }
+      if (event.key === "Escape") {
+        pickList.hidden = true;
+        pickInput.setAttribute("aria-expanded", "false");
+      }
+    });
+    pickList.addEventListener("pointerdown", function (event) {
+      var opt = event.target.closest("[data-city]");
+      if (!opt) return;
+      event.preventDefault();
+      chooseChapter(opt.getAttribute("data-city"));
+    });
+    document.addEventListener("pointerdown", function (event) {
+      if (event.target.closest(".chapter-pick")) return;
+      pickList.hidden = true;
+      pickInput.setAttribute("aria-expanded", "false");
+    });
   }
 
 });
