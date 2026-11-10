@@ -274,170 +274,48 @@ document.addEventListener("DOMContentLoaded", function () {
       var pins = Array.prototype.slice.call(world.querySelectorAll(".pin"));
       pins.forEach(function (pin) {
         pin.classList.remove("is-bunched");
-        pin.removeAttribute("aria-hidden");
       });
       clusterLayer.replaceChildren();
-      if (!pins.length || !world.clientWidth) return;
-      var centers = pins.map(function (pin) {
-        var label = pin.querySelector(".pin__label");
-        return {
-          pin: pin,
-          x: pin.offsetLeft,
-          y: pin.offsetTop,
-          name: label ? label.textContent : pin.getAttribute("data-city"),
-          place: pin.getAttribute("data-place") || "",
-          country: pin.getAttribute("data-country") || ""
-        };
-      });
-      var parent = centers.map(function (_, index) { return index; });
-      function find(index) {
-        while (parent[index] !== index) {
-          parent[index] = parent[parent[index]];
-          index = parent[index];
-        }
-        return index;
-      }
-      if (scale < 3.2) {
-        var byPlace = {};
-        centers.forEach(function (center, index) {
-          if (!center.place) return;
-          if (!byPlace[center.place]) byPlace[center.place] = [];
-          byPlace[center.place].push(index);
-        });
-        Object.keys(byPlace).forEach(function (place) {
-          var ids = byPlace[place];
-          if (ids.length < 2) return;
-          for (var n = 1; n < ids.length; n++) parent[find(ids[n])] = find(ids[0]);
-        });
-      }
+      if (!pins.length || !world.clientWidth || scale >= 3.2) return;
       var groups = {};
-      centers.forEach(function (center, index) {
-        var root = find(index);
-        if (!groups[root]) groups[root] = [];
-        groups[root].push(center);
+      pins.forEach(function (pin) {
+        var place = pin.getAttribute("data-place") || "";
+        if (!place) return;
+        if (!groups[place]) groups[place] = [];
+        groups[place].push(pin);
       });
-      var placed = [];
-      var chrome = controlRects();
-      function screenPoint(wx, wy) {
-        return { sx: x + wx * scale, sy: y + wy * scale };
-      }
-      function overlaps(a, b, gap) {
-        var pad = gap || 0;
-        return a.left < b.right + pad && a.right > b.left - pad && a.top < b.bottom + pad && a.bottom > b.top - pad;
-      }
-      function hitsChrome(rect) {
-        for (var c = 0; c < chrome.length; c++) {
-          if (overlaps(rect, chrome[c], 0)) return true;
-        }
-        return false;
-      }
-      function hitsLabels(rect) {
-        for (var p = 0; p < placed.length; p++) {
-          if (overlaps(rect, placed[p], 6)) return true;
-        }
-        return false;
-      }
-      function onScreen(rect) {
-        return rect.left >= 4 && rect.top >= 4 && rect.right <= viewport.clientWidth - 4 && rect.bottom <= viewport.clientHeight - 4;
-      }
-      function visualRect(sx, sy, layoutW, layoutH) {
-        return {
-          left: sx - layoutW / 2,
-          top: sy - layoutH / 2,
-          right: sx + layoutW / 2,
-          bottom: sy + layoutH / 2
-        };
-      }
-      function labelShifts() {
-        var shifts = [[0, -40]];
-        var radii = [28, 48, 72, 104, 144, 188];
-        for (var r = 0; r < radii.length; r++) {
-          for (var a = 0; a < 16; a++) {
-            var ang = -Math.PI / 2 + (Math.PI * 2 * a) / 16;
-            shifts.push([Math.cos(ang) * radii[r], Math.sin(ang) * radii[r]]);
-          }
-        }
-        return shifts;
-      }
-      var shifts = labelShifts();
-      Object.keys(groups).sort(function (a, b) {
-        return groups[b].length - groups[a].length;
-      }).forEach(function (key) {
-        var group = groups[key];
+      var hot = world.querySelector(".pin.is-hot");
+      var hotPlace = hot ? hot.getAttribute("data-place") || "" : "";
+      Object.keys(groups).forEach(function (place) {
+        var group = groups[place];
+        if (group.length < 2) return;
         var cx = 0;
         var cy = 0;
-        var names = [];
         var live = false;
-        group.forEach(function (center) {
+        var centers = group.map(function (pin) {
+          pin.classList.add("is-bunched");
+          if (pin.classList.contains("pin--founding")) live = true;
+          return { pin: pin, x: pin.offsetLeft, y: pin.offsetTop };
+        });
+        centers.forEach(function (center) {
           cx += center.x;
           cy += center.y;
-          names.push(center.name);
-          if (center.pin.classList.contains("pin--founding")) live = true;
         });
-        cx /= group.length;
-        cy /= group.length;
-        var label = group.length > 1 ? group[0].place : group[0].name;
-        if (!label) label = names[0];
-        var anchor = screenPoint(cx, cy);
-        if (anchor.sx < -8 || anchor.sy < -8 || anchor.sx > viewport.clientWidth + 8 || anchor.sy > viewport.clientHeight + 8) return;
+        cx /= centers.length;
+        cy /= centers.length;
         var button = document.createElement("button");
         button.type = "button";
-        button.className = "map-cluster map-label" + (live ? " map-cluster--live" : "");
-        button.textContent = label;
-        button.setAttribute("aria-label", group.length > 1 ? label + ": " + names.join(", ") : label);
+        button.className = "map-hub" + (live ? " map-hub--live" : "") + (place === hotPlace ? " is-hot" : "");
+        button.setAttribute("data-place", place);
+        button.setAttribute("aria-label", place);
         button.addEventListener("click", function (event) {
           event.stopPropagation();
-          if (group.length > 1) expandGroup(group);
-          else framePin(group[0].pin);
+          expandGroup(centers);
         });
+        button.style.left = (cx / world.clientWidth * 100) + "%";
+        button.style.top = (cy / world.clientHeight * 100) + "%";
         clusterLayer.appendChild(button);
-        var layoutW = Math.max(button.offsetWidth, 44);
-        var layoutH = Math.max(button.offsetHeight, 28);
-        var chosen = null;
-        var spare = null;
-        for (var s = 0; s < shifts.length; s++) {
-          var tryX = cx + shifts[s][0] / scale;
-          var tryY = cy + shifts[s][1] / scale;
-          var point = screenPoint(tryX, tryY);
-          var rect = visualRect(point.sx, point.sy, layoutW, layoutH);
-          if (!onScreen(rect) || hitsChrome(rect)) continue;
-          if (!hitsLabels(rect)) {
-            chosen = { x: tryX, y: tryY, rect: rect };
-            break;
-          }
-          if (!spare) spare = { x: tryX, y: tryY, rect: rect };
-        }
-        if (!chosen) chosen = spare;
-        if (!chosen) {
-          button.remove();
-          return;
-        }
-        button.style.left = (chosen.x / world.clientWidth * 100) + "%";
-        button.style.top = (chosen.y / world.clientHeight * 100) + "%";
-        placed.push(chosen.rect);
       });
-    }
-
-    function controlRects() {
-      var origin = viewport.getBoundingClientRect();
-      var pad = 8;
-      var rects = [];
-      var nodes = mapStage.querySelectorAll(".map-ctl, .map-explore button");
-      for (var i = 0; i < nodes.length; i++) {
-        var el = nodes[i];
-        if (el.hidden) continue;
-        var computed = window.getComputedStyle(el);
-        if (computed.display === "none" || computed.visibility === "hidden") continue;
-        var rect = el.getBoundingClientRect();
-        if (rect.width < 1 || rect.height < 1) continue;
-        rects.push({
-          left: rect.left - origin.left - pad,
-          top: rect.top - origin.top - pad,
-          right: rect.right - origin.left + pad,
-          bottom: rect.bottom - origin.top + pad
-        });
-      }
-      return rects;
     }
 
     function expandGroup(group) {
@@ -506,49 +384,9 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     function frameHome() {
-      var pins = world.querySelectorAll(".pin");
-      var vw = viewport.clientWidth;
-      var vh = viewport.clientHeight;
-      var ww = world.clientWidth;
-      var wh = world.clientHeight;
-      if (!pins.length || !vw || !vh || !ww || !wh) return;
-      var focused = [];
-      var all = [];
-      Array.prototype.forEach.call(pins, function (pin) {
-        var px = pin.offsetLeft;
-        var py = pin.offsetTop;
-        all.push({ x: px, y: py });
-        var rx = px / ww;
-        var ry = py / wh;
-        if (rx > 0.55 && rx < 0.95 && ry > 0.32 && ry < 0.62) focused.push({ x: px, y: py });
-      });
-      var use = focused.length >= 4 ? focused : all;
-      var minX = Infinity;
-      var minY = Infinity;
-      var maxX = -Infinity;
-      var maxY = -Infinity;
-      use.forEach(function (point) {
-        if (point.x < minX) minX = point.x;
-        if (point.y < minY) minY = point.y;
-        if (point.x > maxX) maxX = point.x;
-        if (point.y > maxY) maxY = point.y;
-      });
-      var cx = (minX + maxX) / 2;
-      var cy = (minY + maxY) / 2;
-      var bw = Math.max(maxX - minX, 48);
-      var bh = Math.max(maxY - minY, 48);
-      var next = Math.min((vw - 168) / bw, (vh - 96) / bh);
-      if (!isFinite(next) || next < 1) next = 1;
-      if (next > 3.05) next = 3.05;
-      homeScale = next;
-      homeX = vw / 2 - cx * next;
-      homeY = vh / 2 - cy * next;
-      var minBoundX = vw * (1 - homeScale);
-      var minBoundY = vh * (1 - homeScale);
-      if (homeX > 0) homeX = 0;
-      if (homeY > 0) homeY = 0;
-      if (homeX < minBoundX) homeX = minBoundX;
-      if (homeY < minBoundY) homeY = minBoundY;
+      homeScale = 1;
+      homeX = 0;
+      homeY = 0;
     }
 
     function resetView() {
@@ -567,7 +405,7 @@ document.addEventListener("DOMContentLoaded", function () {
       var px = (pinRect.left + pinRect.width / 2 - worldRect.left) / scale;
       var py = (pinRect.top + pinRect.height / 2 - worldRect.top) / scale;
       var rect = viewport.getBoundingClientRect();
-      var next = Math.max(scale, 4);
+      var next = Math.max(scale, phoneMap() ? 7 : 5);
       if (next > maxScale) next = maxScale;
       scale = next;
       x = rect.width / 2 - px * scale;
@@ -793,6 +631,17 @@ document.addEventListener("DOMContentLoaded", function () {
         el.setAttribute("aria-pressed", lockedCity !== "" && el.getAttribute("data-city") === lockedCity ? "true" : "false");
       }
     });
+    var readout = document.querySelector("[data-map-readout]");
+    if (readout) {
+      var pin = active ? document.querySelector('.map-stage .pin[data-city="' + active + '"]') : null;
+      var label = pin ? pin.querySelector(".pin__label") : null;
+      readout.textContent = label ? label.textContent : "";
+    }
+    var hotPin = active ? document.querySelector('.map-stage .pin[data-city="' + active + '"]') : null;
+    var hotPlace = hotPin ? hotPin.getAttribute("data-place") || "" : "";
+    document.querySelectorAll(".map-hub").forEach(function (hub) {
+      hub.classList.toggle("is-hot", hotPlace !== "" && hub.getAttribute("data-place") === hotPlace);
+    });
   }
 
   document.addEventListener("pointerover", function (event) {
@@ -947,40 +796,6 @@ document.addEventListener("DOMContentLoaded", function () {
     window.addEventListener("scroll", drawOrg, { passive: true });
   }
 
-
-  var stats = document.querySelector(".stats");
-  if (stats && !reduce && "IntersectionObserver" in window) {
-    var counted = false;
-    var statsObserver = new IntersectionObserver(
-      function (entries) {
-        if (counted || !entries.some(function (entry) { return entry.isIntersecting; })) return;
-        counted = true;
-        statsObserver.disconnect();
-        stats.querySelectorAll("[data-count]").forEach(function (el, index) {
-          var target = Number(el.getAttribute("data-count"));
-          var plus = el.getAttribute("data-plus") === "1";
-          var begin = performance.now() + index * 80;
-          el.textContent = "0";
-          function frame(now) {
-            var t = (now - begin) / 900;
-            if (t < 0) {
-              window.requestAnimationFrame(frame);
-              return;
-            }
-            if (t > 1) t = 1;
-            var eased = 1 - Math.pow(1 - t, 3);
-            var value = Math.round(eased * target);
-            var done = t === 1;
-            el.textContent = String(done ? target : value) + (plus && done ? "+" : "");
-            if (!done) window.requestAnimationFrame(frame);
-          }
-          window.requestAnimationFrame(frame);
-        });
-      },
-      { threshold: 0.4 }
-    );
-    statsObserver.observe(stats);
-  }
 
   var steps = document.querySelector(".steps");
   if (steps) {
