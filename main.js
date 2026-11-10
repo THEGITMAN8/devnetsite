@@ -214,29 +214,82 @@ document.addEventListener("DOMContentLoaded", function () {
     stage.classList.add("is-drawn");
   }
 
+  var ONTARIO = { london: true, waterloo: true, guelph: true, toronto: true, kingston: true };
+
   function setupGeoMap(mapStage, svg, reduced) {
     var viewport = mapStage.querySelector(".map-viewport");
     var labelLayer = mapStage.querySelector(".map-labels");
-    var parts = (svg.getAttribute("viewBox") || "0 0 1000 599").split(/[\s,]+/).map(Number);
-    var homeBox = { x: parts[0], y: parts[1], w: parts[2], h: parts[3] };
-    var view = { x: homeBox.x, y: homeBox.y, w: homeBox.w, h: homeBox.h };
-    var maxZoom = 5.2;
+    var SVG_NS = "http://www.w3.org/2000/svg";
+    var parts = (svg.getAttribute("viewBox") || "0 0 1000 598.9").split(/[\s,]+/).map(Number);
+    var outer = { x: parts[0] || 0, y: parts[1] || 0, w: parts[2] || 1000, h: parts[3] || 598.9 };
+    var aspect = outer.w / outer.h;
+    var beltW = 230;
+    var belt = { x: 548, y: 188, w: beltW, h: beltW / aspect };
+    var minW = 78;
+    var view = { x: belt.x, y: belt.y, w: belt.w, h: belt.h };
     var pins = Array.prototype.slice.call(svg.querySelectorAll(".na-pin"));
+    var ontarioPins = pins.filter(function (pin) { return ONTARIO[pin.getAttribute("data-city")]; });
     var tween = null;
-    var bias = {
-      vancouver: [-1, -0.2],
-      london: [-1.2, 0.2],
-      waterloo: [-0.15, -1],
-      guelph: [0.2, -1],
-      toronto: [1.1, -0.15],
-      kingston: [1, 0.45],
-      montreal: [0.2, -1],
-      halifax: [-1, -0.1],
-      tucson: [0.3, 1],
-      miami: [0.1, -1],
-      boston: [1, -0.8],
-      "new-york-city": [0.15, 1]
+    var exploded = false;
+    var clustered = true;
+    var arcsPlayed = false;
+    var arcMode = "";
+    var drag = null;
+    var pointers = {};
+    var pinchDist = 0;
+    var sx = 0;
+    var sy = 0;
+    ontarioPins.forEach(function (pin) {
+      sx += Number(pin.getAttribute("data-x"));
+      sy += Number(pin.getAttribute("data-y"));
+    });
+    var centroid = {
+      x: sx / (ontarioPins.length || 1),
+      y: sy / (ontarioPins.length || 1)
     };
+    var bias = {
+      vancouver: [-1, -0.35],
+      london: [-1, 0.45],
+      waterloo: [-1, -1],
+      guelph: [0.15, -1],
+      toronto: [0.35, 1],
+      kingston: [1, 0.1],
+      montreal: [0.1, -1],
+      halifax: [-1, -0.15],
+      tucson: [0.35, 1],
+      miami: [0, -1],
+      boston: [1, -0.75],
+      "new-york-city": [-1, 0.85],
+      ontario: [0, -1]
+    };
+
+    function svgEl(name, attrs) {
+      var el = document.createElementNS(SVG_NS, name);
+      Object.keys(attrs).forEach(function (key) { el.setAttribute(key, attrs[key]); });
+      return el;
+    }
+
+    var arcs = svgEl("g", { class: "na-arcs" });
+    var pinLayer = svg.querySelector(".na-pins");
+    svg.insertBefore(arcs, pinLayer);
+
+    var cluster = svgEl("g", {
+      class: "pin pin--cluster",
+      "data-city": "ontario",
+      "data-cluster": "ontario",
+      "data-name": "Ontario",
+      "data-country": "Canada",
+      role: "button",
+      tabindex: "0",
+      "aria-label": "Ontario, 5 chapters",
+      "aria-pressed": "false"
+    });
+    cluster.appendChild(svgEl("circle", { class: "pin__pulse", r: "7", fill: "none" }));
+    cluster.appendChild(svgEl("circle", { class: "pin__hit", r: "22", fill: "none" }));
+    cluster.appendChild(svgEl("circle", { class: "pin__dot", r: "6" }));
+    cluster.appendChild(svgEl("line", { class: "pin__leader", x1: "0", y1: "0", x2: "0", y2: "0" }));
+    cluster.setAttribute("transform", "translate(" + centroid.x.toFixed(2) + " " + centroid.y.toFixed(2) + ")");
+    pinLayer.appendChild(cluster);
 
     if (labelLayer) {
       pins.forEach(function (pin) {
@@ -249,40 +302,231 @@ document.addEventListener("DOMContentLoaded", function () {
         labelLayer.appendChild(el);
         pin._label = el;
       });
+      var hubLabel = document.createElement("button");
+      hubLabel.type = "button";
+      hubLabel.className = "map-label map-label--hub";
+      hubLabel.setAttribute("data-city", "ontario");
+      hubLabel.textContent = "Ontario · 5";
+      hubLabel.setAttribute("aria-label", "Ontario, 5 chapters");
+      hubLabel.setAttribute("aria-pressed", "false");
+      labelLayer.appendChild(hubLabel);
+      cluster._label = hubLabel;
     }
 
-    function applyBox(box) {
-      view.x = box.x;
-      view.y = box.y;
-      view.w = box.w;
-      view.h = box.h;
-      svg.setAttribute(
-        "viewBox",
-        view.x.toFixed(2) + " " + view.y.toFixed(2) + " " + view.w.toFixed(2) + " " + view.h.toFixed(2)
-      );
-      syncDots();
-      layoutLabels();
-      var zoomIn = mapStage.querySelector('[data-map="in"]');
-      var zoomOut = mapStage.querySelector('[data-map="out"]');
-      if (zoomIn) zoomIn.disabled = view.w <= homeBox.w / maxZoom + 0.2;
-      if (zoomOut) zoomOut.disabled = view.w >= homeBox.w - 0.6;
+    function onKey(pin) {
+      pin.addEventListener("keydown", function (event) {
+        if (event.key !== "Enter" && event.key !== " ") return;
+        event.preventDefault();
+        pin.click();
+      });
+    }
+    pins.forEach(onKey);
+    onKey(cluster);
+
+    function geoScreen(pin) {
+      var rect = svg.getBoundingClientRect();
+      var x = Number(pin.getAttribute("data-x"));
+      var y = Number(pin.getAttribute("data-y"));
+      if (!rect.width) return { x: 0, y: 0 };
+      return {
+        x: rect.left + ((x - view.x) / view.w) * rect.width,
+        y: rect.top + ((y - view.y) / view.h) * rect.height
+      };
+    }
+
+    function ontarioGap() {
+      var rect = svg.getBoundingClientRect();
+      if (!rect.width) return 0;
+      var pts = ontarioPins.map(geoScreen);
+      var min = Infinity;
+      for (var i = 0; i < pts.length; i++) {
+        for (var j = i + 1; j < pts.length; j++) {
+          var d = Math.hypot(pts[i].x - pts[j].x, pts[i].y - pts[j].y);
+          if (d < min) min = d;
+        }
+      }
+      return min;
+    }
+
+    function placeAtGeo(pin) {
+      pin.setAttribute("transform", "translate(" + pin.getAttribute("data-x") + " " + pin.getAttribute("data-y") + ")");
+    }
+
+    function separateOntario() {
+      var rect = svg.getBoundingClientRect();
+      if (!rect.width) return;
+      var pts = ontarioPins.map(function (pin) {
+        var g = geoScreen(pin);
+        return { pin: pin, x: g.x, y: g.y, hx: g.x, hy: g.y };
+      });
+      var minGap = 30;
+      function relax(spring) {
+        for (var i = 0; i < pts.length; i++) {
+          for (var j = i + 1; j < pts.length; j++) {
+            var a = pts[i];
+            var b = pts[j];
+            var dx = b.x - a.x;
+            var dy = b.y - a.y;
+            var dist = Math.hypot(dx, dy);
+            if (dist >= minGap) continue;
+            var push = (minGap - dist) / 2 + 0.35;
+            var ux;
+            var uy;
+            if (dist < 0.2) {
+              var ang = (i + 1) * 1.35 + j;
+              ux = Math.cos(ang);
+              uy = Math.sin(ang);
+            } else {
+              ux = dx / dist;
+              uy = dy / dist;
+            }
+            a.x -= ux * push;
+            a.y -= uy * push;
+            b.x += ux * push;
+            b.y += uy * push;
+          }
+        }
+        if (!spring) return;
+        pts.forEach(function (p) {
+          p.x += (p.hx - p.x) * 0.08;
+          p.y += (p.hy - p.y) * 0.08;
+        });
+      }
+      var n;
+      for (n = 0; n < 40; n++) relax(true);
+      for (n = 0; n < 30; n++) relax(false);
+      var unit = view.w / rect.width;
+      pts.forEach(function (p) {
+        var gx = Number(p.pin.getAttribute("data-x"));
+        var gy = Number(p.pin.getAttribute("data-y"));
+        var dx = (p.x - p.hx) * unit;
+        var dy = (p.y - p.hy) * unit;
+        p.pin.setAttribute("transform", "translate(" + (gx + dx).toFixed(2) + " " + (gy + dy).toFixed(2) + ")");
+      });
+    }
+
+    function arcPath(x1, y1, x2, y2) {
+      var dx = x2 - x1;
+      var dy = y2 - y1;
+      var len = Math.hypot(dx, dy);
+      if (len < 12) return "";
+      var nx = -dy / len;
+      var ny = dx / len;
+      if (ny > 0) {
+        nx *= -1;
+        ny *= -1;
+      }
+      var bulge = Math.min(48, len * 0.16);
+      var cx = (x1 + x2) / 2 + nx * bulge;
+      var cy = (y1 + y2) / 2 + ny * bulge;
+      return "M" + x1.toFixed(1) + " " + y1.toFixed(1) + " Q" + cx.toFixed(1) + " " + cy.toFixed(1) + " " + x2.toFixed(1) + " " + y2.toFixed(1);
+    }
+
+    function syncArcs(mode) {
+      if (mode === arcMode) return;
+      arcMode = mode;
+      if (window.gsap) window.gsap.killTweensOf(".na-arc");
+      arcs.replaceChildren();
+      var origin = mode === "hub"
+        ? centroid
+        : { x: Number(ontarioPins[0] && document.querySelector('.na-pin[data-city="london"]') ? document.querySelector('.na-pin[data-city="london"]').getAttribute("data-x") : centroid.x), y: Number(document.querySelector('.na-pin[data-city="london"]') ? document.querySelector('.na-pin[data-city="london"]').getAttribute("data-y") : centroid.y) };
+      var london = document.querySelector('.na-pin[data-city="london"]');
+      if (mode !== "hub" && london) {
+        origin = { x: Number(london.getAttribute("data-x")), y: Number(london.getAttribute("data-y")) };
+      }
+      pins.forEach(function (pin) {
+        var id = pin.getAttribute("data-city");
+        if (mode === "hub" && ONTARIO[id]) return;
+        if (mode !== "hub" && id === "london") return;
+        var d = arcPath(origin.x, origin.y, Number(pin.getAttribute("data-x")), Number(pin.getAttribute("data-y")));
+        if (!d) return;
+        var path = svgEl("path", { class: "na-arc", d: d });
+        arcs.appendChild(path);
+        if (reduced || arcsPlayed) return;
+        var length = 0;
+        try { length = path.getTotalLength(); } catch (err) { length = 0; }
+        if (!length) return;
+        path.setAttribute("stroke-dasharray", String(length));
+        path.setAttribute("stroke-dashoffset", String(length));
+      });
+    }
+
+    function playArcs() {
+      if (arcsPlayed) return;
+      arcsPlayed = true;
+      var paths = arcs.querySelectorAll(".na-arc");
+      if (reduced || !window.gsap) {
+        paths.forEach(function (path) {
+          path.removeAttribute("stroke-dasharray");
+          path.removeAttribute("stroke-dashoffset");
+        });
+        return;
+      }
+      paths.forEach(function (path, index) {
+        var length = 0;
+        try { length = path.getTotalLength(); } catch (err) { length = 0; }
+        if (!length) return;
+        path.setAttribute("stroke-dasharray", String(length));
+        path.setAttribute("stroke-dashoffset", String(length));
+        window.gsap.fromTo(path, { strokeDashoffset: length }, {
+          strokeDashoffset: 0,
+          duration: 1.05,
+          delay: 0.05 + index * 0.06,
+          ease: "power2.out",
+          onComplete: function () {
+            path.removeAttribute("stroke-dasharray");
+            path.removeAttribute("stroke-dashoffset");
+          }
+        });
+      });
+    }
+
+    function hidePin(pin, hide) {
+      pin.classList.toggle("is-hidden", hide);
+      pin.setAttribute("aria-hidden", hide ? "true" : "false");
+      pin.setAttribute("tabindex", hide ? "-1" : "0");
+      if (pin._label) {
+        pin._label.hidden = hide;
+        pin._label.tabIndex = hide ? -1 : 0;
+      }
+    }
+
+    function applyCluster() {
+      var gap = ontarioGap();
+      var collapse = !exploded && gap < 26;
+      clustered = collapse;
+      mapStage.dataset.clustered = collapse ? "1" : "0";
+      pins.forEach(function (pin) {
+        var id = pin.getAttribute("data-city");
+        hidePin(pin, collapse && !!ONTARIO[id]);
+        if (!(exploded && ONTARIO[id] && gap < 26)) placeAtGeo(pin);
+      });
+      if (exploded && gap < 26) separateOntario();
+      hidePin(cluster, !collapse);
+      if (collapse) {
+        cluster.setAttribute("transform", "translate(" + centroid.x.toFixed(2) + " " + centroid.y.toFixed(2) + ")");
+      }
+      syncArcs(collapse ? "hub" : "cities");
     }
 
     function syncDots() {
       var rect = svg.getBoundingClientRect();
       if (!rect.width) return;
       var unit = view.w / rect.width;
-      pins.forEach(function (pin) {
-        var founding = pin.classList.contains("pin--founding");
-        var r = (founding ? 6.4 : 5) * unit;
+      pins.concat([cluster]).forEach(function (pin) {
+        if (pin.classList.contains("is-hidden")) return;
         var dot = pin.querySelector(".pin__dot");
         var pulse = pin.querySelector(".pin__pulse");
         var hit = pin.querySelector(".pin__hit");
-        if (dot) dot.setAttribute("r", r.toFixed(3));
-        if (pulse) pulse.setAttribute("r", r.toFixed(3));
+        var screenR = pin.classList.contains("pin--cluster") ? 7 : (pin.classList.contains("pin--founding") ? 6 : 4.5);
+        if (dot) dot.setAttribute("r", (screenR * unit).toFixed(3));
+        if (pulse) pulse.setAttribute("r", (screenR * unit).toFixed(3));
         if (hit) {
+          var hitPx = pin.classList.contains("pin--cluster") ? 22 : 14;
           var nearest = nearestPx(pin);
-          var hitPx = nearest > 0 ? Math.max(8, Math.min(22, nearest * 0.42)) : 16;
+          if (!pin.classList.contains("pin--cluster") && nearest > 0) {
+            hitPx = Math.max(8, Math.min(14, nearest * 0.38));
+          }
           hit.setAttribute("r", (hitPx * unit).toFixed(3));
         }
       });
@@ -295,79 +539,136 @@ document.addEventListener("DOMContentLoaded", function () {
       var ax = a.left + a.width / 2;
       var ay = a.top + a.height / 2;
       var best = Infinity;
-      pins.forEach(function (other) {
-        if (other === pin) return;
+      pins.concat([cluster]).forEach(function (other) {
+        if (other === pin || other.classList.contains("is-hidden")) return;
         var b = other.querySelector(".pin__dot");
         if (!b) return;
         var r = b.getBoundingClientRect();
         var d = Math.hypot(r.left + r.width / 2 - ax, r.top + r.height / 2 - ay);
-        if (d < best) best = d;
+        if (d > 0 && d < best) best = d;
       });
       return best === Infinity ? 0 : best;
     }
 
-    function measure(name) {
-      if (!measure.ctx) measure.ctx = document.createElement("canvas").getContext("2d");
-      measure.ctx.font = "700 12px Inter, system-ui, sans-serif";
-      return Math.ceil(measure.ctx.measureText(name).width) + 8;
+    function controlBox() {
+      var controls = mapStage.querySelector(".map-controls");
+      if (!controls || !viewport) return null;
+      var vp = viewport.getBoundingClientRect();
+      var c = controls.getBoundingClientRect();
+      if (!c.width) return null;
+      return {
+        x: c.left - vp.left - 6,
+        y: c.top - vp.top - 6,
+        w: c.width + 12,
+        h: c.height + 12
+      };
+    }
+
+    function placeControls() {
+      var controls = mapStage.querySelector(".map-controls");
+      if (!controls || !viewport) return;
+      var vp = viewport.getBoundingClientRect();
+      var w = controls.offsetWidth || 148;
+      var h = controls.offsetHeight || 44;
+      var dots = [];
+      svg.querySelectorAll(".pin__dot").forEach(function (dot) {
+        var pin = dot.parentNode;
+        if (!pin || pin.classList.contains("is-hidden")) return;
+        var r = dot.getBoundingClientRect();
+        if (!r.width) return;
+        dots.push(r);
+      });
+      var spots = [
+        { top: "10px", left: "10px", right: "auto", bottom: "auto" },
+        { top: "10px", left: "auto", right: "10px", bottom: "auto" },
+        { top: "auto", left: "10px", right: "auto", bottom: "10px" },
+        { top: "auto", left: "auto", right: "10px", bottom: "10px" }
+      ];
+      function hits(spot) {
+        var x = spot.left !== "auto" ? 10 : vp.width - w - 10;
+        var y = spot.top !== "auto" ? 10 : vp.height - h - 10;
+        var l = vp.left + x - 8;
+        var t = vp.top + y - 8;
+        var r = l + w + 16;
+        var b = t + h + 16;
+        return dots.some(function (d) {
+          return d.left < r && d.right > l && d.top < b && d.bottom > t;
+        });
+      }
+      var spot = spots[0];
+      for (var i = 0; i < spots.length; i++) {
+        if (!hits(spots[i])) {
+          spot = spots[i];
+          break;
+        }
+      }
+      controls.style.top = spot.top;
+      controls.style.left = spot.left;
+      controls.style.right = spot.right;
+      controls.style.bottom = spot.bottom;
     }
 
     function layoutLabels() {
       if (!labelLayer || !viewport) return;
       var vp = viewport.getBoundingClientRect();
       if (!vp.width || !vp.height) return;
-      var items = [];
-      pins.forEach(function (pin) {
-        var id = pin.getAttribute("data-city");
-        var name = pin.getAttribute("data-name") || "";
-        var dot = pin.querySelector(".pin__dot");
-        var r = dot.getBoundingClientRect();
-        var w = measure(name);
-        var h = 16;
-        var cx = r.left + r.width / 2 - vp.left;
-        var cy = r.top + r.height / 2 - vp.top;
-        var inside = cx >= -6 && cy >= -6 && cx <= vp.width + 6 && cy <= vp.height + 6;
-        var line = pin.querySelector(".pin__leader");
-        if (!inside) {
+      var shown = [];
+      pins.concat([cluster]).forEach(function (pin) {
+        if (pin.classList.contains("is-hidden")) {
           if (pin._label) pin._label.hidden = true;
-          if (line) {
-            line.setAttribute("x2", "0");
-            line.setAttribute("y2", "0");
+          var hiddenLine = pin.querySelector(".pin__leader");
+          if (hiddenLine) {
+            hiddenLine.setAttribute("x2", "0");
+            hiddenLine.setAttribute("y2", "0");
           }
           return;
         }
-        if (pin._label) pin._label.hidden = false;
-        items.push({
-          id: id,
-          pin: pin,
-          w: w,
-          h: h,
-          cx: cx,
-          cy: cy,
-          x: cx - w / 2,
-          y: cy - h - 10
-        });
+        shown.push(pin);
       });
-      var edge = 2;
-      for (var n = 0; n < 100; n++) {
+      var items = [];
+      shown.forEach(function (pin) {
+        var id = pin.getAttribute("data-city") || "";
+        var el = pin._label;
+        var dot = pin.querySelector(".pin__dot");
+        if (!el || !dot) return;
+        el.hidden = false;
+        var w = Math.max(24, el.offsetWidth);
+        var h = Math.max(16, el.offsetHeight);
+        var r = dot.getBoundingClientRect();
+        var cx = r.left + r.width / 2 - vp.left;
+        var cy = r.top + r.height / 2 - vp.top;
+        var inside = cx >= -8 && cy >= -8 && cx <= vp.width + 8 && cy <= vp.height + 8;
+        if (!inside) {
+          el.hidden = true;
+          return;
+        }
+        var pref = bias[id] || [0, -1];
+        var lx = cx + pref[0] * (w * 0.5 + 12);
+        var ly = cy + pref[1] * (h * 0.5 + 14);
+        items.push({ id: id, pin: pin, el: el, w: w, h: h, cx: cx, cy: cy, x: lx - w / 2, y: ly - h / 2 });
+      });
+      var controls = controlBox();
+      var edge = 4;
+      var guard;
+      for (guard = 0; guard < 80; guard++) {
         var moved = false;
+        var a;
+        var b;
         for (var i = 0; i < items.length; i++) {
           for (var j = i + 1; j < items.length; j++) {
-            var a = items[i];
-            var b = items[j];
-            var overlapX = Math.min(a.x + a.w + 4 - b.x, b.x + b.w + 4 - a.x);
-            var overlapY = Math.min(a.y + a.h + 4 - b.y, b.y + b.h + 4 - a.y);
+            a = items[i];
+            b = items[j];
+            var overlapX = Math.min(a.x + a.w + 6, b.x + b.w + 6) - Math.max(a.x, b.x);
+            var overlapY = Math.min(a.y + a.h + 6, b.y + b.h + 6) - Math.max(a.y, b.y);
             if (overlapX <= 0 || overlapY <= 0) continue;
-            var ba = bias[a.id] || [0, -1];
-            var bb = bias[b.id] || [0, -1];
             if (overlapX < overlapY) {
-              var dir = (a.cx + ba[0] * 8) <= (b.cx + bb[0] * 8) ? -1 : 1;
-              var push = overlapX / 2 + 0.6;
+              var dir = a.cx <= b.cx ? -1 : 1;
+              var push = overlapX / 2 + 0.5;
               a.x += dir * push;
               b.x -= dir * push;
             } else {
-              var vdir = (a.cy + ba[1] * 8) <= (b.cy + bb[1] * 8) ? -1 : 1;
-              var vpush = overlapY / 2 + 0.6;
+              var vdir = a.cy <= b.cy ? -1 : 1;
+              var vpush = overlapY / 2 + 0.5;
               a.y += vdir * vpush;
               b.y -= vdir * vpush;
             }
@@ -375,20 +676,36 @@ document.addEventListener("DOMContentLoaded", function () {
           }
         }
         items.forEach(function (it) {
+          var left = it.x;
+          var top = it.y;
+          var rad = 12;
+          var hitX = Math.min(it.x + it.w, it.cx + rad) - Math.max(it.x, it.cx - rad);
+          var hitY = Math.min(it.y + it.h, it.cy + rad) - Math.max(it.y, it.cy - rad);
+          if (hitX > 0 && hitY > 0) {
+            if (hitX < hitY) it.x += it.cx < it.x + it.w / 2 ? hitX + 2 : -(hitX + 2);
+            else it.y += it.cy < it.y + it.h / 2 ? hitY + 2 : -(hitY + 2);
+            moved = true;
+          }
+          if (controls) {
+            var cx0 = Math.min(it.x + it.w, controls.x + controls.w) - Math.max(it.x, controls.x);
+            var cy0 = Math.min(it.y + it.h, controls.y + controls.h) - Math.max(it.y, controls.y);
+            if (cx0 > 0 && cy0 > 0) {
+              it.y = controls.y > vp.height / 2 ? controls.y - it.h - 6 : controls.y + controls.h + 6;
+              moved = true;
+            }
+          }
           if (it.x < edge) it.x = edge;
           if (it.y < edge) it.y = edge;
           if (it.x + it.w > vp.width - edge) it.x = Math.max(edge, vp.width - edge - it.w);
           if (it.y + it.h > vp.height - edge) it.y = Math.max(edge, vp.height - edge - it.h);
+          if (it.x !== left || it.y !== top) moved = true;
         });
         if (!moved) break;
       }
       var ctm = svg.getScreenCTM();
       items.forEach(function (it) {
-        var el = it.pin._label;
-        if (el) {
-          el.style.left = (it.x + it.w / 2) + "px";
-          el.style.top = (it.y + it.h / 2) + "px";
-        }
+        it.el.style.left = (it.x + it.w / 2) + "px";
+        it.el.style.top = (it.y + it.h / 2) + "px";
         var line = it.pin.querySelector(".pin__leader");
         if (!line || !ctm) return;
         var lx = it.x + it.w / 2;
@@ -396,16 +713,14 @@ document.addEventListener("DOMContentLoaded", function () {
         var dx = lx - it.cx;
         var dy = ly - it.cy;
         var dist = Math.hypot(dx, dy);
-        if (dist < 18) {
+        if (dist < 16) {
           line.setAttribute("x2", "0");
           line.setAttribute("y2", "0");
           return;
         }
-        var halfW = it.w / 2;
-        var halfH = it.h / 2;
-        var sx = Math.abs(dx) > 0.01 ? halfW / Math.abs(dx) : 1;
-        var sy = Math.abs(dy) > 0.01 ? halfH / Math.abs(dy) : 1;
-        var scale = Math.min(sx, sy, 0.92);
+        var sxScale = Math.abs(dx) > 0.01 ? (it.w / 2) / Math.abs(dx) : 1;
+        var syScale = Math.abs(dy) > 0.01 ? (it.h / 2) / Math.abs(dy) : 1;
+        var scale = Math.min(sxScale, syScale, 0.92);
         var endX = vp.left + lx - dx * scale;
         var endY = vp.top + ly - dy * scale;
         var pt = svg.createSVGPoint();
@@ -424,18 +739,35 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     function clampBox(box) {
-      var minW = homeBox.w / maxZoom;
-      var w = Math.max(minW, Math.min(homeBox.w, box.w));
-      var h = w * (homeBox.h / homeBox.w);
+      var w = Math.max(minW, Math.min(outer.w, box.w));
+      var h = w / aspect;
       var x = box.x + (box.w - w) / 2;
       var y = box.y + (box.h - h) / 2;
-      var slackX = w * 0.28;
-      var slackY = h * 0.28;
-      if (x < homeBox.x - slackX) x = homeBox.x - slackX;
-      if (y < homeBox.y - slackY) y = homeBox.y - slackY;
-      if (x + w > homeBox.x + homeBox.w + slackX) x = homeBox.x + homeBox.w + slackX - w;
-      if (y + h > homeBox.y + homeBox.h + slackY) y = homeBox.y + homeBox.h + slackY - h;
+      if (x < outer.x) x = outer.x;
+      if (y < outer.y) y = outer.y;
+      if (x + w > outer.x + outer.w) x = outer.x + outer.w - w;
+      if (y + h > outer.y + outer.h) y = outer.y + outer.h - h;
       return { x: x, y: y, w: w, h: h };
+    }
+
+    function applyBox(box) {
+      view.x = box.x;
+      view.y = box.y;
+      view.w = box.w;
+      view.h = box.h;
+      svg.setAttribute(
+        "viewBox",
+        view.x.toFixed(2) + " " + view.y.toFixed(2) + " " + view.w.toFixed(2) + " " + view.h.toFixed(2)
+      );
+      applyCluster();
+      syncDots();
+      placeControls();
+      layoutLabels();
+      if (window.positionChapterCard) window.positionChapterCard();
+      var zoomIn = mapStage.querySelector('[data-map="in"]');
+      var zoomOut = mapStage.querySelector('[data-map="out"]');
+      if (zoomIn) zoomIn.disabled = view.w <= minW + 0.6;
+      if (zoomOut) zoomOut.disabled = view.w >= outer.w - 0.8;
     }
 
     function animateTo(box) {
@@ -457,16 +789,67 @@ document.addEventListener("DOMContentLoaded", function () {
       });
     }
 
+    function keepMapInView() {
+      var header = document.getElementById("site-header");
+      var top = (header ? header.getBoundingClientRect().height : 0) + 12;
+      var rect = mapStage.getBoundingClientRect();
+      if (rect.top < top) {
+        window.scrollBy({ top: rect.top - top, behavior: reduced ? "auto" : "smooth" });
+      }
+    }
+
+    function ontarioFrame() {
+      var minX = Infinity;
+      var maxX = -Infinity;
+      var minY = Infinity;
+      var maxY = -Infinity;
+      ontarioPins.forEach(function (pin) {
+        var x = Number(pin.getAttribute("data-x"));
+        var y = Number(pin.getAttribute("data-y"));
+        if (x < minX) minX = x;
+        if (x > maxX) maxX = x;
+        if (y < minY) minY = y;
+        if (y > maxY) maxY = y;
+      });
+      var cx = (minX + maxX) / 2;
+      var cy = (minY + maxY) / 2;
+      var w = Math.max(150, (maxX - minX) + 108, ((maxY - minY) + 78) * aspect);
+      var h = w / aspect;
+      return { x: cx - w / 2, y: cy - h / 2, w: w, h: h };
+    }
+
+    function focusOntario() {
+      exploded = true;
+      animateTo(ontarioFrame());
+      keepMapInView();
+    }
+
     function framePin(pin) {
+      if (!pin) return;
+      var id = pin.getAttribute("data-city") || "";
+      if (id === "ontario" || ONTARIO[id]) {
+        focusOntario();
+        return;
+      }
+      exploded = false;
       var cx = Number(pin.getAttribute("data-x"));
       var cy = Number(pin.getAttribute("data-y"));
-      var boxW = homeBox.w / 4.4;
-      var boxH = boxW * homeBox.h / homeBox.w;
-      animateTo({ x: cx - boxW / 2, y: cy - boxH / 2, w: boxW, h: boxH });
+      var boxW = Math.min(outer.w * 0.46, 240);
+      var boxH = boxW / aspect;
+      animateTo({ x: cx - boxW / 2, y: cy - boxH * 0.46, w: boxW, h: boxH });
+      keepMapInView();
     }
 
     function home() {
-      animateTo({ x: homeBox.x, y: homeBox.y, w: homeBox.w, h: homeBox.h });
+      exploded = false;
+      animateTo(belt);
+      keepMapInView();
+    }
+
+    function showContinent() {
+      exploded = false;
+      animateTo({ x: outer.x, y: outer.y, w: outer.w, h: outer.h });
+      keepMapInView();
     }
 
     function resetView() {
@@ -474,19 +857,9 @@ document.addEventListener("DOMContentLoaded", function () {
       document.dispatchEvent(new CustomEvent("devnet:mapreset"));
     }
 
-    applyBox(homeBox);
-    window.requestAnimationFrame(function () { applyBox(view); });
-
-    mapStage.querySelectorAll("[data-map]").forEach(function (button) {
-      button.addEventListener("click", function () {
-        var action = button.getAttribute("data-map");
-        if (action === "in") zoomBy(1.6);
-        else if (action === "out") zoomBy(1 / 1.6);
-        else if (action === "reset") resetView();
-      });
-    });
-
-    function zoomBy(factor, clientX, clientY) {
+    function zoomBy(factor, clientX, clientY, immediate) {
+      if (factor > 1.01) exploded = true;
+      else if (factor < 0.99) exploded = false;
       var rect = viewport.getBoundingClientRect();
       var px = clientX == null ? rect.left + rect.width / 2 : clientX;
       var py = clientY == null ? rect.top + rect.height / 2 : clientY;
@@ -498,25 +871,72 @@ document.addEventListener("DOMContentLoaded", function () {
       var focus = pt.matrixTransform(ctm.inverse());
       var w = view.w / factor;
       var h = view.h / factor;
-      animateTo({
+      var next = {
         x: focus.x - ((px - rect.left) / rect.width) * w,
         y: focus.y - ((py - rect.top) / rect.height) * h,
         w: w,
         h: h
-      });
+      };
+      if (immediate) applyBox(clampBox(next));
+      else animateTo(next);
     }
 
-    var drag = null;
-    viewport.addEventListener("pointerdown", function (event) {
-      if (event.pointerType === "touch") return;
-      if (event.button !== 0) return;
-      if (event.target.closest(".na-pin, .map-label, .map-controls")) return;
-      drag = { id: event.pointerId, x: event.clientX, y: event.clientY };
-      if (tween && window.gsap) tween.kill();
-      viewport.classList.add("is-drag");
-      viewport.setPointerCapture(event.pointerId);
+    applyBox(belt);
+    window.requestAnimationFrame(function () { applyBox(view); });
+
+    mapStage.querySelectorAll("[data-map]").forEach(function (button) {
+      button.addEventListener("click", function () {
+        var action = button.getAttribute("data-map");
+        if (action === "in") {
+          zoomBy(1.55);
+          keepMapInView();
+        } else if (action === "out") {
+          zoomBy(1 / 1.55);
+          keepMapInView();
+        } else if (action === "reset") resetView();
+      });
     });
+
+    function pointerDistance() {
+      var ids = Object.keys(pointers);
+      if (ids.length < 2) return 0;
+      var a = pointers[ids[0]];
+      var b = pointers[ids[1]];
+      return Math.hypot(a.x - b.x, a.y - b.y) || 1;
+    }
+
+    viewport.addEventListener("pointerdown", function (event) {
+      if (event.pointerType === "mouse" && event.button !== 0) return;
+      if (event.target.closest(".pin, .map-label, .map-controls")) return;
+      pointers[event.pointerId] = { x: event.clientX, y: event.clientY };
+      var count = Object.keys(pointers).length;
+      if (tween && window.gsap) tween.kill();
+      if (count === 1) {
+        drag = { id: event.pointerId, x: event.clientX, y: event.clientY };
+        viewport.classList.add("is-drag");
+      } else {
+        drag = null;
+        viewport.classList.remove("is-drag");
+        pinchDist = pointerDistance();
+      }
+      try { viewport.setPointerCapture(event.pointerId); } catch (err) { /* already captured */ }
+    });
+
     viewport.addEventListener("pointermove", function (event) {
+      if (!pointers[event.pointerId]) return;
+      pointers[event.pointerId] = { x: event.clientX, y: event.clientY };
+      var ids = Object.keys(pointers);
+      if (ids.length >= 2) {
+        var dist = pointerDistance();
+        var factor = dist / (pinchDist || dist);
+        pinchDist = dist;
+        if (Math.abs(factor - 1) > 0.008) {
+          var a = pointers[ids[0]];
+          var b = pointers[ids[1]];
+          zoomBy(factor, (a.x + b.x) / 2, (a.y + b.y) / 2, true);
+        }
+        return;
+      }
       if (!drag || event.pointerId !== drag.id) return;
       var rect = viewport.getBoundingClientRect();
       var dx = ((event.clientX - drag.x) / rect.width) * view.w;
@@ -525,38 +945,26 @@ document.addEventListener("DOMContentLoaded", function () {
       drag.y = event.clientY;
       applyBox(clampBox({ x: view.x - dx, y: view.y - dy, w: view.w, h: view.h }));
     });
-    function endDrag(event) {
-      if (!drag || event.pointerId !== drag.id) return;
-      drag = null;
-      viewport.classList.remove("is-drag");
+
+    function endPointer(event) {
+      delete pointers[event.pointerId];
+      if (drag && event.pointerId === drag.id) {
+        drag = null;
+        viewport.classList.remove("is-drag");
+      }
+      if (Object.keys(pointers).length < 2) pinchDist = 0;
     }
-    viewport.addEventListener("pointerup", endDrag);
-    viewport.addEventListener("pointercancel", endDrag);
+    viewport.addEventListener("pointerup", endPointer);
+    viewport.addEventListener("pointercancel", endPointer);
 
     viewport.addEventListener("wheel", function (event) {
-      var pinch = event.ctrlKey;
-      var coarse = event.deltaMode !== 0 || Math.abs(event.deltaY) >= 40;
-      if (!pinch && !coarse) return;
       event.preventDefault();
       if (tween && window.gsap) tween.kill();
-      var rect = viewport.getBoundingClientRect();
-      var ctm = svg.getScreenCTM();
-      if (!ctm) return;
       var delta = event.deltaY;
       if (event.deltaMode === 1) delta *= 16;
-      var factor = Math.exp(-delta * (pinch ? 0.01 : 0.0016));
-      var pt = svg.createSVGPoint();
-      pt.x = event.clientX;
-      pt.y = event.clientY;
-      var focus = pt.matrixTransform(ctm.inverse());
-      var w = view.w / factor;
-      var h = view.h / factor;
-      applyBox(clampBox({
-        x: focus.x - ((event.clientX - rect.left) / rect.width) * w,
-        y: focus.y - ((event.clientY - rect.top) / rect.height) * h,
-        w: w,
-        h: h
-      }));
+      if (event.deltaMode === 2) delta *= viewport.clientHeight;
+      var factor = Math.exp(-delta * (event.ctrlKey ? 0.01 : 0.0016));
+      zoomBy(factor, event.clientX, event.clientY, true);
     }, { passive: false });
 
     mapStage.addEventListener("keydown", function (event) {
@@ -583,24 +991,32 @@ document.addEventListener("DOMContentLoaded", function () {
       }
     });
 
-    pins.forEach(function (pin) {
-      pin.addEventListener("keydown", function (event) {
-        if (event.key !== "Enter" && event.key !== " ") return;
-        event.preventDefault();
-        pin.click();
-      });
+    window.addEventListener("resize", function () {
+      applyBox(view);
     });
 
-    window.addEventListener("resize", function () {
-      syncDots();
-      layoutLabels();
-    });
-    if (document.fonts && document.fonts.ready) {
-      document.fonts.ready.then(function () { layoutLabels(); });
+    if ("IntersectionObserver" in window) {
+      var arcObserver = new IntersectionObserver(function (entries) {
+        if (!entries.some(function (entry) { return entry.isIntersecting; })) return;
+        arcObserver.disconnect();
+        playArcs();
+      }, { threshold: 0.28 });
+      arcObserver.observe(mapStage);
+    } else {
+      playArcs();
     }
 
-    return { framePin: framePin, resetView: resetView, home: home, layoutLabels: layoutLabels };
+    return {
+      framePin: framePin,
+      resetView: resetView,
+      home: home,
+      showContinent: showContinent,
+      focusOntario: focusOntario,
+      layoutLabels: layoutLabels,
+      clustered: function () { return clustered; }
+    };
   }
+
 
   function setupMap(mapStage, reduced) {
     var geo = mapStage ? mapStage.querySelector(".na-map") : null;
@@ -1012,25 +1428,105 @@ document.addEventListener("DOMContentLoaded", function () {
 
   var mapApi = setupMap(stage, reduce);
   var lockedCity = "";
+  var regionLock = "";
+
+  function countryOf(id) {
+    if (!id) return "";
+    if (id === "ontario") return "Canada";
+    var pin = document.querySelector('.map-stage .pin[data-city="' + id + '"]');
+    return pin ? (pin.getAttribute("data-country") || "") : "";
+  }
+
+  function applyRegion(country) {
+    document.querySelectorAll(".region-switch").forEach(function (button) {
+      var on = !!country && button.getAttribute("data-region") === country;
+      button.setAttribute("aria-pressed", on ? "true" : "false");
+    });
+  }
+
+  function anchorPin(pin) {
+    if (!pin) return null;
+    if (pin.classList.contains("is-hidden")) {
+      var hub = document.querySelector(".map-stage .pin--cluster");
+      if (hub && !hub.classList.contains("is-hidden")) return hub;
+    }
+    return pin;
+  }
+
+  function positionChapterCard() {
+    var card = document.querySelector(".chapter-card");
+    var viewport = document.querySelector(".map-viewport");
+    if (!card || !viewport || card.hidden) return;
+    var pin = card._pin ? anchorPin(card._pin) : null;
+    if (!pin) return;
+    var dot = pin.querySelector(".pin__dot") || pin;
+    var vp = viewport.getBoundingClientRect();
+    var r = dot.getBoundingClientRect();
+    var cardW = card.offsetWidth || 148;
+    var cardH = card.offsetHeight || 58;
+    var cx = r.left + r.width / 2 - vp.left;
+    var cy = r.top + r.height / 2 - vp.top;
+    var x = cx + 18;
+    var y = cy - cardH - 14;
+    if (x + cardW > vp.width - 8) x = cx - cardW - 18;
+    if (x < 8) x = 8;
+    if (y < 8) y = cy + 18;
+    if (y + cardH > vp.height - 8) y = Math.max(8, vp.height - cardH - 8);
+    var controls = viewport.querySelector(".map-controls");
+    if (controls) {
+      var c = controls.getBoundingClientRect();
+      var cl = c.left - vp.left;
+      var ct = c.top - vp.top;
+      var overlap = x < cl + c.width + 8 && x + cardW > cl - 8 && y < ct + c.height + 8 && y + cardH > ct - 8;
+      if (overlap) y = ct > vp.height / 2 ? 8 : Math.max(8, vp.height - cardH - 8);
+    }
+    card.style.left = x + "px";
+    card.style.top = y + "px";
+  }
+  window.positionChapterCard = positionChapterCard;
+
+  function showCard(pin) {
+    var card = document.querySelector(".chapter-card");
+    var readout = document.querySelector("[data-map-readout]");
+    if (!card) return;
+    if (!pin) {
+      card.hidden = true;
+      card._pin = null;
+      if (readout) readout.textContent = "";
+      return;
+    }
+    var name = pin.getAttribute("data-name") || "";
+    var country = pin.getAttribute("data-country") || "";
+    var flagship = pin.classList.contains("pin--founding");
+    card.querySelector("[data-card-name]").textContent = name;
+    card.querySelector("[data-card-country]").textContent = country;
+    var flag = card.querySelector("[data-card-flag]");
+    if (flag) flag.hidden = !flagship;
+    card.hidden = false;
+    card._pin = pin;
+    if (readout) {
+      var bits = [name, country];
+      if (flagship) bits.push("Flagship");
+      readout.textContent = bits.filter(Boolean).join(", ");
+    }
+    positionChapterCard();
+  }
+
   function setCity(id) {
+    if (lockedCity && id && id !== lockedCity) return;
     var active = id || lockedCity;
     document.querySelectorAll("[data-city]").forEach(function (el) {
       var on = active !== "" && el.getAttribute("data-city") === active;
-      el.classList.toggle("is-hot", on);
+      var grouped = active === "ontario" && el.classList.contains("city-row") && ONTARIO[el.getAttribute("data-city")];
+      el.classList.toggle("is-hot", on || grouped);
       if (el.classList.contains("pin") || el.classList.contains("city-row") || el.classList.contains("map-label")) {
-        el.setAttribute("aria-pressed", lockedCity !== "" && el.getAttribute("data-city") === lockedCity ? "true" : "false");
+        var pressed = lockedCity !== "" && (el.getAttribute("data-city") === lockedCity || (lockedCity === "ontario" && el.classList.contains("city-row") && ONTARIO[el.getAttribute("data-city")]));
+        el.setAttribute("aria-pressed", pressed ? "true" : "false");
       }
     });
-    var readout = document.querySelector("[data-map-readout]");
-    if (readout) {
-      var pin = active ? document.querySelector('.map-stage .pin[data-city="' + active + '"]') : null;
-      readout.textContent = pin ? (pin.getAttribute("data-name") || "") : "";
-    }
-    var hotPin = active ? document.querySelector('.map-stage .pin[data-city="' + active + '"]') : null;
-    var hotPlace = hotPin ? hotPin.getAttribute("data-place") || "" : "";
-    document.querySelectorAll(".map-hub").forEach(function (hub) {
-      hub.classList.toggle("is-hot", hotPlace !== "" && hub.getAttribute("data-place") === hotPlace);
-    });
+    var pin = active ? document.querySelector('.map-stage .pin[data-city="' + active + '"]') : null;
+    applyRegion((active && countryOf(active)) || regionLock);
+    showCard(pin);
   }
 
   document.addEventListener("pointerover", function (event) {
@@ -1059,33 +1555,52 @@ document.addEventListener("DOMContentLoaded", function () {
   document.querySelectorAll(".chapter, .city-row, .map-stage .pin, .map-label").forEach(function (button) {
     button.addEventListener("click", function () {
       var id = button.getAttribute("data-city") || "";
+      if (!id) return;
       var pin = document.querySelector('.map-stage .pin[data-city="' + id + '"]');
-      var row = document.querySelector('.city-row[data-city="' + id + '"]');
       if (lockedCity === id) {
         lockedCity = "";
+        regionLock = "";
         setCity("");
         document.dispatchEvent(new CustomEvent("devnet:city", { detail: "" }));
         if (mapApi && mapApi.home) mapApi.home();
         return;
       }
       lockedCity = id;
+      regionLock = countryOf(id) || regionLock;
       setCity(lockedCity);
       document.dispatchEvent(new CustomEvent("devnet:city", { detail: lockedCity }));
-      if ((button.classList.contains("pin") || button.classList.contains("map-label")) && row) {
-        row.scrollIntoView({ block: "nearest", inline: "nearest", behavior: reduce ? "auto" : "smooth" });
-      }
       var boardNow = document.querySelector(".map-board");
       if (pin && mapApi && (!boardNow || boardNow.getAttribute("data-network") !== "globe")) mapApi.framePin(pin);
     });
   });
 
+  document.querySelectorAll(".region-switch").forEach(function (button) {
+    button.addEventListener("click", function () {
+      var region = button.getAttribute("data-region") || "";
+      if (regionLock === region && !lockedCity) {
+        regionLock = "";
+        setCity("");
+        if (mapApi && mapApi.home) mapApi.home();
+        return;
+      }
+      regionLock = region;
+      lockedCity = "";
+      setCity("");
+      if (!mapApi) return;
+      if (region === "United States") mapApi.showContinent();
+      else mapApi.home();
+    });
+  });
+
   document.addEventListener("devnet:spin", function () {
     lockedCity = "";
+    regionLock = "";
     setCity("");
   });
 
   document.addEventListener("devnet:mapreset", function () {
     lockedCity = "";
+    regionLock = "";
     setCity("");
   });
 
