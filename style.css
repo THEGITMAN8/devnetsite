@@ -5429,6 +5429,13 @@ main .block h2,
   min-width: 0;
 }
 
+.build-card__role {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 18px;
+}
+
 .build-card summary b {
   font-size: 22px;
   letter-spacing: -0.03em;
