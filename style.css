@@ -1,25 +1,33 @@
 @font-face {
-  font-family: Inter;
+  font-family: "General Sans";
   font-style: normal;
   font-weight: 400;
   font-display: swap;
-  src: url("/assets/fonts/inter-400.woff2") format("woff2");
+  src: url("/assets/fonts/general-sans-400.woff2") format("woff2");
 }
 
 @font-face {
-  font-family: Inter;
+  font-family: "General Sans";
   font-style: normal;
   font-weight: 500;
   font-display: swap;
-  src: url("/assets/fonts/inter-500.woff2") format("woff2");
+  src: url("/assets/fonts/general-sans-500.woff2") format("woff2");
 }
 
 @font-face {
-  font-family: Inter;
+  font-family: "General Sans";
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("/assets/fonts/general-sans-600.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "General Sans";
   font-style: normal;
   font-weight: 700;
   font-display: swap;
-  src: url("/assets/fonts/inter-700.woff2") format("woff2");
+  src: url("/assets/fonts/general-sans-700.woff2") format("woff2");
 }
 
 :root {
@@ -34,7 +42,7 @@
   --london: #f5d0fe;
   --max: 1120px;
   --header: 64px;
-  --font: Inter, system-ui, sans-serif;
+  --font: "General Sans", system-ui, sans-serif;
   color-scheme: dark;
 }
 
@@ -151,16 +159,16 @@ main:focus {
   color: var(--accent);
   font-size: 14px;
   font-weight: 500;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.01em;
   line-height: 20px;
-  text-transform: uppercase;
 }
 
 h1,
 h2,
 .tile__n,
 .stat-num {
-  letter-spacing: -0.02em;
+  letter-spacing: -0.03em;
+  line-height: 1.08;
 }
 
 .site-header {
@@ -841,9 +849,8 @@ section {
   color: var(--muted);
   font-size: 14px;
   font-weight: 500;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.01em;
   line-height: 20px;
-  text-transform: uppercase;
 }
 
 .channels {
@@ -1182,9 +1189,8 @@ section {
   color: var(--accent);
   font-size: 14px;
   font-weight: 500;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.01em;
   line-height: 20px;
-  text-transform: uppercase;
 }
 
 .block {
@@ -2584,7 +2590,6 @@ section {
   font-weight: 700;
   line-height: 16px;
   letter-spacing: 0.04em;
-  text-transform: uppercase;
 }
 
 .info-card .free-chip {
@@ -3165,7 +3170,6 @@ section {
   font-weight: 700;
   letter-spacing: 0.06em;
   line-height: 16px;
-  text-transform: uppercase;
 }
 .event__date {
   width: 56px;
@@ -3529,7 +3533,6 @@ section {
   font-weight: 700;
   letter-spacing: 0.08em;
   line-height: 16px;
-  text-transform: uppercase;
   white-space: nowrap;
 }
 
@@ -4157,7 +4160,6 @@ button.map-cluster.map-label.map-cluster--live { background: var(--london); }
   font-weight: 700;
   letter-spacing: 0.08em;
   line-height: 16px;
-  text-transform: uppercase;
 }
 
 .date-block b {
@@ -4402,7 +4404,6 @@ button.map-cluster.map-label.map-cluster--live { background: var(--london); }
   font-weight: 700;
   letter-spacing: 0.08em;
   line-height: 16px;
-  text-transform: uppercase;
 }
 
 .map-board .directory {
@@ -4635,7 +4636,8 @@ button.map-cluster.map-label.map-cluster--live { background: var(--london); }
 
   .hero h1 {
     font-size: 80px;
-    line-height: 80px;
+    line-height: 86px;
+    letter-spacing: -0.04em;
   }
 }
 
@@ -4690,7 +4692,6 @@ main .block h2,
   font-weight: 700;
   letter-spacing: 0.04em;
   line-height: 18px;
-  text-transform: uppercase;
 }
 
 .cal__name {
@@ -5060,7 +5061,6 @@ main .block h2,
   letter-spacing: 0.08em;
   line-height: 16px;
   text-align: left;
-  text-transform: uppercase;
   cursor: pointer;
 }
 
@@ -5473,12 +5473,12 @@ main .block h2,
   transition: none;
 }
 
-#about .timeline-board {
+.timeline-board {
   position: relative;
   margin-top: 28px;
 }
 
-#about .timeline-spine {
+.timeline-spine {
   position: absolute;
   z-index: 0;
   top: 6px;
@@ -5490,7 +5490,7 @@ main .block h2,
   pointer-events: none;
 }
 
-#about .milestones__era {
+.milestones__era {
   position: relative;
   z-index: 1;
   width: max-content;
@@ -5499,11 +5499,11 @@ main .block h2,
   color: var(--accent);
   font-size: 12px;
   font-weight: 700;
-  letter-spacing: 0.16em;
+  letter-spacing: 0.02em;
   line-height: 16px;
 }
 
-#about .milestones {
+.milestones {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   gap: 0;
@@ -5512,11 +5512,11 @@ main .block h2,
   padding: 0;
 }
 
-#about .milestones::before {
+.milestones::before {
   content: none;
 }
 
-#about .milestones > li {
+.milestones > li {
   position: relative;
   display: block;
   margin: 0;
@@ -5525,13 +5525,13 @@ main .block h2,
   background: transparent;
 }
 
-#about .milestones > li::before,
-#about .milestones > li::after {
+.milestones > li::before,
+.milestones > li::after {
   content: none;
   display: none;
 }
 
-#about .milestone__node {
+.milestone__node {
   position: absolute;
   z-index: 1;
   left: 4px;
@@ -5544,24 +5544,56 @@ main .block h2,
   box-sizing: border-box;
 }
 
-#about .milestone {
+
+.milestone__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  min-height: 22px;
+  padding: 0 8px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0;
+  line-height: 16px;
+}
+
+.tag--devnet {
+  border: 1px solid rgba(205, 184, 242, 0.5);
+  color: var(--accent);
+  background: transparent;
+}
+
+.tag--western {
+  border: 1px solid transparent;
+  background: #f5d0fe;
+  color: #2a1038;
+}
+
+.milestone {
   display: grid;
   gap: 4px;
   min-width: 0;
   max-width: 36rem;
 }
 
-#about .milestone time {
+.milestone time {
   display: block;
   margin: 0;
   color: var(--accent);
   font-size: 13px;
   font-weight: 700;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.01em;
   line-height: 18px;
 }
 
-#about .milestone > span {
+.milestone > span {
   display: block;
   color: var(--ink);
   font-size: 18px;
@@ -5570,7 +5602,7 @@ main .block h2,
   overflow-wrap: break-word;
 }
 
-#about .milestones > li.is-now .milestone__node {
+.milestones > li.is-now .milestone__node {
   left: 2px;
   top: 20px;
   width: 18px;
@@ -5580,7 +5612,7 @@ main .block h2,
   box-shadow: 0 0 0 5px rgba(138, 92, 240, 0.28);
 }
 
-#about .milestones > li.is-now .milestone {
+.milestones > li.is-now .milestone {
   max-width: none;
   padding: 16px 16px 18px;
   border: 1px solid rgba(168, 140, 230, 0.78);
@@ -5590,13 +5622,13 @@ main .block h2,
     var(--card);
 }
 
-#about .milestones > li.is-now time {
+.milestones > li.is-now time {
   color: var(--london);
   font-size: 14px;
   letter-spacing: 0.08em;
 }
 
-#about .milestones > li.is-now .milestone > span {
+.milestones > li.is-now .milestone > span {
   font-size: 22px;
   font-weight: 700;
   letter-spacing: -0.03em;
@@ -5604,22 +5636,22 @@ main .block h2,
 }
 
 @media (min-width: 800px) {
-  #about .timeline-spine {
+  .timeline-spine {
     left: 50%;
     width: 2px;
     transform: translateX(-50%);
   }
 
-  #about .milestones__era {
+  .milestones__era {
     margin: 8px auto 16px;
     padding: 4px 12px;
     border: 1px solid rgba(205, 184, 242, 0.28);
     border-radius: 999px;
     background: var(--raised);
-    letter-spacing: 0.18em;
+    letter-spacing: 0.02em;
   }
 
-  #about .milestones > li {
+  .milestones > li {
     display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     column-gap: 56px;
@@ -5627,40 +5659,44 @@ main .block h2,
     padding: 8px 0 28px;
   }
 
-  #about .milestone__node {
+  .milestone__node {
     left: 50%;
     top: 4px;
     margin-left: -7px;
   }
 
-  #about .milestones > li.is-start .milestone {
+  .milestones > li.is-start .milestone {
     grid-column: 1;
     justify-self: end;
     text-align: right;
   }
 
-  #about .milestones > li:not(.is-start) .milestone {
+  .milestones > li.is-start .milestone__meta {
+    justify-content: flex-end;
+  }
+
+  .milestones > li:not(.is-start) .milestone {
     grid-column: 2;
     justify-self: start;
     text-align: left;
   }
 
-  #about .milestone {
+  .milestone {
     max-width: 440px;
   }
 
-  #about .milestones > li.is-now .milestone__node {
+  .milestones > li.is-now .milestone__node {
     left: 50%;
     top: 22px;
     margin-left: -9px;
   }
 
-  #about .milestones > li.is-now .milestone {
+  .milestones > li.is-now .milestone {
     max-width: 480px;
     padding: 18px 20px 20px;
   }
 
-  #about .milestones > li.is-now .milestone > span {
+  .milestones > li.is-now .milestone > span {
     font-size: 26px;
     line-height: 32px;
   }

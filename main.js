@@ -702,6 +702,9 @@ document.addEventListener("DOMContentLoaded", function () {
             return da - db;
           });
         }
+        if (it.id === "toronto") {
+          order = [[-1, -1], [-1, 0], [0, -1]].concat(order);
+        }
         var d;
         for (d = 0; d < order.length; d++) {
           var box = candidate(it, order[d]);
