@@ -111,7 +111,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-  var sectionIds = ["network", "western", "events", "recap", "western-socials", "about", "landed", "cursor", "builds", "faq"];
+  var sectionIds = ["network", "western", "landed", "about", "events", "recap", "cursor", "builds", "faq", "socials"];
   var sections = sectionIds
     .map(function (id) {
       return document.getElementById(id);
@@ -288,7 +288,7 @@ document.addEventListener("DOMContentLoaded", function () {
       "data-country": "Canada",
       role: "button",
       tabindex: "0",
-      "aria-label": "Ontario, 5 chapters",
+      "aria-label": "Ontario, 5 cities",
       "aria-pressed": "false"
     });
     cluster.appendChild(svgEl("circle", { class: "pin__pulse", r: "7", fill: "none" }));
@@ -314,7 +314,7 @@ document.addEventListener("DOMContentLoaded", function () {
       hubLabel.className = "map-label map-label--hub";
       hubLabel.setAttribute("data-city", "ontario");
       hubLabel.textContent = "Ontario · 5";
-      hubLabel.setAttribute("aria-label", "Ontario, 5 chapters");
+      hubLabel.setAttribute("aria-label", "Ontario, 5 cities");
       hubLabel.setAttribute("aria-pressed", "false");
       labelLayer.appendChild(hubLabel);
       cluster._label = hubLabel;
@@ -489,8 +489,8 @@ document.addEventListener("DOMContentLoaded", function () {
         path.setAttribute("stroke-dashoffset", String(length));
         window.gsap.fromTo(path, { strokeDashoffset: length }, {
           strokeDashoffset: 0,
-          duration: 1.05,
-          delay: 0.05 + index * 0.06,
+          duration: 0.55,
+          delay: 0.08 + index * 0.035,
           ease: "power2.out",
           onComplete: function () {
             path.removeAttribute("stroke-dasharray");
@@ -1741,10 +1741,10 @@ document.addEventListener("DOMContentLoaded", function () {
         if (pin.getAttribute("data-city") === "london") pin.classList.add("is-pulse");
         var row = board.querySelector('.city-row[data-city="' + pin.getAttribute("data-city") + '"]');
         if (row) row.classList.add("is-shown");
-      }, index * 60);
+      }, 40 + index * 40);
     });
   }
-  if (board && !reduce && !phoneQuery.matches && "IntersectionObserver" in window) {
+  if (board && !reduce && "IntersectionObserver" in window) {
     var pinObserver = new IntersectionObserver(
       function (entries) {
         if (!entries.some(function (entry) { return entry.isIntersecting; })) return;

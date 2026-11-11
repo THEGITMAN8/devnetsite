@@ -307,18 +307,6 @@ function mountMarquee() {
 
 function mountTilt() {
   if (reduceQuery.matches) return;
-  document.querySelectorAll(".build-card").forEach(function (card) {
-    card.addEventListener("pointermove", function (event) {
-      if (event.pointerType !== "mouse") return;
-      var rect = card.getBoundingClientRect();
-      var px = (event.clientX - rect.left) / rect.width - 0.5;
-      var py = (event.clientY - rect.top) / rect.height - 0.5;
-      card.style.transform = "rotateX(" + (-py * 6).toFixed(2) + "deg) rotateY(" + (px * 8).toFixed(2) + "deg) translateY(-2px)";
-    });
-    card.addEventListener("pointerleave", function () {
-      card.style.transform = "";
-    });
-  });
   document.querySelectorAll(".btn--primary").forEach(function (btn) {
     btn.addEventListener("pointermove", function (event) {
       if (event.pointerType !== "mouse") return;
@@ -334,12 +322,6 @@ function mountTilt() {
 }
 
 function mountCounts() {
-  var chapters = document.querySelectorAll(".na-map .na-pin").length;
-  document.querySelectorAll("[data-count-chapters]").forEach(function (el) {
-    if (!chapters) return;
-    el.setAttribute("data-count", String(chapters));
-    el.textContent = String(chapters);
-  });
   var reduced = plainMotion() || !window.gsap || !window.ScrollTrigger;
   document.querySelectorAll(".chapter-facts, .hero-count").forEach(function (group) {
     Array.prototype.forEach.call(group.querySelectorAll("[data-count]"), function (el, index) {
