@@ -1498,9 +1498,12 @@ document.addEventListener("DOMContentLoaded", function () {
     if (flag) flag.hidden = !flagship;
     card.hidden = false;
     card._pin = pin;
+    var westernLink = card.querySelector("[data-card-western]");
+    if (westernLink) westernLink.hidden = pin.getAttribute("data-city") !== "london";
     if (readout) {
       var bits = [name, country];
       if (flagship) bits.push("Flagship");
+      if (pin.getAttribute("data-city") === "london") bits.push("Western chapter");
       readout.textContent = bits.filter(Boolean).join(", ");
     }
     positionChapterCard();
@@ -1550,6 +1553,10 @@ document.addEventListener("DOMContentLoaded", function () {
     button.addEventListener("click", function () {
       var id = button.getAttribute("data-city") || "";
       if (!id) return;
+      if (id === "london") {
+        window.location.href = "/western";
+        return;
+      }
       var pin = document.querySelector('.map-stage .pin[data-city="' + id + '"]');
       if (lockedCity === id) {
         lockedCity = "";
