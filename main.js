@@ -236,7 +236,6 @@ document.addEventListener("DOMContentLoaded", function () {
     var view = { x: belt.x, y: belt.y, w: belt.w, h: belt.h };
     var pins = Array.prototype.slice.call(svg.querySelectorAll(".na-pin"));
     var ontarioPins = pins.filter(function (pin) { return ONTARIO[pin.getAttribute("data-city")]; });
-    var tween = null;
     var exploded = false;
     var clustered = true;
     var arcsPlayed = false;
@@ -442,7 +441,6 @@ document.addEventListener("DOMContentLoaded", function () {
     function syncArcs(mode) {
       if (mode === arcMode) return;
       arcMode = mode;
-      if (window.gsap) window.gsap.killTweensOf(".na-arc");
       arcs.replaceChildren();
       var london = document.querySelector('.na-pin[data-city="london"]');
       var origin = centroid;
@@ -459,44 +457,12 @@ document.addEventListener("DOMContentLoaded", function () {
         if (!d) return;
         var path = svgEl("path", { class: "na-arc", d: d, "data-x": String(x), "data-y": String(y) });
         arcs.appendChild(path);
-        if (reduced || arcsPlayed) return;
-        var length = 0;
-        try { length = path.getTotalLength(); } catch (err) { length = 0; }
-        if (!length) return;
-        path.setAttribute("stroke-dasharray", String(length));
-        path.setAttribute("stroke-dashoffset", String(length));
       });
       updateArcVisibility();
     }
 
     function playArcs() {
-      if (arcsPlayed) return;
       arcsPlayed = true;
-      var paths = arcs.querySelectorAll(".na-arc");
-      if (reduced || !window.gsap) {
-        paths.forEach(function (path) {
-          path.removeAttribute("stroke-dasharray");
-          path.removeAttribute("stroke-dashoffset");
-        });
-        return;
-      }
-      paths.forEach(function (path, index) {
-        var length = 0;
-        try { length = path.getTotalLength(); } catch (err) { length = 0; }
-        if (!length) return;
-        path.setAttribute("stroke-dasharray", String(length));
-        path.setAttribute("stroke-dashoffset", String(length));
-        window.gsap.fromTo(path, { strokeDashoffset: length }, {
-          strokeDashoffset: 0,
-          duration: 0.55,
-          delay: 0.08 + index * 0.035,
-          ease: "power2.out",
-          onComplete: function () {
-            path.removeAttribute("stroke-dasharray");
-            path.removeAttribute("stroke-dashoffset");
-          }
-        });
-      });
     }
 
     function hidePin(pin, hide) {
@@ -806,22 +772,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     function animateTo(box) {
-      var next = clampBox(box);
-      if (tween && window.gsap) tween.kill();
-      if (reduced || !window.gsap) {
-        applyBox(next);
-        return;
-      }
-      var proxy = { x: view.x, y: view.y, w: view.w, h: view.h };
-      tween = window.gsap.to(proxy, {
-        x: next.x,
-        y: next.y,
-        w: next.w,
-        h: next.h,
-        duration: 0.7,
-        ease: "power2.inOut",
-        onUpdate: function () { applyBox(proxy); }
-      });
+      applyBox(clampBox(box));
     }
 
     function keepMapInView() {
@@ -876,8 +827,8 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     function home() {
-      exploded = false;
-      animateTo(belt);
+      exploded = true;
+      animateTo(ontarioFrame());
       keepMapInView();
     }
 
@@ -892,23 +843,46 @@ document.addEventListener("DOMContentLoaded", function () {
       document.dispatchEvent(new CustomEvent("devnet:mapreset"));
     }
 
+    function focusClientPoint() {
+      var hot = mapStage.querySelector(".pin.is-hot:not(.is-hidden)");
+      var x = centroid.x;
+      var y = centroid.y;
+      if (!hot) {
+        var row = document.querySelector(".city-row.is-hot");
+        if (row) hot = svg.querySelector('.na-pin[data-city="' + row.getAttribute("data-city") + '"]');
+      }
+      if (hot) {
+        var hx = Number(hot.getAttribute("data-x"));
+        var hy = Number(hot.getAttribute("data-y"));
+        if (hx && hy) { x = hx; y = hy; }
+      }
+      var ctm = svg.getScreenCTM();
+      if (!ctm) return null;
+      var pt = svg.createSVGPoint();
+      pt.x = x;
+      pt.y = y;
+      var screen = pt.matrixTransform(ctm);
+      return { x: screen.x, y: screen.y };
+    }
+
     function zoomBy(factor, clientX, clientY, immediate) {
       if (factor > 1.01) exploded = true;
       else if (factor < 0.99) exploded = false;
       var rect = viewport.getBoundingClientRect();
-      var px = clientX == null ? rect.left + rect.width / 2 : clientX;
-      var py = clientY == null ? rect.top + rect.height / 2 : clientY;
+      var aimed = focusClientPoint();
+      var px = clientX == null ? (aimed ? aimed.x : rect.left + rect.width / 2) : clientX;
+      var py = clientY == null ? (aimed ? aimed.y : rect.top + rect.height / 2) : clientY;
       var ctm = svg.getScreenCTM();
       if (!ctm) return;
       var pt = svg.createSVGPoint();
       pt.x = px;
       pt.y = py;
-      var focus = pt.matrixTransform(ctm.inverse());
+      var origin = pt.matrixTransform(ctm.inverse());
       var w = view.w / factor;
       var h = view.h / factor;
       var next = {
-        x: focus.x - ((px - rect.left) / rect.width) * w,
-        y: focus.y - ((py - rect.top) / rect.height) * h,
+        x: origin.x - ((px - rect.left) / rect.width) * w,
+        y: origin.y - ((py - rect.top) / rect.height) * h,
         w: w,
         h: h
       };
@@ -916,7 +890,8 @@ document.addEventListener("DOMContentLoaded", function () {
       else animateTo(next);
     }
 
-    applyBox(belt);
+    exploded = true;
+    applyBox(clampBox(ontarioFrame()));
     window.requestAnimationFrame(function () { applyBox(view); });
 
     mapStage.querySelectorAll("[data-map]").forEach(function (button) {
@@ -945,7 +920,6 @@ document.addEventListener("DOMContentLoaded", function () {
       if (event.target.closest(".pin, .map-label, .map-controls")) return;
       pointers[event.pointerId] = { x: event.clientX, y: event.clientY };
       var count = Object.keys(pointers).length;
-      if (tween && window.gsap) tween.kill();
       if (count === 1) {
         drag = { id: event.pointerId, x: event.clientX, y: event.clientY };
         viewport.classList.add("is-drag");
@@ -994,7 +968,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
     viewport.addEventListener("wheel", function (event) {
       event.preventDefault();
-      if (tween && window.gsap) tween.kill();
       var delta = event.deltaY;
       if (event.deltaMode === 1) delta *= 16;
       if (event.deltaMode === 2) delta *= viewport.clientHeight;
@@ -1608,55 +1581,26 @@ document.addEventListener("DOMContentLoaded", function () {
     setCity("");
   });
 
-  var milestoneItems = Array.prototype.slice.call(document.querySelectorAll("#about .milestones > li"));
-  function showMilestones() {
-    milestoneItems.forEach(function (item) {
-      item.classList.add("is-in");
-    });
-  }
-  function revealMilestones() {
-    if (!milestoneItems.length) return;
-    var batch = [];
-    milestoneItems.forEach(function (item) {
-      if (item.classList.contains("is-in") || item.getAttribute("data-playing") === "1") return;
-      var rect = item.getBoundingClientRect();
-      if (rect.top > window.innerHeight * 0.92) return;
-      var passed = rect.bottom < 48;
-      if (reduce || !window.gsap || passed) {
-        if (window.gsap) window.gsap.set(item, { opacity: 1, y: 0, clearProps: "transform" });
-        item.classList.add("is-in");
-        return;
-      }
-      item.setAttribute("data-playing", "1");
-      batch.push(item);
-    });
-    if (!batch.length || !window.gsap) {
-      if (batch.length) showMilestones();
-      return;
-    }
-    window.gsap.to(batch, {
-      opacity: 1,
-      y: 0,
-      duration: 0.24,
-      stagger: 0.035,
-      ease: "power1.out",
-      overwrite: "auto",
-      onComplete: function () {
-        batch.forEach(function (item) {
-          item.classList.add("is-in");
-          item.removeAttribute("data-playing");
-          window.gsap.set(item, { clearProps: "opacity,transform" });
-        });
-      }
-    });
+  var milestoneItems = Array.prototype.slice.call(document.querySelectorAll(".milestones > li"));
+  function markMilestone(item) {
+    var rect = item.getBoundingClientRect();
+    if (rect.top < window.innerHeight * 0.92 && rect.bottom > 40) item.classList.add("is-in");
   }
   if (milestoneItems.length) {
-    if (reduce || !window.gsap) showMilestones();
-    else {
-      window.gsap.set(milestoneItems, { opacity: 0, y: 8 });
-      revealMilestones();
-      window.addEventListener("scroll", revealMilestones, { passive: true });
-      window.addEventListener("resize", revealMilestones);
+    if (reduce || !("IntersectionObserver" in window)) {
+      milestoneItems.forEach(function (item) { item.classList.add("is-in"); });
+    } else {
+      var milestoneObserver = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (!entry.isIntersecting) return;
+          entry.target.classList.add("is-in");
+          milestoneObserver.unobserve(entry.target);
+        });
+      }, { threshold: 0.08 });
+      milestoneItems.forEach(function (item) {
+        milestoneObserver.observe(item);
+        markMilestone(item);
+      });
     }
   }
 

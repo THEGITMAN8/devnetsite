@@ -7,7 +7,6 @@
     "build": "node --check main.js && node --check enhance.js && node --check instagram.js && node --check vendor/cobe.js"
   },
   "devDependencies": {
-    "cobe": "0.6.5",
-    "gsap": "3.13.0"
+    "cobe": "0.6.5"
   }
 }

@@ -13,6 +13,3 @@ writeFileSync(
   "/* cobe 0.6.5 (MIT) https://github.com/shuding/cobe — bundled with phenomenon 1.6.0 (MIT) for script-src 'self'. */\n" +
     cobe
 );
-
-copyFileSync("node_modules/gsap/dist/gsap.min.js", "vendor/gsap.min.js");
-copyFileSync("node_modules/gsap/dist/ScrollTrigger.min.js", "vendor/ScrollTrigger.min.js");

@@ -217,55 +217,12 @@ function mountGlobe() {
   });
 }
 
-function plainMotion() {
-  return reduceQuery.matches || window.matchMedia("(max-width: 767px)").matches;
-}
-
 function mountMotion() {
-  if (plainMotion() || !window.gsap || !window.ScrollTrigger) return;
-  var gsap = window.gsap;
-  var ScrollTrigger = window.ScrollTrigger;
-  try {
-  gsap.registerPlugin(ScrollTrigger);
-  document.documentElement.classList.add("motion-on");
-
-  var chars = document.querySelectorAll(".split__ch > span");
-  if (chars.length) {
-    gsap.fromTo(
-      chars,
-      { yPercent: 115 },
-      { yPercent: 0, duration: 0.72, stagger: 0.045, ease: "power3.out", delay: 0.05 }
-    );
-  }
-
-  if (typeof gsap.utils.toArray === "function") {
-    gsap.utils.toArray("main .reveal").forEach(function (section) {
-      gsap.fromTo(
-        section,
-        { autoAlpha: 0, y: 28 },
-        {
-          autoAlpha: 1,
-          y: 0,
-          duration: 0.75,
-          ease: "power2.out",
-          scrollTrigger: {
-            trigger: section,
-            start: "top 88%",
-            once: true
-          }
-        }
-      );
-    });
-  }
-
-  } catch (error) {
-    document.documentElement.classList.remove("motion-on");
-    document.querySelectorAll(".reveal, .cursor-lockup, .cursor-copy").forEach(function (section) {
-      section.style.opacity = "";
-      section.style.transform = "";
-      section.style.visibility = "";
-    });
-  }
+  document.querySelectorAll(".reveal").forEach(function (section) {
+    section.style.opacity = "";
+    section.style.transform = "";
+    section.style.visibility = "";
+  });
 }
 
 function mountMarquee() {
@@ -302,49 +259,11 @@ function mountTilt() {
 }
 
 function mountCounts() {
-  var reduced = plainMotion() || !window.gsap || !window.ScrollTrigger;
-  document.querySelectorAll(".chapter-facts, .hero-count").forEach(function (group) {
-    Array.prototype.forEach.call(group.querySelectorAll("[data-count]"), function (el, index) {
-      var target = Number(el.getAttribute("data-count"));
-      var suffix = el.getAttribute("data-suffix") || "";
-      if (!isFinite(target)) return;
-      el.textContent = String(target) + suffix;
-      if (reduced) return;
-      var obj = { n: 0 };
-      window.gsap.to(obj, {
-        n: target,
-        duration: 1.15,
-        delay: index * 0.08,
-        ease: "power2.out",
-        scrollTrigger: {
-          trigger: el,
-          start: "top 90%",
-          toggleActions: "play none none none"
-        },
-        onStart: function () {
-          el.textContent = "0" + suffix;
-        },
-        onUpdate: function () {
-          el.textContent = String(Math.round(obj.n)) + suffix;
-        }
-      });
-    });
-  });
-  if (reduced) return;
-  document.querySelectorAll(".chart__bar").forEach(function (bar, index) {
-    var width = Number(bar.getAttribute("width"));
-    if (!isFinite(width)) return;
-    window.gsap.fromTo(bar, { attr: { width: 0 } }, {
-      attr: { width: width },
-      duration: 0.9,
-      delay: index * 0.08,
-      ease: "power2.out",
-      scrollTrigger: {
-        trigger: bar.closest(".chart") || bar,
-        start: "top 84%",
-        toggleActions: "play none none none"
-      }
-    });
+  document.querySelectorAll("[data-count]").forEach(function (el) {
+    var target = Number(el.getAttribute("data-count"));
+    var suffix = el.getAttribute("data-suffix") || "";
+    if (!isFinite(target)) return;
+    el.textContent = String(target) + suffix;
   });
 }
 
@@ -353,6 +272,3 @@ mountMarquee();
 mountTilt();
 mountMotion();
 mountCounts();
-window.addEventListener("load", function () {
-  if (window.ScrollTrigger) window.ScrollTrigger.refresh();
-});
