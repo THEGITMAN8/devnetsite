@@ -2,6 +2,12 @@ document.documentElement.classList.add("js");
 
 document.addEventListener("DOMContentLoaded", function () {
   var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var recapCount = document.querySelector("[data-recap-count]");
+  var recapRoll = document.querySelector(".recap-roll");
+  if (recapCount && recapRoll) {
+    recapCount.textContent = String(recapRoll.querySelectorAll("img").length);
+  }
+
   var header = document.getElementById("site-header");
   var toggle = document.getElementById("menu-toggle");
   var menu = document.getElementById("mobile-menu");
@@ -105,7 +111,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-  var sectionIds = ["events", "about", "builds", "landed", "cursor", "western", "network", "faq"];
+  var sectionIds = ["network", "western", "events", "recap", "western-socials", "about", "landed", "cursor", "builds", "faq"];
   var sections = sectionIds
     .map(function (id) {
       return document.getElementById(id);
@@ -1750,46 +1756,6 @@ document.addEventListener("DOMContentLoaded", function () {
     pinObserver.observe(board.querySelector(".map-stage") || board);
   }
 
-  var timeline = document.querySelector(".timeline");
-  var timelineFill = timeline ? timeline.querySelector(".timeline__fill") : null;
-  var timelineNodes = timeline ? timeline.querySelectorAll(".tl-node") : [];
-  var timelineFrame = false;
-  function paintTimeline() {
-    timelineFrame = false;
-    if (!timeline || !timelineFill || !timelineNodes.length || reduce) return;
-    var horizontal = window.matchMedia("(min-width: 1100px)").matches;
-    var first = timelineNodes[0].getBoundingClientRect();
-    var last = timelineNodes[timelineNodes.length - 1].getBoundingClientRect();
-    var top = Math.min(first.top, last.top);
-    var bottom = Math.max(first.bottom, last.bottom);
-    var progress = (window.innerHeight * 0.72 - top) / Math.max(bottom - top, 1);
-    if (progress < 0) progress = 0;
-    if (progress > 1) progress = 1;
-    timelineFill.style.transform = (horizontal ? "scaleX(" : "scaleY(") + progress.toFixed(4) + ")";
-    Array.prototype.forEach.call(timelineNodes, function (node) {
-      var rect = node.getBoundingClientRect();
-      node.classList.toggle("is-lit", rect.top <= window.innerHeight * 0.72);
-    });
-  }
-  if (timeline && document.documentElement.classList.contains("motion-on")) {
-    timeline.classList.add("is-motion");
-  } else if (timeline) {
-    if (reduce) {
-      timeline.classList.add("is-complete");
-      Array.prototype.forEach.call(timelineNodes, function (node) {
-        node.classList.add("is-lit");
-      });
-    } else {
-      paintTimeline();
-      window.addEventListener("scroll", function () {
-        if (timelineFrame) return;
-        timelineFrame = true;
-        window.requestAnimationFrame(paintTimeline);
-      }, { passive: true });
-      window.addEventListener("resize", paintTimeline);
-    }
-  }
-
   var hero = document.querySelector(".hero");
   var graph = document.querySelector(".hero-graph");
   if (graph && !reduce) {
@@ -1813,43 +1779,6 @@ document.addEventListener("DOMContentLoaded", function () {
       heroFrame = true;
       window.requestAnimationFrame(paintHero);
     }, { passive: true });
-  }
-
-  var story = document.querySelector(".story-seq");
-  var storyStage = document.querySelector(".story-stage");
-  function paintStory() {
-    if (!story || !storyStage) return;
-    var beats = story.querySelectorAll(".story-beat");
-    if (reduce || phoneQuery.matches) {
-      story.classList.remove("is-live");
-      Array.prototype.forEach.call(beats, function (beat) {
-        beat.classList.remove("is-on", "is-lit");
-      });
-      return;
-    }
-    story.classList.add("is-live");
-    var rect = storyStage.getBoundingClientRect();
-    var total = storyStage.offsetHeight - window.innerHeight;
-    var scrolled = Math.min(Math.max(-rect.top, 0), Math.max(total, 1));
-    var progress = total <= 0 ? 1 : scrolled / total;
-    var index = Math.min(beats.length - 1, Math.floor(progress * beats.length));
-    if (progress >= 0.98) index = beats.length - 1;
-    Array.prototype.forEach.call(beats, function (beat, i) {
-      beat.classList.toggle("is-on", i === index);
-      beat.classList.toggle("is-lit", i <= index);
-    });
-  }
-  if (story) {
-    var storyWasPhone = phoneQuery.matches;
-    paintStory();
-    window.addEventListener("scroll", paintStory, { passive: true });
-    window.addEventListener("resize", function () {
-      paintStory();
-      var nowPhone = phoneQuery.matches;
-      if (nowPhone === storyWasPhone) return;
-      storyWasPhone = nowPhone;
-      if (window.ScrollTrigger) window.ScrollTrigger.refresh();
-    });
   }
 
   var pickInput = document.getElementById("chapter-pick");
