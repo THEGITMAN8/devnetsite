@@ -4490,8 +4490,7 @@ button.map-cluster.map-label.map-cluster--live { background: var(--london); }
 }
 
 .na-map .pin__hit { fill: transparent; pointer-events: auto; }
-.na-map .pin__pulse,
-.na-map .pin__leader { pointer-events: none; }
+.na-map .pin__pulse { pointer-events: none; }
 
 .na-map .pin__dot {
   fill: #c4b5fd;
@@ -4522,12 +4521,6 @@ button.map-cluster.map-label.map-cluster--live { background: var(--london); }
 }
 
 .na-map .pin--founding .pin__pulse { stroke: #f5d0fe; }
-
-.na-map .pin__leader {
-  stroke: rgba(243, 238, 251, 0.72);
-  stroke-width: 1px;
-  vector-effect: non-scaling-stroke;
-}
 
 .map-labels {
   position: absolute;
@@ -4951,48 +4944,8 @@ main .block h2,
 
 .network-head h2 { margin: 0; }
 
-.chapter-pick {
-  position: relative;
-  width: min(100%, 220px);
-  flex: 0 0 auto;
-}
-
-.chapter-pick input {
-  width: 100%;
-  height: 44px;
-  padding: 0 14px;
-  border: 1px solid var(--line);
-  border-radius: 14px;
-  background: var(--card);
-}
-
-.chapter-pick__list {
-  position: absolute;
-  z-index: 8;
-  top: calc(100% + 6px);
-  left: 0;
-  right: 0;
-  max-height: 240px;
-  margin: 0;
-  padding: 6px;
-  overflow: auto;
-  list-style: none;
-  border: 1px solid var(--line);
-  border-radius: 14px;
-  background: var(--raised);
-}
-
-.chapter-pick__list [role="option"] {
-  padding: 8px 10px;
-  border-radius: 8px;
-  cursor: pointer;
-}
-
-.chapter-pick__list [aria-selected="true"] { background: #24143f; }
-
 @media (max-width: 640px) {
   .network-head { align-items: stretch; flex-direction: column; }
-  .chapter-pick { width: 100%; }
 }
 
 .ig-embeds {
@@ -5046,8 +4999,7 @@ main .block h2,
 }
 
 .na-map .pin--cluster .pin__hit { fill: transparent; pointer-events: auto; }
-.na-map .pin--cluster .pin__pulse,
-.na-map .pin--cluster .pin__leader { pointer-events: none; }
+.na-map .pin--cluster .pin__pulse { pointer-events: none; }
 .na-map .pin--cluster .pin__dot,
 .na-map .pin--cluster .pin__pulse,
 .na-map .pin--cluster .pin__hit {
@@ -5155,16 +5107,13 @@ main .block h2,
 
 /* pass 2: hero map, western rail, events, timeline, builds */
 .desktop-nav .nav-link,
-.footer-socials__text,
-.chapter-pick__list [role="option"] {
+.footer-socials__text {
   display: inline-flex;
   align-items: center;
   min-height: 44px;
 }
 
 .footer-socials__text { padding: 0 8px; }
-
-.chapter-pick__list [role="option"] { width: 100%; }
 
 .hero {
   min-height: 0;
@@ -5190,8 +5139,6 @@ main .block h2,
   justify-content: flex-end;
   margin: 0 0 8px;
 }
-
-.hero-map .chapter-pick { width: 100%; }
 
 .hero .map-board {
   grid-template-columns: 1fr;
@@ -5506,13 +5453,13 @@ main .block h2,
 .skip-link { min-height: 44px; }
 
 .map-labels .map-label {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
   box-sizing: border-box;
-  min-width: 44px;
-  min-height: 44px;
-  padding: 12px 8px;
+  min-width: 0;
+  min-height: 0;
+  padding: 0 2px;
 }
 
 /* Timeline: spine, year groups, current milestone */
