@@ -1,33 +1,33 @@
 @font-face {
-  font-family: "General Sans";
+  font-family: "Red Hat Display";
   font-style: normal;
   font-weight: 400;
   font-display: swap;
-  src: url("/assets/fonts/general-sans-400.woff2") format("woff2");
+  src: url("/assets/fonts/red-hat-display-400.woff2") format("woff2");
 }
 
 @font-face {
-  font-family: "General Sans";
+  font-family: "Red Hat Display";
   font-style: normal;
   font-weight: 500;
   font-display: swap;
-  src: url("/assets/fonts/general-sans-500.woff2") format("woff2");
+  src: url("/assets/fonts/red-hat-display-500.woff2") format("woff2");
 }
 
 @font-face {
-  font-family: "General Sans";
+  font-family: "Red Hat Display";
   font-style: normal;
   font-weight: 600;
   font-display: swap;
-  src: url("/assets/fonts/general-sans-600.woff2") format("woff2");
+  src: url("/assets/fonts/red-hat-display-600.woff2") format("woff2");
 }
 
 @font-face {
-  font-family: "General Sans";
+  font-family: "Red Hat Display";
   font-style: normal;
   font-weight: 700;
   font-display: swap;
-  src: url("/assets/fonts/general-sans-700.woff2") format("woff2");
+  src: url("/assets/fonts/red-hat-display-700.woff2") format("woff2");
 }
 
 :root {
@@ -42,7 +42,7 @@
   --london: #f5d0fe;
   --max: 1120px;
   --header: 64px;
-  --font: "General Sans", system-ui, sans-serif;
+  --font: "Red Hat Display", system-ui, sans-serif;
   color-scheme: dark;
 }
 
@@ -168,7 +168,7 @@ h2,
 .tile__n,
 .stat-num {
   letter-spacing: -0.03em;
-  line-height: 1.08;
+  line-height: 1.05;
 }
 
 .site-header {
@@ -6069,4 +6069,189 @@ a.city-row {
 
 #instagram .btn { margin-top: 12px; }
 #instagram [data-instagram]:empty { display: none; }
+
+/* Red Hat Display: heading fit, city columns, hero stats, FAQ, coming-up contrast */
+.hero h1,
+.page-chapter .wordmark,
+main .block h2,
+.network-head h2,
+.cursor-lockup h2,
+.recap-head h2,
+.build-card summary b {
+  letter-spacing: -0.03em;
+}
+
+.hero h1,
+.page-chapter .wordmark {
+  letter-spacing: -0.032em;
+}
+
+#network .city-list {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 12px 10px;
+  align-items: start;
+}
+
+.page-chapter .hero-place {
+  margin: 10px 0 0;
+  color: #f3eefb;
+  font-size: 17px;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  line-height: 24px;
+}
+
+.page-chapter .hero-count {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px 16px;
+  margin-top: 16px;
+}
+
+.page-chapter .hero-count b {
+  letter-spacing: -0.035em;
+}
+
+@media (min-width: 800px) {
+  .page-chapter .hero-count {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px 20px;
+  }
+}
+
+.tag--devnet {
+  border: 1px solid rgba(205, 184, 242, 0.72);
+  background: rgba(138, 92, 240, 0.28);
+  color: #f3eefb;
+}
+
+.tag--western {
+  border: 1px solid transparent;
+  background: #f5d0fe;
+  color: #2a1038;
+}
+
+#events .upcoming li.is-next time,
+#events .upcoming li.is-next time small {
+  background: #6845b4;
+  color: #f7f2ff;
+}
+
+#events .upcoming li.upcoming-reg time {
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 24px;
+}
+
+@media (min-width: 1000px) {
+  #events .upcoming li.upcoming-reg time {
+    align-content: center;
+    min-height: 112px;
+    font-size: 16px;
+    line-height: 22px;
+  }
+}
+
+@media (min-width: 900px) {
+  .recap-roll {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+#faq .faq {
+  display: grid;
+  gap: 0;
+  margin-top: 8px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+#faq .faq details {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 0;
+  background: transparent;
+}
+
+#faq .faq details:first-child {
+  border-top: 0;
+}
+
+#faq .faq summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 44px;
+  margin: 0;
+  padding: 14px 0;
+  border: 0;
+  background: transparent;
+  color: #f3eefb;
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 24px;
+  list-style: none;
+}
+
+#faq .faq summary::-webkit-details-marker {
+  display: none;
+}
+
+#faq .faq summary::marker {
+  content: "";
+}
+
+#faq .faq summary::after {
+  content: "+";
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 24px;
+  height: 24px;
+  margin: 0;
+  border: 0;
+  background: transparent;
+  color: #cdb8f2;
+  font-size: 22px;
+  font-weight: 500;
+  line-height: 1;
+  transform: none;
+}
+
+#faq .faq details[open] summary::after {
+  content: "\2212";
+  transform: none;
+}
+
+#faq .faq summary:hover,
+#faq .faq summary:focus-visible {
+  border-color: transparent;
+  color: #ffffff;
+}
+
+#faq .faq details p {
+  display: block;
+  max-width: 68ch;
+  margin: 0;
+  padding: 0 40px 16px 0;
+  color: #e7dff6;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 24px;
+}
+
+@media (min-width: 1100px) {
+  #faq .faq summary {
+    font-size: 20px;
+    line-height: 28px;
+    padding: 16px 0;
+  }
+}
 

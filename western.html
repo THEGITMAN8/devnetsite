@@ -29,7 +29,8 @@
   <link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png">
   <link rel="manifest" href="/manifest.webmanifest">
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"DevNet Western","url":"https://www.devnetwork.app/western","parentOrganization":{"@type":"Organization","name":"DevNet","url":"https://www.devnetwork.app/"},"sameAs":["https://www.instagram.com/devnet_western"]}</script>
-  <link rel="preload" href="/assets/fonts/general-sans-400.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/assets/fonts/red-hat-display-400.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/assets/fonts/red-hat-display-700.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" as="image" href="/assets/logo.webp" type="image/webp">
   <link rel="stylesheet" href="/style.css">
   <script src="/main.js"></script>
@@ -50,7 +51,7 @@
           <a class="nav-link" href="/western" data-nav data-section="western" aria-current="page">Western</a>
           <span class="nav-indicator" aria-hidden="true"></span>
       </nav>
-      <a class="btn btn--primary header-join" href="https://docs.google.com/forms/d/e/1FAIpQLSepIp21u2-UWk3RKEXfqirkb2ZRyZ3W1cim90FPCFbdUjWC2w/viewform" target="_blank" rel="noopener noreferrer">Join</a>
+      <a class="btn btn--primary header-join" href="https://docs.google.com/forms/d/e/1FAIpQLSepIp21u2-UWk3RKEXfqirkb2ZRyZ3W1cim90FPCFbdUjWC2w/viewform" target="_blank" rel="noopener noreferrer">Join DevNet Western</a>
       <button type="button" id="menu-toggle" class="menu-toggle" aria-expanded="false" aria-controls="mobile-menu" aria-label="Open menu">
         <svg class="icon-open" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"></path></svg>
         <svg class="icon-close" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" hidden><path d="M6 6l12 12M18 6L6 18"></path></svg>
@@ -60,7 +61,7 @@
       <nav aria-label="Mobile">
           <a class="nav-link" href="/" data-nav data-section="home">Network</a>
           <a class="nav-link" href="/western" data-nav data-section="western" aria-current="page">Western</a>
-          <a class="btn btn--primary sheet-join" href="https://docs.google.com/forms/d/e/1FAIpQLSepIp21u2-UWk3RKEXfqirkb2ZRyZ3W1cim90FPCFbdUjWC2w/viewform" target="_blank" rel="noopener noreferrer">Join DevNet</a>
+          <a class="btn btn--primary sheet-join" href="https://docs.google.com/forms/d/e/1FAIpQLSepIp21u2-UWk3RKEXfqirkb2ZRyZ3W1cim90FPCFbdUjWC2w/viewform" target="_blank" rel="noopener noreferrer">Join DevNet Western</a>
       </nav>
     </div>
   </header>
@@ -71,22 +72,17 @@
         <div class="hero-copy">
           <p class="chapter-badge"><a href="/">Chapter of DevNet</a></p>
           <h1 id="western-hero" class="wordmark">DevNet Western</h1>
+          <p class="hero-place">London, Ontario · Founded December 2025</p>
+          <p class="hero-count">
+            <span><b data-count="50" data-suffix="+">50+</b> members</span>
+            <span><b data-count="20" data-suffix="+">20+</b> exec</span>
+            <span><b data-count="5">5</b> first-year reps</span>
+            <span><b data-count="2">2</b> co-presidents</span>
+          </p>
           <div class="hero-actions">
-            <a class="btn btn--primary" id="join" href="https://docs.google.com/forms/d/e/1FAIpQLSepIp21u2-UWk3RKEXfqirkb2ZRyZ3W1cim90FPCFbdUjWC2w/viewform" target="_blank" rel="noopener noreferrer">Join DevNet</a>
+            <a class="btn btn--primary" id="join" href="https://docs.google.com/forms/d/e/1FAIpQLSepIp21u2-UWk3RKEXfqirkb2ZRyZ3W1cim90FPCFbdUjWC2w/viewform" target="_blank" rel="noopener noreferrer">Join DevNet Western</a>
           </div>
         </div>
-      </div>
-    </section>
-<section id="western" class="block reveal" aria-labelledby="western-heading">
-      <div class="wrap">
-        <h2 id="western-heading">DevNet at Western</h2>
-        <ul class="chapter-facts">
-          <li><b data-count="2">2</b><span>co-presidents</span></li>
-          <li><b data-count="20" data-suffix="+">20+</b><span>exec</span></li>
-          <li><b data-count="5">5</b><span>first-year reps</span></li>
-          <li><b data-count="50" data-suffix="+">50+</b><span>members</span></li>
-          <li><b>Dec 2025</b><span>founded</span></li>
-        </ul>
       </div>
     </section>
 <section id="events" class="block reveal" aria-labelledby="events-heading">
@@ -109,9 +105,8 @@
             <time datetime="2027-03"><span>Mar</span><small>2027</small></time>
             <span class="upcoming__name">Hackathon</span>
           </li>
-          <li>
-            <time datetime="2027-04"><span>Apr to Sep</span><small>2027</small></time>
-            <span class="upcoming__name">Next year's registration</span>
+          <li class="upcoming-reg">
+            <time datetime="2027-04"><span>2027–28 registration · opens April 2027</span></time>
           </li>
         </ol>
       </div>
@@ -127,10 +122,10 @@
               <span class="milestone__node" aria-hidden="true"></span>
               <div class="milestone">
                 <div class="milestone__meta">
-                  <time datetime="2026-09">Sep 2026</time>
+                  <time datetime="2026-02">Feb 2026</time>
                   <span class="tag tag--western">Western</span>
                 </div>
-                <span>Admission forms out</span>
+                <span>First DevNet-wide hackathon</span>
               </div>
             </li>
             <li>
@@ -140,10 +135,20 @@
                   <time datetime="2026-09">Sep 2026</time>
                   <span class="tag tag--western">Western</span>
                 </div>
-                <span>Intro exec meeting</span>
+                <span>Admission forms out</span>
               </div>
             </li>
             <li class="is-start">
+              <span class="milestone__node" aria-hidden="true"></span>
+              <div class="milestone">
+                <div class="milestone__meta">
+                  <time datetime="2026-09">Sep 2026</time>
+                  <span class="tag tag--western">Western</span>
+                </div>
+                <span>Intro exec meeting</span>
+              </div>
+            </li>
+            <li>
               <span class="milestone__node" aria-hidden="true"></span>
               <div class="milestone">
                 <div class="milestone__meta">
@@ -175,20 +180,17 @@
             <p class="recap-title">Event 01, Build with AI Workshop</p>
             <p class="recap-meta"><time datetime="2026-11-06">Fri Nov 6</time> · Ivey Building Room 1130</p>
           </div>
-          <p class="recap-count"><b data-recap-count>4</b><span class="visually-hidden"> photos</span></p>
+          <p class="recap-count"><b data-recap-count>3</b><span class="visually-hidden"> photos</span></p>
         </div>
         <div class="recap-roll">
           <figure>
-            <img src="/assets/events/01-recap-group.webp" width="1280" height="1600" alt="Members in Ivey Building Room 1130 at the Build with AI Workshop, Friday November 6." loading="lazy" decoding="async">
+            <img src="/assets/events/01-recap-group-800.webp" srcset="/assets/events/01-recap-group-400.webp 400w, /assets/events/01-recap-group-800.webp 800w" sizes="(min-width: 900px) 30vw, 50vw" width="800" height="1000" alt="Members in Ivey Building Room 1130 at the Build with AI Workshop, Friday November 6." loading="lazy" decoding="async">
           </figure>
           <figure>
-            <img src="/assets/events/02-debow.webp" width="1280" height="1600" alt="Daniel Debow on a video call during the Build with AI Workshop. He joined virtually." loading="lazy" decoding="async">
+            <img src="/assets/events/02-debow-800.webp" srcset="/assets/events/02-debow-400.webp 400w, /assets/events/02-debow-800.webp 800w" sizes="(min-width: 900px) 30vw, 50vw" width="800" height="1000" alt="Daniel Debow on a video call during the Build with AI Workshop. He joined virtually." loading="lazy" decoding="async">
           </figure>
           <figure>
-            <img src="/assets/events/03-conrad.webp" width="1280" height="1600" alt="Parker Conrad on a video call during the Build with AI Workshop. He joined virtually." loading="lazy" decoding="async">
-          </figure>
-          <figure>
-            <img src="/assets/events/04-truell-slide.webp" width="1200" height="1600" alt="A slide about Michael Truell, Cursor, projected in Ivey Building Room 1130 during the Build with AI Workshop." loading="lazy" decoding="async">
+            <img src="/assets/events/03-conrad-800.webp" srcset="/assets/events/03-conrad-400.webp 400w, /assets/events/03-conrad-800.webp 800w" sizes="(min-width: 900px) 30vw, 50vw" width="800" height="1000" alt="Parker Conrad on a video call during the Build with AI Workshop. He joined virtually." loading="lazy" decoding="async">
           </figure>
         </div>
       </div>
