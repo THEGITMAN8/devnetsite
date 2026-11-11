@@ -36,7 +36,7 @@
   <script src="/main.js"></script>
 </head>
 <body>
-  <div class="spine" aria-hidden="true"><span class="spine__fill"></span><span class="spine__node" data-spine="events"><b>01</b><span>Events</span></span><span class="spine__node" data-spine="about"><b>02</b><span>About</span></span><span class="spine__node" data-spine="western"><b>03</b><span>Western</span></span><span class="spine__node" data-spine="network"><b>04</b><span>Network</span></span></div>
+  <div class="spine" aria-hidden="true"><span class="spine__fill"></span><span class="spine__node" data-spine="network"><b>01</b><span>Network</span></span><span class="spine__node" data-spine="western"><b>02</b><span>Western</span></span><span class="spine__node" data-spine="events"><b>03</b><span>Coming up</span></span><span class="spine__node" data-spine="about"><b>04</b><span>Timeline</span></span></div>
   <a href="#top" class="skip-link">Skip to content</a>
   <header class="site-header" id="site-header">
     <div class="bar">
@@ -48,10 +48,10 @@
         DevNet
       </a>
       <nav class="desktop-nav" aria-label="Primary">
-          <a class="nav-link" href="#events" data-nav data-section="events">Events</a>
-          <a class="nav-link" href="#about" data-nav data-section="about">About</a>
-          <a class="nav-link" href="#western" data-nav data-section="western">Western</a>
           <a class="nav-link" href="#network" data-nav data-section="network">Network</a>
+          <a class="nav-link" href="#western" data-nav data-section="western">Western</a>
+          <a class="nav-link" href="#events" data-nav data-section="events">Coming up</a>
+          <a class="nav-link" href="#about" data-nav data-section="about">Timeline</a>
           <a class="nav-link" href="/socials" data-nav data-section="socials">Socials</a>
           <span class="nav-indicator" aria-hidden="true"></span>
       </nav>
@@ -63,10 +63,10 @@
     </div>
     <div id="mobile-menu" class="mobile-menu">
       <nav aria-label="Mobile">
-          <a class="nav-link" href="#events" data-nav data-section="events">Events</a>
-          <a class="nav-link" href="#about" data-nav data-section="about">About</a>
-          <a class="nav-link" href="#western" data-nav data-section="western">Western</a>
           <a class="nav-link" href="#network" data-nav data-section="network">Network</a>
+          <a class="nav-link" href="#western" data-nav data-section="western">Western</a>
+          <a class="nav-link" href="#events" data-nav data-section="events">Coming up</a>
+          <a class="nav-link" href="#about" data-nav data-section="about">Timeline</a>
           <a class="nav-link" href="/socials" data-nav data-section="socials">Socials</a>
           <a class="btn btn--primary sheet-join" href="https://docs.google.com/forms/d/e/1FAIpQLSepIp21u2-UWk3RKEXfqirkb2ZRyZ3W1cim90FPCFbdUjWC2w/viewform" target="_blank" rel="noopener noreferrer">Join DevNet</a>
       </nav>
@@ -91,187 +91,12 @@
             <a class="btn btn--secondary" href="https://www.instagram.com/devnet_western" target="_blank" rel="noopener noreferrer">Instagram</a>
           </div>
         </div>
-        <canvas class="constellation" id="constellation" width="720" height="720" aria-hidden="true"></canvas>
       </div>
     </section>
-
-    <section id="events" class="block reveal" aria-labelledby="events-heading">
-      <div class="wrap">
-        <h2 id="events-heading">Events</h2>
-        <ol class="events-line">
-          <li class="events-line__item is-past">
-            <a class="events-line__row" href="#recap">
-              <time datetime="2026-11-06">Fri Nov 6, 2026</time>
-              <span class="events-line__name">Event 01, Build with AI Workshop</span>
-              <span class="events-line__place">Ivey Building, Room 1130</span>
-            </a>
-          </li>
-          <li class="events-line__item is-next">
-            <div class="events-line__row">
-              <time datetime="2026-12-04">Dec 4, 2026</time>
-              <span class="events-line__name">Hackathon</span>
-            </div>
-          </li>
-          <li class="events-line__item">
-            <div class="events-line__row">
-              <time datetime="2027-01">January 2027</time>
-              <span class="events-line__name">Kickoff event</span>
-            </div>
-          </li>
-          <li class="events-line__item">
-            <div class="events-line__row">
-              <time datetime="2027-02">End of February 2027</time>
-              <span class="events-line__name">Workshop</span>
-            </div>
-          </li>
-          <li class="events-line__item">
-            <div class="events-line__row">
-              <time datetime="2027-03">End of March 2027</time>
-              <span class="events-line__name">Hackathon</span>
-            </div>
-          </li>
-          <li class="events-line__item">
-            <div class="events-line__row">
-              <time datetime="2027-04">April to September 2027</time>
-              <span class="events-line__name">Next year's registration</span>
-            </div>
-          </li>
-        </ol>
-        <div data-instagram>
-        <a class="ig-preview" href="https://www.instagram.com/devnet_western" target="_blank" rel="noopener noreferrer">
-          <span class="ig-preview__shot" aria-hidden="true"></span>
-          <span class="ig-preview__meta">
-            <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path fill="currentColor" d="M12 2.2c3.2 0 3.6 0 4.8.1 3.3.1 4.8 1.7 4.9 4.9.1 1.3.1 1.6.1 4.8s0 3.6-.1 4.8c-.1 3.2-1.7 4.8-4.9 4.9-1.3.1-1.6.1-4.8.1s-3.6 0-4.8-.1c-3.3-.1-4.8-1.7-4.9-4.9-.1-1.3-.1-1.6-.1-4.8s0-3.6.1-4.8c.1-3.2 1.7-4.8 4.9-4.9 1.2-.1 1.6-.1 4.8-.1zM12 0C8.7 0 8.3 0 7.1.1 2.7.3.3 2.7.1 7.1 0 8.3 0 8.7 0 12s0 3.7.1 4.9c.2 4.4 2.6 6.8 7 7C8.3 24 8.7 24 12 24s3.7 0 4.9-.1c4.4-.2 6.8-2.6 7-7 .1-1.2.1-1.6.1-4.9s0-3.7-.1-4.9c-.2-4.4-2.6-6.8-7-7C15.7 0 15.3 0 12 0zm0 5.8a6.2 6.2 0 100 12.4 6.2 6.2 0 000-12.4zM12 16a4 4 0 110-8 4 4 0 010 8zm6.4-11.8a1.4 1.4 0 100 2.8 1.4 1.4 0 000-2.8z"/></svg>
-            <strong>@devnet_western</strong>
-          </span>
-        </a>
-        </div>
-      </div>
-    </section>
-
-    <section id="recap" class="block" aria-labelledby="recap-heading">
-      <div class="wrap">
-        <h2 id="recap-heading">Event 01</h2>
-        <div class="recap-roll">
-          <figure>
-            <img src="/assets/events/01-recap-group.webp" width="1280" height="1600" alt="Members in Ivey Building Room 1130 at the Build with AI Workshop, Friday November 6." loading="lazy" decoding="async">
-          </figure>
-          <figure>
-            <img src="/assets/events/02-debow.webp" width="1280" height="1600" alt="Daniel Debow on a video call during the Build with AI Workshop. He joined virtually." loading="lazy" decoding="async">
-          </figure>
-          <figure>
-            <img src="/assets/events/03-conrad.webp" width="1280" height="1600" alt="Parker Conrad on a video call during the Build with AI Workshop. He joined virtually." loading="lazy" decoding="async">
-          </figure>
-          <figure>
-            <img src="/assets/events/04-truell-slide.webp" width="1200" height="1600" alt="A slide about Michael Truell projected in Ivey Building Room 1130 during the Build with AI Workshop." loading="lazy" decoding="async">
-          </figure>
-          <figure>
-            <img src="/assets/events/05-workshop-title.webp" width="1200" height="1600" alt="The DevNet Workshop title slide in Ivey Building Room 1130." loading="lazy" decoding="async">
-          </figure>
-        </div>
-        <ul class="speakers">
-          <li>
-            <h3>Daniel Debow</h3>
-            <p>Serial entrepreneur (Workbrain, Rypple, Helpful), ex SVP Salesforce and VP at Shopify, now building Torch.</p>
-          </li>
-          <li>
-            <h3>Parker Conrad</h3>
-            <p>Software engineer on voice at SpaceX Super Intelligence, the company behind Grok and Cursor; before that, Starlink.</p>
-          </li>
-        </ul>
-      </div>
-    </section>
-
-    <section id="about" class="block story" aria-labelledby="about-heading">
-      <div class="story-stage">
-        <div class="wrap story-sticky">
-          <h2 id="about-heading" class="visually-hidden">Founded</h2>
-          <ol class="story-seq">
-            <li class="story-beat"><span class="story-when">Sep 2025</span><span class="story-what">Network founded</span></li>
-            <li class="story-beat"><span class="story-when">Dec 2025</span><span class="story-what">DevNet Western</span></li>
-            <li class="story-beat"><span class="story-when"><b data-count="75" data-suffix="+">75+</b></span><span class="story-what">members</span></li>
-            <li class="story-beat"><span class="story-when"><b data-count-chapters data-count="12">12</b></span><span class="story-what">chapters</span></li>
-            <li class="story-beat"><span class="story-when"><b data-count="2" data-suffix="+">2+</b></span><span class="story-what">Cursor hackathons</span></li>
-            <li class="story-beat"><span class="story-when">Nov 6, 2026</span><span class="story-what">Event 01</span></li>
-          </ol>
-        </div>
-      </div>
-    </section>
-
-    <section id="builds" class="block reveal" aria-labelledby="builds-heading">
-      <div class="wrap">
-        <h2 id="builds-heading">What members built</h2>
-        <ul class="build-grid">
-          <li class="build-card">
-            <p class="build-card__who">Kyle Little</p>
-            <h3>Peply</h3>
-          </li>
-          <li class="build-card">
-            <p class="build-card__who">Lior Rubinstein</p>
-            <h3>Bull or Bear</h3>
-          </li>
-          <li class="build-card">
-            <p class="build-card__who">Ethan Perlis</p>
-            <h3>MyCaddy</h3>
-          </li>
-          <li class="build-card">
-            <p class="build-card__who">Jack Minsky and Greg Brenner</p>
-            <h3>Road to the Prem</h3>
-          </li>
-          <li class="build-card">
-            <p class="build-card__who">Greg Brenner</p>
-            <h3>FutureGrad</h3>
-          </li>
-          <li class="build-card">
-            <p class="build-card__who">Jordan Rubinstein</p>
-            <h3>Watchmen Ultra</h3>
-          </li>
-        </ul>
-      </div>
-    </section>
-
-    <section id="landed" class="block reveal" aria-labelledby="landed-heading">
-      <div class="wrap">
-        <h2 id="landed-heading">Where members landed</h2>
-        <div class="logo-marquee">
-        <ul class="logo-strip">
-          <li><img src="/assets/logos/dayforce.svg" alt="Dayforce" height="28"></li>
-          <li><img src="/assets/logos/cibc.svg" alt="CIBC" height="28"></li>
-          <li><img src="/assets/logos/bmo.svg" alt="BMO" height="28"></li>
-          <li><img src="/assets/logos/cohere.svg" alt="Cohere" height="28"></li>
-          <li><img src="/assets/logos/tbpn.svg" alt="TBPN" height="28"></li>
-          <li><img src="/assets/logos/ey.svg" alt="EY" height="28"></li>
-        </ul>
-        </div>
-      </div>
-    </section>
-
-    <section id="cursor" class="block" aria-labelledby="cursor-heading">
-      <div class="wrap">
-        <div class="cursor-lockup">
-          <img src="/assets/logos/cursor.svg" alt="" width="40" height="40">
-          <h2 id="cursor-heading">Building with Cursor</h2>
-        </div>
-        <p class="prose cursor-copy">DevNet and Cursor have partnered on more than one hackathon, with credits and at times merch and prizes. On top of that, Cursor speakers have come to club events.</p>
-      </div>
-    </section>
-
-    <section id="western" class="block reveal" aria-labelledby="western-heading">
-      <div class="wrap">
-        <h2 id="western-heading">DevNet at Western</h2>
-        <ul class="chapter-facts">
-          <li><b data-count="2">2</b><span>co-presidents</span></li>
-          <li><b data-count="20" data-suffix="+">20+</b><span>exec</span></li>
-          <li><b data-count="5">5</b><span>first-year reps</span></li>
-          <li><b data-count="50" data-suffix="+">50+</b><span>members</span></li>
-        </ul>
-      </div>
-    </section>
-
     <section id="network" class="block reveal" aria-labelledby="network-heading">
       <div class="wrap">
         <div class="network-head">
-          <h2 id="network-heading">Network</h2>
+          <h2 id="network-heading">The network</h2>
           <div class="chapter-pick">
             <label class="visually-hidden" for="chapter-pick">Chapter</label>
             <input id="chapter-pick" type="text" role="combobox" aria-expanded="false" aria-controls="chapter-list" aria-autocomplete="list" autocomplete="off" placeholder="City" spellcheck="false">
@@ -329,7 +154,183 @@
         </div>
       </div>
     </section>
-
+    <section id="western" class="block reveal" aria-labelledby="western-heading">
+      <div class="wrap">
+        <h2 id="western-heading">DevNet at Western</h2>
+        <ul class="chapter-facts">
+          <li><b data-count="2">2</b><span>co-presidents</span></li>
+          <li><b data-count="20" data-suffix="+">20+</b><span>exec</span></li>
+          <li><b data-count="5">5</b><span>first-year reps</span></li>
+          <li><b data-count="50" data-suffix="+">50+</b><span>members</span></li>
+        </ul>
+      </div>
+    </section>
+    <section id="events" class="block reveal" aria-labelledby="events-heading">
+      <div class="wrap">
+        <h2 id="events-heading">Coming up</h2>
+        <ol class="cal">
+          <li class="cal__card cal__card--month">
+            <div class="cal__top">
+              <time datetime="2026-12">December 2026</time>
+              <span class="cal__name">Hackathon</span>
+            </div>
+            <table class="cal__grid">
+              <caption class="visually-hidden">December 2026</caption>
+              <thead>
+                <tr>
+                  <th scope="col"><abbr title="Sunday">Su</abbr></th>
+                  <th scope="col"><abbr title="Monday">Mo</abbr></th>
+                  <th scope="col"><abbr title="Tuesday">Tu</abbr></th>
+                  <th scope="col"><abbr title="Wednesday">We</abbr></th>
+                  <th scope="col"><abbr title="Thursday">Th</abbr></th>
+                  <th scope="col"><abbr title="Friday">Fr</abbr></th>
+                  <th scope="col"><abbr title="Saturday">Sa</abbr></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td></td><td></td><td>1</td><td>2</td><td>3</td><td><time datetime="2026-12-04">4</time></td><td>5</td></tr>
+                <tr><td>6</td><td>7</td><td>8</td><td>9</td><td>10</td><td>11</td><td>12</td></tr>
+                <tr><td>13</td><td>14</td><td>15</td><td>16</td><td>17</td><td>18</td><td>19</td></tr>
+                <tr><td>20</td><td>21</td><td>22</td><td>23</td><td>24</td><td>25</td><td>26</td></tr>
+                <tr><td>27</td><td>28</td><td>29</td><td>30</td><td>31</td><td></td><td></td></tr>
+              </tbody>
+            </table>
+          </li>
+          <li class="cal__card">
+            <time datetime="2027-01">January 2027</time>
+            <span class="cal__name">Kickoff</span>
+          </li>
+          <li class="cal__card">
+            <time datetime="2027-02">Before the end of February 2027</time>
+            <span class="cal__name">Workshop</span>
+          </li>
+          <li class="cal__card">
+            <time datetime="2027-03">Before the end of March 2027</time>
+            <span class="cal__name">Hackathon</span>
+          </li>
+          <li class="cal__card cal__card--range">
+            <time datetime="2027-04">April to September 2027</time>
+            <span class="cal__name">Next year's registration</span>
+          </li>
+        </ol>
+      </div>
+    </section>
+    <section id="recap" class="block" aria-labelledby="recap-heading">
+      <div class="wrap">
+        <div class="recap-head">
+          <div>
+            <h2 id="recap-heading">Event 01</h2>
+            <p class="recap-title">Build with AI Workshop</p>
+            <p class="recap-meta"><time datetime="2026-11-06">Fri Nov 6</time> · Ivey Building Room 1130</p>
+          </div>
+          <p class="recap-count"><b data-recap-count>3</b><span class="visually-hidden"> photos</span></p>
+        </div>
+        <div class="recap-roll">
+          <figure>
+            <img src="/assets/events/01-recap-group.webp" width="1280" height="1600" alt="Members in Ivey Building Room 1130 at the Build with AI Workshop, Friday November 6." loading="lazy" decoding="async">
+          </figure>
+          <figure>
+            <img src="/assets/events/04-truell-slide.webp" width="1200" height="1600" alt="A slide about Michael Truell, Cursor, projected in Ivey Building Room 1130 during the Build with AI Workshop." loading="lazy" decoding="async">
+          </figure>
+          <figure>
+            <img src="/assets/events/05-workshop-title.webp" width="1200" height="1600" alt="The DevNet Workshop title slide in Ivey Building Room 1130." loading="lazy" decoding="async">
+          </figure>
+        </div>
+      </div>
+    </section>
+    <section id="western-socials" class="block reveal" aria-labelledby="western-socials-heading">
+      <div class="wrap">
+        <h2 id="western-socials-heading">DevNet Western</h2>
+        <ul class="social-row">
+          <li><a href="https://www.instagram.com/devnet_western" target="_blank" rel="noopener noreferrer">Instagram</a></li>
+          <li><a href="https://www.linkedin.com/company/dev-network/" target="_blank" rel="noopener noreferrer">LinkedIn</a></li>
+          <li><a href="https://x.com/devnet_x" target="_blank" rel="noopener noreferrer">X</a></li>
+        </ul>
+        <div data-instagram></div>
+      </div>
+    </section>
+    <section id="about" class="block reveal" aria-labelledby="about-heading">
+      <div class="wrap">
+        <h2 id="about-heading">Timeline</h2>
+        <ol class="milestones">
+          <li>
+            <time datetime="2025-09">Sep 2025</time>
+            <span>DevNet founded</span>
+          </li>
+          <li>
+            <time datetime="2025-11">Nov 2025</time>
+            <span>First DevNet-wide workshop, teaching Cursor</span>
+          </li>
+          <li>
+            <time datetime="2025-12">Dec 2025</time>
+            <span>DevNet Western launched</span>
+          </li>
+          <li>
+            <time datetime="2026-02">Feb 2026</time>
+            <span>First hackathon</span>
+          </li>
+        </ol>
+      </div>
+    </section>
+    <section id="landed" class="block reveal" aria-labelledby="landed-heading">
+      <div class="wrap">
+        <h2 id="landed-heading">Where members landed</h2>
+        <div class="logo-marquee">
+        <ul class="logo-strip">
+          <li><img src="/assets/logos/dayforce.svg" alt="Dayforce" height="28"></li>
+          <li><img src="/assets/logos/cibc.svg" alt="CIBC" height="28"></li>
+          <li><img src="/assets/logos/bmo.svg" alt="BMO" height="28"></li>
+          <li><img src="/assets/logos/cohere.svg" alt="Cohere" height="28"></li>
+          <li><img src="/assets/logos/tbpn.svg" alt="TBPN" height="28"></li>
+          <li><img class="logo--ey" src="/assets/logos/ey.svg" alt="EY" height="52"></li>
+          <li><img class="logo--wide" src="/assets/logos/mckinsey.svg" alt="McKinsey &amp; Company" height="24"></li>
+          <li><img class="logo--mark" src="/assets/logos/mercedes.svg" alt="Mercedes-Benz" height="36"></li>
+          <li><img src="/assets/logos/jefferies.svg" alt="Jefferies" height="28"></li>
+          <li><img class="logo--badge" src="/assets/logos/spin-master.png" alt="Spin Master" height="44"></li>
+        </ul>
+        </div>
+      </div>
+    </section>
+    <section id="cursor" class="block" aria-labelledby="cursor-heading">
+      <div class="wrap">
+        <div class="cursor-lockup">
+          <img src="/assets/logos/cursor.svg" alt="" width="40" height="40">
+          <h2 id="cursor-heading">Building with Cursor</h2>
+        </div>
+        <p class="prose cursor-copy">DevNet and Cursor have partnered on more than one hackathon, with credits and at times merch and prizes. On top of that, Cursor speakers have come to club events.</p>
+      </div>
+    </section>
+    <section id="builds" class="block reveal" aria-labelledby="builds-heading">
+      <div class="wrap">
+        <h2 id="builds-heading">What members built</h2>
+        <ul class="build-grid">
+          <li class="build-card">
+            <p class="build-card__who">Kyle Little</p>
+            <h3>Peply</h3>
+          </li>
+          <li class="build-card">
+            <p class="build-card__who">Lior Rubinstein</p>
+            <h3>Bull or Bear</h3>
+          </li>
+          <li class="build-card">
+            <p class="build-card__who">Ethan Perlis</p>
+            <h3>MyCaddy</h3>
+          </li>
+          <li class="build-card">
+            <p class="build-card__who">Jack Minsky and Greg Brenner</p>
+            <h3>Road to the Prem</h3>
+          </li>
+          <li class="build-card">
+            <p class="build-card__who">Greg Brenner</p>
+            <h3>FutureGrad</h3>
+          </li>
+          <li class="build-card">
+            <p class="build-card__who">Jordan Rubinstein</p>
+            <h3>Watchmen Ultra</h3>
+          </li>
+        </ul>
+      </div>
+    </section>
     <section id="faq" class="block reveal" aria-labelledby="faq-heading">
       <div class="wrap">
         <h2 id="faq-heading">Questions</h2>
@@ -361,6 +362,7 @@
         </div>
       </div>
     </section>
+
   </main>
   <footer class="site-footer">
     <div class="site-footer__bar">
