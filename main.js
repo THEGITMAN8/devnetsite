@@ -1615,20 +1615,6 @@ document.addEventListener("DOMContentLoaded", function () {
     window.addEventListener("scroll", paintSpine, { passive: true });
   }
 
-  function retirePastEvents() {
-    var nowMs = Date.now();
-    Array.prototype.slice.call(document.querySelectorAll("#upcoming [data-end], .hub-events [data-end]")).forEach(function (card) {
-      var end = Date.parse(card.getAttribute("data-end"));
-      var past = isFinite(end) && nowMs >= end;
-      card.classList.toggle("is-past", past);
-      card.hidden = past;
-      var rsvpLink = card.querySelector(".rsvp, .btn");
-      if (rsvpLink && past) rsvpLink.hidden = true;
-    });
-  }
-
-  retirePastEvents();
-
   var countdown = document.getElementById("countdown");
   var intro = document.getElementById("event-intro");
   var week = document.getElementById("event-week3");
