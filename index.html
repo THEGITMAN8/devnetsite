@@ -36,7 +36,7 @@
   <script src="/main.js"></script>
 </head>
 <body>
-  <div class="spine" aria-hidden="true"><span class="spine__fill"></span><span class="spine__node" data-spine="network"><b>01</b><span>Network</span></span><span class="spine__node" data-spine="western"><b>02</b><span>Western</span></span><span class="spine__node" data-spine="events"><b>03</b><span>Coming up</span></span><span class="spine__node" data-spine="about"><b>04</b><span>Timeline</span></span></div>
+  <div class="spine" aria-hidden="true"><span class="spine__fill"></span><span class="spine__node" data-spine="network"><b>01</b><span>Network</span></span><span class="spine__node" data-spine="western"><b>02</b><span>Western</span></span><span class="spine__node" data-spine="about"><b>03</b><span>Timeline</span></span><span class="spine__node" data-spine="events"><b>04</b><span>Coming up</span></span></div>
   <a href="#top" class="skip-link">Skip to content</a>
   <header class="site-header" id="site-header">
     <div class="bar">
@@ -191,40 +191,71 @@
     <section id="about" class="block reveal" aria-labelledby="about-heading">
       <div class="wrap">
         <h2 id="about-heading">Timeline</h2>
-        <ol class="milestones">
-          <li>
-            <time datetime="2025-09">Sep 2025</time>
-            <span>DevNet founded</span>
-          </li>
-          <li>
-            <time datetime="2025-11">Nov 2025</time>
-            <span>First DevNet-wide workshop, teaching Cursor</span>
-          </li>
-          <li>
-            <time datetime="2025-12">Dec 2025</time>
-            <span>DevNet Western launched</span>
-          </li>
-          <li>
-            <time datetime="2026-02">Feb 2026</time>
-            <span>First hackathon</span>
-          </li>
-          <li>
-            <time datetime="2026-09">Sep 2026</time>
-            <span>Intro forms</span>
-          </li>
-          <li>
-            <time datetime="2026-09">Sep 2026</time>
-            <span>Intro exec meeting</span>
-          </li>
-          <li>
-            <time datetime="2026-10">Oct 2026</time>
-            <span>Intro club meeting</span>
-          </li>
-          <li>
-            <time datetime="2026-11-06">Nov 6 2026</time>
-            <span>First workshop, Event 01, Build with AI Workshop</span>
-          </li>
-        </ol>
+        <div class="timeline-board">
+          <div class="timeline-spine" aria-hidden="true"></div>
+          <p class="milestones__era">2025</p>
+          <ol class="milestones">
+            <li class="is-start">
+              <span class="milestone__node" aria-hidden="true"></span>
+              <div class="milestone">
+                <time datetime="2025-09">Sep 2025</time>
+                <span>DevNet founded</span>
+              </div>
+            </li>
+            <li>
+              <span class="milestone__node" aria-hidden="true"></span>
+              <div class="milestone">
+                <time datetime="2025-11">Nov 2025</time>
+                <span>First DevNet-wide workshop, teaching Cursor</span>
+              </div>
+            </li>
+            <li class="is-start">
+              <span class="milestone__node" aria-hidden="true"></span>
+              <div class="milestone">
+                <time datetime="2025-12">Dec 2025</time>
+                <span>DevNet Western launched</span>
+              </div>
+            </li>
+          </ol>
+          <p class="milestones__era">2026</p>
+          <ol class="milestones">
+            <li>
+              <span class="milestone__node" aria-hidden="true"></span>
+              <div class="milestone">
+                <time datetime="2026-02">Feb 2026</time>
+                <span>First hackathon</span>
+              </div>
+            </li>
+            <li class="is-start">
+              <span class="milestone__node" aria-hidden="true"></span>
+              <div class="milestone">
+                <time datetime="2026-09">Sep 2026</time>
+                <span>Intro forms</span>
+              </div>
+            </li>
+            <li>
+              <span class="milestone__node" aria-hidden="true"></span>
+              <div class="milestone">
+                <time datetime="2026-09">Sep 2026</time>
+                <span>Intro exec meeting</span>
+              </div>
+            </li>
+            <li class="is-start">
+              <span class="milestone__node" aria-hidden="true"></span>
+              <div class="milestone">
+                <time datetime="2026-10">Oct 2026</time>
+                <span>Intro club meeting</span>
+              </div>
+            </li>
+            <li class="is-now">
+              <span class="milestone__node" aria-hidden="true"></span>
+              <div class="milestone">
+                <time datetime="2026-11-06">Nov 6 2026</time>
+                <span>First workshop, Event 01, Build with AI Workshop</span>
+              </div>
+            </li>
+          </ol>
+        </div>
       </div>
     </section>
     <section id="events" class="block reveal" aria-labelledby="events-heading">
@@ -247,11 +278,17 @@
             <p class="recap-title">Build with AI Workshop</p>
             <p class="recap-meta"><time datetime="2026-11-06">Fri Nov 6</time> · Ivey Building Room 1130</p>
           </div>
-          <p class="recap-count"><b data-recap-count>3</b><span class="visually-hidden"> photos</span></p>
+          <p class="recap-count"><b data-recap-count>5</b><span class="visually-hidden"> photos</span></p>
         </div>
         <div class="recap-roll">
           <figure>
             <img src="/assets/events/01-recap-group.webp" width="1280" height="1600" alt="Members in Ivey Building Room 1130 at the Build with AI Workshop, Friday November 6." loading="lazy" decoding="async">
+          </figure>
+          <figure>
+            <img src="/assets/events/02-debow.webp" width="1280" height="1600" alt="Daniel Debow on a video call during the Build with AI Workshop. He joined virtually." loading="lazy" decoding="async">
+          </figure>
+          <figure>
+            <img src="/assets/events/03-conrad.webp" width="1280" height="1600" alt="Parker Conrad on a video call during the Build with AI Workshop. He joined virtually." loading="lazy" decoding="async">
           </figure>
           <figure>
             <img src="/assets/events/04-truell-slide.webp" width="1200" height="1600" alt="A slide about Michael Truell, Cursor, projected in Ivey Building Room 1130 during the Build with AI Workshop." loading="lazy" decoding="async">
