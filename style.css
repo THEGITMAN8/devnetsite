@@ -5098,10 +5098,13 @@ main .block h2,
 
   .js .reveal,
   .js.motion-on .reveal,
-  .js.motion-on .reveal.is-in {
-    opacity: 1;
-    transform: none;
-    visibility: visible;
+  .js.motion-on .reveal.is-in,
+  #cursor .cursor-lockup,
+  #cursor .cursor-copy,
+  #cursor .cursor-partner {
+    opacity: 1 !important;
+    transform: none !important;
+    visibility: visible !important;
   }
 }
 

@@ -15,7 +15,7 @@
         { "key": "Strict-Transport-Security", "value": "max-age=63072000" },
         {
           "key": "Content-Security-Policy",
-          "value": "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'none'; img-src 'self' data:; font-src 'self'; style-src 'self'; script-src 'self' 'sha256-c4a8863c12b3a4a79bed15add579706a50aad790882d06342159c43e1aa041f3'; frame-src https://www.instagram.com; connect-src 'self'; upgrade-insecure-requests"
+          "value": "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'none'; img-src 'self' data:; font-src 'self'; style-src 'self'; script-src 'self' 'sha256-w/XfGQXgnob9gLBr2tx2+86kZRP12QdMVO2UFA6PMQQ=' 'sha256-imWwWvUg9C8bdEWhdJWs+sIbVs94cEYSRTOrGi6uui8='; frame-src https://www.instagram.com; connect-src 'self'; upgrade-insecure-requests"
         }
       ]
     }
