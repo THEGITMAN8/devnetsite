@@ -4703,38 +4703,16 @@ button.map-cluster.map-label.map-cluster--live { background: var(--london); }
 
 @media (min-width: 1100px) {
   .hero {
-    padding: 72px 0 64px;
+    padding: 80px 0 72px;
   }
 
-  .hero-copy {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
-    column-gap: 64px;
-    align-items: end;
-    max-width: none;
-  }
-
-  .hero-copy picture,
-  .hero-copy h1 {
-    grid-column: 1;
+  .hero .hero-copy {
+    max-width: 640px;
   }
 
   .hero h1 {
-    font-size: 84px;
-    line-height: 84px;
-  }
-
-  .hero-count {
-    grid-column: 2;
-    grid-row: 1 / span 2;
-    align-content: end;
-    justify-items: start;
-    margin: 0 0 8px;
-  }
-
-  .hero-actions {
-    grid-column: 1 / -1;
-    margin-top: 32px;
+    font-size: 80px;
+    line-height: 80px;
   }
 }
 
