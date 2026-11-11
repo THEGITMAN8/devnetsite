@@ -1598,49 +1598,6 @@ document.addEventListener("DOMContentLoaded", function () {
     setCity("");
   });
 
-  var spine = document.querySelector(".spine");
-  function placeSpine() {
-    if (!spine) return;
-    var height = document.documentElement.scrollHeight || 1;
-    document.querySelectorAll(".spine__node").forEach(function (node) {
-      var section = document.getElementById(node.getAttribute("data-spine"));
-      if (!section) return;
-      var top = section.getBoundingClientRect().top + window.scrollY;
-      var ratio = Math.max(0.02, Math.min(0.96, top / height));
-      node.style.top = (ratio * 100) + "%";
-    });
-  }
-  function paintSpine() {
-    if (!spine) return;
-    var about = document.getElementById("about");
-    var quiet = false;
-    if (about) {
-      var rect = about.getBoundingClientRect();
-      quiet = rect.top < window.innerHeight * 0.7 && rect.bottom > 80;
-    }
-    if (reduce) {
-      spine.classList.toggle("is-quiet", quiet);
-      return;
-    }
-    var max = document.documentElement.scrollHeight - window.innerHeight;
-    var step = max <= 0 ? 20 : Math.max(0, Math.min(20, Math.round((window.scrollY / max) * 20)));
-    spine.className = "spine is-p" + step + (quiet ? " is-quiet" : "");
-    document.querySelectorAll(".spine__node").forEach(function (node) {
-      var section = document.getElementById(node.getAttribute("data-spine"));
-      if (!section) return;
-      node.classList.toggle("is-on", section.getBoundingClientRect().top < window.innerHeight * 0.65);
-    });
-  }
-  if (spine) {
-    placeSpine();
-    paintSpine();
-    window.addEventListener("scroll", paintSpine, { passive: true });
-    window.addEventListener("resize", function () {
-      placeSpine();
-      paintSpine();
-    });
-  }
-
   var milestoneItems = Array.prototype.slice.call(document.querySelectorAll("#about .milestones > li"));
   function showMilestones() {
     milestoneItems.forEach(function (item) {

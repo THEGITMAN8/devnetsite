@@ -36,7 +36,6 @@
   <script src="/main.js"></script>
 </head>
 <body>
-  <div class="spine" aria-hidden="true"><span class="spine__fill"></span><span class="spine__node" data-spine="network"><b>01</b><span>Network</span></span><span class="spine__node" data-spine="western"><b>02</b><span>Western</span></span><span class="spine__node" data-spine="about"><b>03</b><span>Timeline</span></span><span class="spine__node" data-spine="events"><b>04</b><span>Coming up</span></span></div>
   <a href="#top" class="skip-link">Skip to content</a>
   <header class="site-header" id="site-header">
     <div class="bar">
@@ -262,11 +261,26 @@
       <div class="wrap">
         <h2 id="events-heading">Coming up</h2>
         <ol class="upcoming">
-          <li><time datetime="2026-12-04">Dec 4 2026</time><span>Hackathon</span></li>
-          <li><time datetime="2027-01">Jan 2027</time><span>Kickoff</span></li>
-          <li><time datetime="2027-02">Feb 2027</time><span>Workshop</span></li>
-          <li><time datetime="2027-03">Mar 2027</time><span>Hackathon</span></li>
-          <li><time datetime="2027-04">Apr to Sep 2027</time><span>Next year's registration</span></li>
+          <li class="is-next">
+            <time datetime="2026-12-04"><span>Dec 4</span><small>2026</small></time>
+            <span class="upcoming__name">Hackathon</span>
+          </li>
+          <li>
+            <time datetime="2027-01"><span>Jan</span><small>2027</small></time>
+            <span class="upcoming__name">Kickoff</span>
+          </li>
+          <li>
+            <time datetime="2027-02"><span>Feb</span><small>2027</small></time>
+            <span class="upcoming__name">Workshop</span>
+          </li>
+          <li>
+            <time datetime="2027-03"><span>Mar</span><small>2027</small></time>
+            <span class="upcoming__name">Hackathon</span>
+          </li>
+          <li>
+            <time datetime="2027-04"><span>Apr to Sep</span><small>2027</small></time>
+            <span class="upcoming__name">Next year's registration</span>
+          </li>
         </ol>
       </div>
     </section>
@@ -285,10 +299,10 @@
             <img src="/assets/events/01-recap-group.webp" width="1280" height="1600" alt="Members in Ivey Building Room 1130 at the Build with AI Workshop, Friday November 6." loading="lazy" decoding="async">
           </figure>
           <figure>
-            <img src="/assets/events/02-debow.webp" width="1280" height="1600" alt="Daniel Debow on a video call during the Build with AI Workshop. He joined virtually." loading="lazy" decoding="async">
+            <img class="recap-photo--speaker" src="/assets/events/02-debow.webp" width="1280" height="1600" alt="Daniel Debow on a video call during the Build with AI Workshop. He joined virtually." loading="lazy" decoding="async">
           </figure>
           <figure>
-            <img src="/assets/events/03-conrad.webp" width="1280" height="1600" alt="Parker Conrad on a video call during the Build with AI Workshop. He joined virtually." loading="lazy" decoding="async">
+            <img class="recap-photo--speaker" src="/assets/events/03-conrad.webp" width="1280" height="1600" alt="Parker Conrad on a video call during the Build with AI Workshop. He joined virtually." loading="lazy" decoding="async">
           </figure>
           <figure>
             <img src="/assets/events/04-truell-slide.webp" width="1200" height="1600" alt="A slide about Michael Truell, Cursor, projected in Ivey Building Room 1130 during the Build with AI Workshop." loading="lazy" decoding="async">
@@ -301,11 +315,21 @@
     </section>
     <section id="cursor" class="block" aria-labelledby="cursor-heading">
       <div class="wrap">
-        <div class="cursor-lockup">
-          <img src="/assets/logos/cursor.svg" alt="" width="40" height="40">
-          <h2 id="cursor-heading">Building with Cursor</h2>
+        <div class="cursor-feature">
+          <div class="cursor-feature__copy">
+            <div class="cursor-lockup">
+              <img src="/assets/logos/cursor.svg" alt="" width="40" height="40">
+              <h2 id="cursor-heading">Building with Cursor</h2>
+            </div>
+            <p class="cursor-copy">Cursor is an AI code editor, now part of SpaceX.</p>
+            <p class="cursor-partner">DevNet and Cursor have partnered on more than one hackathon, with credits and at times merch and prizes. Cursor speakers have come to club events.</p>
+          </div>
+          <ul class="cursor-facts">
+            <li>Hackathons partnered</li>
+            <li>Credits, merch, and prizes</li>
+            <li>Speakers at club events</li>
+          </ul>
         </div>
-        <p class="prose cursor-copy">DevNet and Cursor have partnered on more than one hackathon, with credits and at times merch and prizes. On top of that, Cursor speakers have come to club events.</p>
       </div>
     </section>
     <section id="builds" class="block reveal" aria-labelledby="builds-heading">
