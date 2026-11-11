@@ -294,7 +294,6 @@ document.addEventListener("DOMContentLoaded", function () {
     cluster.appendChild(svgEl("circle", { class: "pin__pulse", r: "7", fill: "none" }));
     cluster.appendChild(svgEl("circle", { class: "pin__hit", r: "22", fill: "none" }));
     cluster.appendChild(svgEl("circle", { class: "pin__dot", r: "6" }));
-    cluster.appendChild(svgEl("line", { class: "pin__leader", x1: "0", y1: "0", x2: "0", y2: "0" }));
     cluster.setAttribute("transform", "translate(" + centroid.x.toFixed(2) + " " + centroid.y.toFixed(2) + ")");
     pinLayer.appendChild(cluster);
 
@@ -519,9 +518,8 @@ document.addEventListener("DOMContentLoaded", function () {
       pins.forEach(function (pin) {
         var id = pin.getAttribute("data-city");
         hidePin(pin, (collapse && !!ONTARIO[id]) || (tightOntario && !ONTARIO[id]));
-        if (!(exploded && ONTARIO[id] && gap < 26)) placeAtGeo(pin);
+        placeAtGeo(pin);
       });
-      if (exploded && gap < 26) separateOntario();
       hidePin(cluster, !collapse);
       if (collapse) {
         cluster.setAttribute("transform", "translate(" + centroid.x.toFixed(2) + " " + centroid.y.toFixed(2) + ")");
@@ -636,11 +634,6 @@ document.addEventListener("DOMContentLoaded", function () {
       pins.concat([cluster]).forEach(function (pin) {
         if (pin.classList.contains("is-hidden")) {
           if (pin._label) pin._label.hidden = true;
-          var hiddenLine = pin.querySelector(".pin__leader");
-          if (hiddenLine) {
-            hiddenLine.setAttribute("x2", "0");
-            hiddenLine.setAttribute("y2", "0");
-          }
           return;
         }
         shown.push(pin);
@@ -653,11 +646,6 @@ document.addEventListener("DOMContentLoaded", function () {
         if (!el || !dot) return;
         if (exploded && view.w < 145 && id !== "ontario" && !ONTARIO[id]) {
           el.hidden = true;
-          var farLine = pin.querySelector(".pin__leader");
-          if (farLine) {
-            farLine.setAttribute("x2", "0");
-            farLine.setAttribute("y2", "0");
-          }
           return;
         }
         el.hidden = false;
@@ -671,101 +659,113 @@ document.addEventListener("DOMContentLoaded", function () {
           el.hidden = true;
           return;
         }
-        var pref = bias[id] || [0, -1];
-        var lx = cx + pref[0] * (w * 0.5 + 12);
-        var ly = cy + pref[1] * (h * 0.5 + 14);
-        items.push({ id: id, pin: pin, el: el, w: w, h: h, cx: cx, cy: cy, x: lx - w / 2, y: ly - h / 2 });
+        items.push({ id: id, el: el, w: w, h: h, cx: cx, cy: cy });
       });
-      var controls = controlBox();
-      var edge = 4;
-      var guard;
-      for (guard = 0; guard < 80; guard++) {
-        var moved = false;
-        var a;
-        var b;
-        for (var i = 0; i < items.length; i++) {
-          for (var j = i + 1; j < items.length; j++) {
-            a = items[i];
-            b = items[j];
-            var overlapX = Math.min(a.x + a.w + 6, b.x + b.w + 6) - Math.max(a.x, b.x);
-            var overlapY = Math.min(a.y + a.h + 6, b.y + b.h + 6) - Math.max(a.y, b.y);
-            if (overlapX <= 0 || overlapY <= 0) continue;
-            if (overlapX < overlapY) {
-              var dir = a.cx <= b.cx ? -1 : 1;
-              var push = overlapX / 2 + 0.5;
-              a.x += dir * push;
-              b.x -= dir * push;
+      var gap = 8;
+      var dirs = [[1, 0], [-1, 0], [0, -1], [0, 1], [1, -1], [-1, -1], [1, 1], [-1, 1]];
+      function candidate(it, dir) {
+        var ox = dir[0] * (it.w / 2 + gap);
+        var oy = dir[1] * (it.h / 2 + gap);
+        if (dir[0] && dir[1]) {
+          ox *= 0.8;
+          oy *= 0.8;
+        }
+        return { x: it.cx + ox - it.w / 2, y: it.cy + oy - it.h / 2 };
+      }
+      function overlaps(a, b, pad) {
+        return a.x < b.x + b.w + pad && a.x + a.w + pad > b.x && a.y < b.y + b.h + pad && a.y + a.h + pad > b.y;
+      }
+      function coversDot(box, it) {
+        var i;
+        for (i = 0; i < items.length; i++) {
+          var pin = items[i];
+          if (pin === it) continue;
+          if (box.x < pin.cx + 8 && box.x + it.w > pin.cx - 8 && box.y < pin.cy + 8 && box.y + it.h > pin.cy - 8) return true;
+        }
+        return false;
+      }
+      var placed = [];
+      var meanX = 0;
+      var meanY = 0;
+      items.forEach(function (it) { meanX += it.cx; meanY += it.cy; });
+      meanX /= items.length || 1;
+      meanY /= items.length || 1;
+      items.forEach(function (it) {
+        var choice = null;
+        var outwardX = it.cx - meanX;
+        var outwardY = it.cy - meanY;
+        var order = dirs.slice();
+        if (Math.hypot(outwardX, outwardY) > 6) {
+          order.sort(function (a, b) {
+            var da = Math.hypot(a[0] - outwardX, a[1] - outwardY);
+            var db = Math.hypot(b[0] - outwardX, b[1] - outwardY);
+            return da - db;
+          });
+        }
+        var d;
+        for (d = 0; d < order.length; d++) {
+          var box = candidate(it, order[d]);
+          var taken = false;
+          var p;
+          for (p = 0; p < placed.length; p++) {
+            if (overlaps(box, placed[p], 4)) taken = true;
+          }
+          if (taken || coversDot(box, it)) continue;
+          if (box.x < 2 || box.y < 2 || box.x + it.w > vp.width - 2 || box.y + it.h > vp.height - 2) continue;
+          choice = box;
+          break;
+        }
+        if (!choice) choice = candidate(it, [1, 0]);
+        it.homeX = choice.x;
+        it.homeY = choice.y;
+        it.x = choice.x;
+        it.y = choice.y;
+        placed.push(it);
+      });
+      var step;
+      for (step = 0; step < 12; step++) {
+        var i;
+        var j;
+        for (i = 0; i < placed.length; i++) {
+          for (j = i + 1; j < placed.length; j++) {
+            var a = placed[i];
+            var b = placed[j];
+            var ox = Math.min(a.x + a.w + 4, b.x + b.w) - Math.max(a.x, b.x);
+            var oy = Math.min(a.y + a.h + 4, b.y + b.h) - Math.max(a.y, b.y);
+            if (ox <= 0 || oy <= 0) continue;
+            if (ox < oy) {
+              var push = ox / 2 + 0.5;
+              if (a.cx <= b.cx) { a.x -= push; b.x += push; }
+              else { a.x += push; b.x -= push; }
             } else {
-              var vdir = a.cy <= b.cy ? -1 : 1;
-              var vpush = overlapY / 2 + 0.5;
-              a.y += vdir * vpush;
-              b.y -= vdir * vpush;
+              var vpush = oy / 2 + 0.5;
+              if (a.cy <= b.cy) { a.y -= vpush; b.y += vpush; }
+              else { a.y += vpush; b.y -= vpush; }
             }
-            moved = true;
           }
         }
-        items.forEach(function (it) {
-          var left = it.x;
-          var top = it.y;
-          items.forEach(function (other) {
-            var hx = Math.min(it.x + it.w, other.cx + 11) - Math.max(it.x, other.cx - 11);
-            var hy = Math.min(it.y + it.h, other.cy + 11) - Math.max(it.y, other.cy - 11);
-            if (hx <= 0 || hy <= 0) return;
-            var dx = (it.x + it.w / 2) - other.cx;
-            var dy = (it.y + it.h / 2) - other.cy;
-            if (Math.abs(dx) >= Math.abs(dy)) it.x += dx >= 0 ? hx + 3 : -(hx + 3);
-            else it.y += dy >= 0 ? hy + 3 : -(hy + 3);
-            moved = true;
-          });
-          if (controls) {
-            var cx0 = Math.min(it.x + it.w, controls.x + controls.w) - Math.max(it.x, controls.x);
-            var cy0 = Math.min(it.y + it.h, controls.y + controls.h) - Math.max(it.y, controls.y);
-            if (cx0 > 0 && cy0 > 0) {
-              it.y = controls.y > vp.height / 2 ? controls.y - it.h - 6 : controls.y + controls.h + 6;
-              moved = true;
-            }
+        placed.forEach(function (it) {
+          var cx = it.x + it.w / 2;
+          var cy = it.y + it.h / 2;
+          var dx = cx - it.cx;
+          var dy = cy - it.cy;
+          var maxDist = Math.max(it.w, it.h) / 2 + gap + 14;
+          var dist = Math.hypot(dx, dy) || 1;
+          if (dist > maxDist) {
+            cx = it.cx + dx / dist * maxDist;
+            cy = it.cy + dy / dist * maxDist;
+            it.x = cx - it.w / 2;
+            it.y = cy - it.h / 2;
           }
-          if (it.x < edge) it.x = edge;
-          if (it.y < edge) it.y = edge;
-          if (it.x + it.w > vp.width - edge) it.x = Math.max(edge, vp.width - edge - it.w);
-          if (it.y + it.h > vp.height - edge) it.y = Math.max(edge, vp.height - edge - it.h);
-          if (it.x !== left || it.y !== top) moved = true;
+          if (it.x < it.cx && it.x + it.w > it.cx && it.y < it.cy && it.y + it.h > it.cy) {
+            it.x = it.homeX;
+            it.y = it.homeY;
+          }
         });
-        if (!moved) break;
       }
-      var ctm = svg.getScreenCTM();
-      items.forEach(function (it) {
+      placed.forEach(function (it) {
         it.el.style.left = (it.x + it.w / 2) + "px";
         it.el.style.top = (it.y + it.h / 2) + "px";
-        var line = it.pin.querySelector(".pin__leader");
-        if (!line || !ctm) return;
-        var lx = it.x + it.w / 2;
-        var ly = it.y + it.h / 2;
-        var dx = lx - it.cx;
-        var dy = ly - it.cy;
-        var dist = Math.hypot(dx, dy);
-        if (dist < 16) {
-          line.setAttribute("x2", "0");
-          line.setAttribute("y2", "0");
-          return;
-        }
-        var sxScale = Math.abs(dx) > 0.01 ? (it.w / 2) / Math.abs(dx) : 1;
-        var syScale = Math.abs(dy) > 0.01 ? (it.h / 2) / Math.abs(dy) : 1;
-        var scale = Math.min(sxScale, syScale, 0.92);
-        var endX = vp.left + lx - dx * scale;
-        var endY = vp.top + ly - dy * scale;
-        var pt = svg.createSVGPoint();
-        pt.x = endX;
-        pt.y = endY;
-        var local = pt.matrixTransform(ctm.inverse());
-        var origin = svg.createSVGPoint();
-        origin.x = vp.left + it.cx;
-        origin.y = vp.top + it.cy;
-        var o = origin.matrixTransform(ctm.inverse());
-        line.setAttribute("x1", "0");
-        line.setAttribute("y1", "0");
-        line.setAttribute("x2", (local.x - o.x).toFixed(2));
-        line.setAttribute("y2", (local.y - o.y).toFixed(2));
       });
     }
 
@@ -1498,9 +1498,12 @@ document.addEventListener("DOMContentLoaded", function () {
     if (flag) flag.hidden = !flagship;
     card.hidden = false;
     card._pin = pin;
+    var westernLink = card.querySelector("[data-card-western]");
+    if (westernLink) westernLink.hidden = pin.getAttribute("data-city") !== "london";
     if (readout) {
       var bits = [name, country];
       if (flagship) bits.push("Flagship");
+      if (pin.getAttribute("data-city") === "london") bits.push("Western chapter");
       readout.textContent = bits.filter(Boolean).join(", ");
     }
     positionChapterCard();
@@ -1550,6 +1553,10 @@ document.addEventListener("DOMContentLoaded", function () {
     button.addEventListener("click", function () {
       var id = button.getAttribute("data-city") || "";
       if (!id) return;
+      if (id === "london") {
+        window.location.href = "/western";
+        return;
+      }
       var pin = document.querySelector('.map-stage .pin[data-city="' + id + '"]');
       if (lockedCity === id) {
         lockedCity = "";
@@ -1598,21 +1605,56 @@ document.addEventListener("DOMContentLoaded", function () {
     setCity("");
   });
 
-  var spine = document.querySelector(".spine");
-  function paintSpine() {
-    if (!spine || reduce) return;
-    var max = document.documentElement.scrollHeight - window.innerHeight;
-    var step = max <= 0 ? 20 : Math.max(0, Math.min(20, Math.round((window.scrollY / max) * 20)));
-    spine.className = "spine is-p" + step;
-    document.querySelectorAll(".spine__node").forEach(function (node) {
-      var section = document.getElementById(node.getAttribute("data-spine"));
-      if (!section) return;
-      node.classList.toggle("is-on", section.getBoundingClientRect().top < window.innerHeight * 0.65);
+  var milestoneItems = Array.prototype.slice.call(document.querySelectorAll("#about .milestones > li"));
+  function showMilestones() {
+    milestoneItems.forEach(function (item) {
+      item.classList.add("is-in");
     });
   }
-  if (spine && !reduce) {
-    paintSpine();
-    window.addEventListener("scroll", paintSpine, { passive: true });
+  function revealMilestones() {
+    if (!milestoneItems.length) return;
+    var batch = [];
+    milestoneItems.forEach(function (item) {
+      if (item.classList.contains("is-in") || item.getAttribute("data-playing") === "1") return;
+      var rect = item.getBoundingClientRect();
+      if (rect.top > window.innerHeight * 0.92) return;
+      var passed = rect.bottom < 48;
+      if (reduce || !window.gsap || passed) {
+        if (window.gsap) window.gsap.set(item, { opacity: 1, y: 0, clearProps: "transform" });
+        item.classList.add("is-in");
+        return;
+      }
+      item.setAttribute("data-playing", "1");
+      batch.push(item);
+    });
+    if (!batch.length || !window.gsap) {
+      if (batch.length) showMilestones();
+      return;
+    }
+    window.gsap.to(batch, {
+      opacity: 1,
+      y: 0,
+      duration: 0.24,
+      stagger: 0.035,
+      ease: "power1.out",
+      overwrite: "auto",
+      onComplete: function () {
+        batch.forEach(function (item) {
+          item.classList.add("is-in");
+          item.removeAttribute("data-playing");
+          window.gsap.set(item, { clearProps: "opacity,transform" });
+        });
+      }
+    });
+  }
+  if (milestoneItems.length) {
+    if (reduce || !window.gsap) showMilestones();
+    else {
+      window.gsap.set(milestoneItems, { opacity: 0, y: 8 });
+      revealMilestones();
+      window.addEventListener("scroll", revealMilestones, { passive: true });
+      window.addEventListener("resize", revealMilestones);
+    }
   }
 
   var countdown = document.getElementById("countdown");
@@ -1767,96 +1809,5 @@ document.addEventListener("DOMContentLoaded", function () {
     }, { passive: true });
   }
 
-  var pickInput = document.getElementById("chapter-pick");
-  var pickList = document.getElementById("chapter-list");
-  if (pickInput && pickList) {
-    var chapterOptions = Array.prototype.map.call(document.querySelectorAll(".city-row[data-city]"), function (row) {
-      return { id: row.getAttribute("data-city"), name: row.textContent.replace(/\s+/g, " ").trim() };
-    });
-    var activeIndex = -1;
-    function shownOptions(filter) {
-      var query = (filter || "").trim().toLowerCase();
-      return chapterOptions.filter(function (opt) {
-        return !query || opt.name.toLowerCase().indexOf(query) !== -1 || opt.id.indexOf(query) !== -1;
-      });
-    }
-    function renderPick(filter) {
-      var shown = shownOptions(filter);
-      pickList.replaceChildren();
-      shown.forEach(function (opt, i) {
-        var item = document.createElement("li");
-        item.id = "chapter-opt-" + opt.id;
-        item.setAttribute("role", "option");
-        item.setAttribute("data-city", opt.id);
-        item.setAttribute("aria-selected", i === activeIndex ? "true" : "false");
-        item.textContent = opt.name;
-        pickList.appendChild(item);
-      });
-      var open = shown.length > 0;
-      pickList.hidden = !open;
-      pickInput.setAttribute("aria-expanded", open ? "true" : "false");
-      if (activeIndex >= 0 && shown[activeIndex]) pickInput.setAttribute("aria-activedescendant", "chapter-opt-" + shown[activeIndex].id);
-      else pickInput.removeAttribute("aria-activedescendant");
-    }
-    function chooseChapter(id) {
-      var row = document.querySelector('.city-row[data-city="' + id + '"]');
-      var pin = document.querySelector('.map-stage .pin[data-city="' + id + '"]');
-      if (!row) return;
-      if (!pin || pin.getAttribute("aria-pressed") !== "true") row.click();
-      var match = chapterOptions.filter(function (opt) { return opt.id === id; })[0];
-      pickInput.value = match ? match.name : "";
-      pickList.hidden = true;
-      pickInput.setAttribute("aria-expanded", "false");
-      var viewport = document.querySelector(".map-viewport");
-      if (viewport) viewport.scrollIntoView({ block: "center", behavior: reduce ? "auto" : "smooth" });
-    }
-    pickInput.addEventListener("focus", function () {
-      activeIndex = -1;
-      renderPick(pickInput.value);
-    });
-    pickInput.addEventListener("input", function () {
-      activeIndex = -1;
-      renderPick(pickInput.value);
-    });
-    pickInput.addEventListener("keydown", function (event) {
-      var items = pickList.querySelectorAll('[role="option"]');
-      if (event.key === "ArrowDown" || event.key === "ArrowUp") {
-        event.preventDefault();
-        if (!items.length) renderPick(pickInput.value);
-        items = pickList.querySelectorAll('[role="option"]');
-        if (!items.length) return;
-        activeIndex += event.key === "ArrowDown" ? 1 : -1;
-        if (activeIndex < 0) activeIndex = items.length - 1;
-        if (activeIndex >= items.length) activeIndex = 0;
-        renderPick(pickInput.value);
-        return;
-      }
-      if (event.key === "Enter") {
-        event.preventDefault();
-        var current = activeIndex >= 0 ? shownOptions(pickInput.value)[activeIndex] : shownOptions(pickInput.value)[0];
-        if (!current) {
-          var typed = pickInput.value.trim().toLowerCase();
-          current = chapterOptions.filter(function (opt) { return opt.name.toLowerCase() === typed; })[0];
-        }
-        if (current) chooseChapter(current.id);
-        return;
-      }
-      if (event.key === "Escape") {
-        pickList.hidden = true;
-        pickInput.setAttribute("aria-expanded", "false");
-      }
-    });
-    pickList.addEventListener("pointerdown", function (event) {
-      var opt = event.target.closest("[data-city]");
-      if (!opt) return;
-      event.preventDefault();
-      chooseChapter(opt.getAttribute("data-city"));
-    });
-    document.addEventListener("pointerdown", function (event) {
-      if (event.target.closest(".chapter-pick")) return;
-      pickList.hidden = true;
-      pickInput.setAttribute("aria-expanded", "false");
-    });
-  }
 
 });

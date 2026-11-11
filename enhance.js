@@ -238,26 +238,6 @@ function mountMotion() {
     );
   }
 
-  var cursorBits = document.querySelectorAll(".cursor-lockup, .cursor-copy");
-  if (cursorBits.length) {
-    gsap.fromTo(
-      cursorBits,
-      { autoAlpha: 0, y: 20 },
-      {
-        autoAlpha: 1,
-        y: 0,
-        duration: 0.7,
-        stagger: 0.12,
-        ease: "power2.out",
-        scrollTrigger: {
-          trigger: "#cursor",
-          start: "top 82%",
-          once: true
-        }
-      }
-    );
-  }
-
   if (typeof gsap.utils.toArray === "function") {
     gsap.utils.toArray("main .reveal").forEach(function (section) {
       gsap.fromTo(
