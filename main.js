@@ -230,8 +230,8 @@ document.addEventListener("DOMContentLoaded", function () {
     var parts = (svg.getAttribute("viewBox") || "0 0 1000 598.9").split(/[\s,]+/).map(Number);
     var outer = { x: parts[0] || 0, y: parts[1] || 0, w: parts[2] || 1000, h: parts[3] || 598.9 };
     var aspect = outer.w / outer.h;
-    var beltW = 230;
-    var belt = { x: 548, y: 188, w: beltW, h: beltW / aspect };
+    var beltW = 228;
+    var belt = { x: 544, y: 176, w: beltW, h: beltW / aspect };
     var minW = 78;
     var view = { x: belt.x, y: belt.y, w: belt.w, h: belt.h };
     var pins = Array.prototype.slice.call(svg.querySelectorAll(".na-pin"));
@@ -701,6 +701,9 @@ document.addEventListener("DOMContentLoaded", function () {
             var db = Math.hypot(b[0] - outwardX, b[1] - outwardY);
             return da - db;
           });
+        }
+        if (it.id === "toronto") {
+          order = [[-1, -1], [-1, 0], [0, -1]].concat(order);
         }
         var d;
         for (d = 0; d < order.length; d++) {
